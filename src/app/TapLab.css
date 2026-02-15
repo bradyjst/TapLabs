@@ -18,3 +18,22 @@
 	color: var(--text-muted);
 	font-size: 14px;
 }
+
+/* 🔥 Mobile */
+@media (max-width: 768px) {
+	.app {
+		flex-direction: column;
+	}
+
+	.sidebar {
+		width: 100%;
+		border-right: none;
+		border-top: 1px solid var(--border);
+		order: 2; /* sidebar moves to bottom */
+	}
+
+	.main {
+		padding: 16px;
+		order: 1;
+	}
+}

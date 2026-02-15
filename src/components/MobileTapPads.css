@@ -1,0 +1,36 @@
+/* Default: hidden everywhere */
+.tap-pads {
+	display: none;
+}
+
+/* 🔥 Mobile only */
+@media (max-width: 768px) {
+	.tap-pads {
+		display: flex;
+		margin-top: auto;
+		height: 300px;
+		width: 100%;
+	}
+
+	.tap-button {
+		flex: 1;
+		border: none;
+		background: var(--accent-soft);
+		font-size: 20px;
+		color: var(--text-primary);
+	}
+
+	.tap-button.left {
+		border-right: 1px solid var(--border);
+	}
+
+	.tap-button:active {
+		background: var(--accent);
+	}
+
+	html,
+	body {
+		overscroll-behavior: none;
+		touch-action: manipulation;
+	}
+}

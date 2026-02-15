@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar";
 import Sidebar from "../sidebar/Sidebar";
+import MobileTapPads from "../components/MobileTapPads";
 import "./TapLab.css";
 
 export default function TapLabApp() {
@@ -20,6 +21,9 @@ export default function TapLabApp() {
 		od,
 		snapDivisor,
 	});
+
+	// 🔥 Bridge ref so mobile + keyboard use same tap logic
+	const tapRef = useRef<() => void>(() => {});
 
 	return (
 		<div className="app">
@@ -48,9 +52,17 @@ export default function TapLabApp() {
 					registerMiss={engine.registerMiss}
 					getGrade={engine.getGrade}
 					windows={engine.hitWindows}
+					externalTapRef={tapRef} // 🔥 add this prop
 				/>
 
 				<URBar recentOffsetsMsRef={engine.live.recentOffsetsMsRef} od={od} />
+				<MobileTapPads
+					onTap={() => {
+						// fake keyboard trigger
+						const e = new KeyboardEvent("keydown", { code: "KeyZ" });
+						window.dispatchEvent(e);
+					}}
+				/>
 
 				<StatsPanel
 					alignmentSD={engine.live.alignmentStdDevRef.current}

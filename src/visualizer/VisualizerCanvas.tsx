@@ -14,6 +14,9 @@ type Props = {
 	registerMiss: () => void;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
+
+	// 🔥 NEW
+	externalTapRef?: React.MutableRefObject<() => void>;
 };
 
 type ActiveNote = {
@@ -30,26 +33,26 @@ export default function VisualizerCanvas({
 	registerMiss,
 	getGrade,
 	windows,
+	externalTapRef, // 🔥 receive it
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
-
-	const activeNotesRef = useRef<ActiveNote[]>([]);
-	const noteIdRef = useRef(0);
-	const lastHitTimeRef = useRef(0);
+	const lastHitTimeRef = useRef<number>(0);
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext("2d")!;
 
-		const travelTime = msPerGrid * 6; // 🔥 slightly longer preempt = better feel
+		const travelTime = msPerGrid * 4;
 
+		let activeNotes: ActiveNote[] = [];
+		let noteId = 0;
+
+		// 🔥 Unified tap logic
 		const handleTap = () => {
 			if (!isRunning) return;
 
 			const now = performance.now();
-			const activeNotes = activeNotesRef.current;
-
 			if (activeNotes.length === 0) return;
 
 			let closestIndex = -1;
@@ -71,11 +74,17 @@ export default function VisualizerCanvas({
 
 			if (grade !== null) {
 				registerHit(offset, grade);
-				lastHitTimeRef.current = now;
+				lastHitTimeRef.current = performance.now();
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
 
+		// 🔥 Wire mobile tap bridge
+		if (externalTapRef) {
+			externalTapRef.current = handleTap;
+		}
+
+		// Keyboard
 		const keyHandler = (e: KeyboardEvent) => {
 			if (e.code === "KeyZ" || e.code === "KeyX") {
 				handleTap();
@@ -115,38 +124,22 @@ export default function VisualizerCanvas({
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
-			// Hit flash
-			const flashDuration = 120;
-			const timeSinceHit = now - lastHitTimeRef.current;
-
-			if (timeSinceHit < flashDuration) {
-				const alpha = 1 - timeSinceHit / flashDuration;
-				ctx.strokeStyle = `rgba(34,211,238,${alpha})`;
-				ctx.lineWidth = 8;
-				ctx.beginPath();
-				ctx.arc(centerX, centerY, 34, 0, Math.PI * 2);
-				ctx.stroke();
-			}
-
+			// Spawn
 			if (isRunning) {
-				const activeNotes = activeNotesRef.current;
-
-				// 🔥 Spawn notes when within preempt window
 				while (
 					upcomingNotesRef.current.length > 0 &&
-					now >= upcomingNotesRef.current[0] - travelTime
+					upcomingNotesRef.current[0] - travelTime <= now
 				) {
 					const scheduledTime = upcomingNotesRef.current.shift()!;
 
 					activeNotes.push({
-						id: noteIdRef.current++,
+						id: noteId++,
 						scheduledTime,
 						spawnTime: scheduledTime - travelTime,
 					});
 				}
 
-				// 🔥 Update & render notes
-				activeNotesRef.current = activeNotes.filter((note) => {
+				activeNotes = activeNotes.filter((note) => {
 					if (now - note.scheduledTime > windows.MEH) {
 						registerMiss();
 						return false;
@@ -155,7 +148,7 @@ export default function VisualizerCanvas({
 					const progress = (now - note.spawnTime) / travelTime;
 
 					if (progress < 0) return true;
-					if (progress > 1.2) return false;
+					if (progress >= 1.2) return false;
 
 					const x = startX + progress * (centerX - startX);
 
@@ -186,15 +179,8 @@ export default function VisualizerCanvas({
 		registerMiss,
 		getGrade,
 		windows,
+		externalTapRef,
 	]);
 
-	return (
-		<canvas
-			ref={canvasRef}
-			style={{
-				width: "100%",
-				height: "250px",
-			}}
-		/>
-	);
+	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;
 }
