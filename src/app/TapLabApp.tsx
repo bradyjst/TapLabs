@@ -1,116 +1,63 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
+import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar";
+import Sidebar from "../sidebar/Sidebar";
+import "./TapLab.css";
 
 export default function TapLabApp() {
-	const [bpm, setBpm] = useState(100);
-	const [subdivision, setSubdivision] = useState(1);
+	const [bpm, setBpm] = useState(150);
 	const [burstCount, setBurstCount] = useState(5);
-	const [gapBeats, setGapBeats] = useState(1);
+	const [gapBeats, setGapBeats] = useState(2);
+	const [od, setOd] = useState(8);
+	const [snapDivisor, setSnapDivisor] = useState<2 | 3 | 4 | 6 | 8>(4);
 
 	const engine = useTapEngine({
-		bpm: bpm,
-		subdivision: subdivision,
-		burstCount: burstCount,
-		gapBeats: gapBeats,
+		bpm,
+		burstCount,
+		gapBeats,
+		od,
+		snapDivisor,
 	});
 
-	useEffect(() => {
-		const onKey = (e: KeyboardEvent) => {
-			if (e.code === "Space") {
-				if (engine.isRunning) {
-					engine.stop();
-				} else {
-					engine.start();
-				}
-			}
-		};
-
-		window.addEventListener("keydown", onKey);
-		return () => window.removeEventListener("keydown", onKey);
-	}, [engine]);
-
-	const totalHits =
-		engine.live.hit300Ref.current +
-		engine.live.hit100Ref.current +
-		engine.live.hit50Ref.current;
-
 	return (
-		<div style={{ padding: 40 }}>
-			<VisualizerCanvas
-				msPerGrid={engine.msPerGrid}
-				sessionStartRef={engine.live.sessionStartRef}
-				upcomingNotesRef={engine.upcomingNotesRef} // 🔥 add this
+		<div className="app">
+			<Sidebar
+				bpm={bpm}
+				setBpm={setBpm}
+				burstCount={burstCount}
+				setBurstCount={setBurstCount}
+				gapBeats={gapBeats}
+				setGapBeats={setGapBeats}
+				od={od}
+				setOd={setOd}
+				snapDivisor={snapDivisor}
+				setSnapDivisor={setSnapDivisor}
 				isRunning={engine.isRunning}
-				registerHit={engine.registerHit}
-				registerMiss={engine.registerMiss}
+				start={engine.start}
+				stop={engine.stop}
 			/>
 
-			<URBar recentOffsetsMsRef={engine.live.recentOffsetsMsRef} />
+			<main className="main">
+				<VisualizerCanvas
+					msPerGrid={engine.msPerGrid}
+					upcomingNotesRef={engine.upcomingNotesRef}
+					isRunning={engine.isRunning}
+					registerHit={engine.registerHit}
+					registerMiss={engine.registerMiss}
+					getGrade={engine.getGrade}
+					windows={engine.hitWindows}
+				/>
 
-			<h1>TapLabs Engine Test</h1>
-			<p>Running: {engine.isRunning ? "Yes" : "No"}</p>
-			<p>Taps: {totalHits}</p>
-			<p>Last Offset: {engine.live.lastOffsetRef.current?.toFixed(2)}</p>
-			<p>
-				Alignment SD: {engine.live.alignmentStdDevRef.current.toFixed(2)} ms
-			</p>
+				<URBar recentOffsetsMsRef={engine.live.recentOffsetsMsRef} od={od} />
 
-			<p>Press Space to start/stop. Tap Z/X.</p>
-
-			<aside>
-				<h3>Settings</h3>
-
-				<label>
-					BPM: {bpm}
-					<input
-						type="text"
-						min={60}
-						max={300}
-						value={bpm}
-						onChange={(e) => setBpm(Number(e.target.value))}
-					/>
-				</label>
-
-				<label>
-					Subdivision:
-					<select
-						value={subdivision}
-						onChange={(e) => setSubdivision(Number(e.target.value))}
-					>
-						<option value={1}>Quarter</option>
-					</select>
-				</label>
-
-				<div style={{ marginTop: 16 }}>
-					<button onClick={() => engine.start()}>Start</button>
-					<button onClick={() => engine.stop()}>Stop</button>
-				</div>
-
-				<label>
-					Burst Count:
-					<input
-						type="number"
-						min={1}
-						max={16}
-						value={burstCount}
-						onChange={(e) => setBurstCount(Number(e.target.value))}
-					/>
-				</label>
-
-				<label>
-					Gap (beats):
-					<input
-						type="number"
-						step="0.25"
-						min={0.25}
-						max={4}
-						value={gapBeats}
-						onChange={(e) => setGapBeats(Number(e.target.value))}
-					/>
-				</label>
-			</aside>
+				<StatsPanel
+					alignmentSD={engine.live.alignmentStdDevRef.current}
+					unstableRate={engine.live.unstableRateRef.current}
+					meanOffset={engine.live.meanOffsetRef.current}
+				/>
+			</main>
 		</div>
 	);
 }

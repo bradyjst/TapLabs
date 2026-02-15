@@ -1,0 +1,75 @@
+.sidebar {
+	width: 260px;
+	padding: 24px;
+	background: var(--surface);
+	border-right: 1px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.sidebar h2 {
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.section label {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.sidebar input[type="range"] {
+	accent-color: var(--accent);
+}
+
+.sidebar input,
+.sidebar select {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	color: var(--text-primary);
+	padding: 6px 8px;
+	border-radius: 6px;
+	transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar input:focus {
+	outline: none;
+	border-color: var(--accent);
+	box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.buttonSection {
+	margin-top: auto;
+}
+
+.button {
+	padding: 10px 16px;
+	border-radius: 6px;
+	border: none;
+	cursor: pointer;
+	transition: transform 0.08s ease, background 0.2s ease;
+}
+
+.button:active {
+	transform: scale(0.98);
+}
+
+.start {
+	background: var(--accent);
+	color: black;
+}
+
+.stop {
+	background: var(--late);
+	color: white;
+}

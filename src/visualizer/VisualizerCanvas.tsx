@@ -1,13 +1,19 @@
 import { useEffect, useRef } from "react";
-import { HIT_WINDOWS } from "../engine/timingConfig";
+
+type HitWindows = {
+	PERFECT: number;
+	GOOD: number;
+	MEH: number;
+};
 
 type Props = {
-	msPerGrid: number; // still used to calculate travelTime
-	sessionStartRef: React.RefObject<number>;
+	msPerGrid: number;
 	upcomingNotesRef: React.RefObject<number[]>;
 	isRunning: boolean;
 	registerHit: (offset: number, grade: 300 | 100 | 50) => void;
 	registerMiss: () => void;
+	getGrade: (offset: number) => 300 | 100 | 50 | null;
+	windows: HitWindows;
 };
 
 type ActiveNote = {
@@ -22,23 +28,28 @@ export default function VisualizerCanvas({
 	isRunning,
 	registerHit,
 	registerMiss,
+	getGrade,
+	windows,
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
+
+	const activeNotesRef = useRef<ActiveNote[]>([]);
+	const noteIdRef = useRef(0);
+	const lastHitTimeRef = useRef(0);
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext("2d")!;
 
-		const travelTime = msPerGrid * 4; // visual preempt distance
-
-		let activeNotes: ActiveNote[] = [];
-		let noteId = 0;
+		const travelTime = msPerGrid * 6; // 🔥 slightly longer preempt = better feel
 
 		const handleTap = () => {
 			if (!isRunning) return;
 
 			const now = performance.now();
+			const activeNotes = activeNotesRef.current;
+
 			if (activeNotes.length === 0) return;
 
 			let closestIndex = -1;
@@ -56,16 +67,11 @@ export default function VisualizerCanvas({
 
 			const note = activeNotes[closestIndex];
 			const offset = now - note.scheduledTime;
-			const abs = Math.abs(offset);
-
-			let grade: 300 | 100 | 50 | null = null;
-
-			if (abs <= HIT_WINDOWS.PERFECT) grade = 300;
-			else if (abs <= HIT_WINDOWS.GOOD) grade = 100;
-			else if (abs <= HIT_WINDOWS.MEH) grade = 50;
+			const grade = getGrade(offset);
 
 			if (grade !== null) {
 				registerHit(offset, grade);
+				lastHitTimeRef.current = now;
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
@@ -97,34 +103,51 @@ export default function VisualizerCanvas({
 			const startX = width * 0.1;
 
 			ctx.clearRect(0, 0, width, height);
-			ctx.fillStyle = "#111";
+
+			// Background
+			ctx.fillStyle = "#0f172a";
 			ctx.fillRect(0, 0, width, height);
 
 			// Circle of truth
-			ctx.strokeStyle = "#fff";
+			ctx.strokeStyle = "#ffffff";
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
+			// Hit flash
+			const flashDuration = 120;
+			const timeSinceHit = now - lastHitTimeRef.current;
+
+			if (timeSinceHit < flashDuration) {
+				const alpha = 1 - timeSinceHit / flashDuration;
+				ctx.strokeStyle = `rgba(34,211,238,${alpha})`;
+				ctx.lineWidth = 8;
+				ctx.beginPath();
+				ctx.arc(centerX, centerY, 34, 0, Math.PI * 2);
+				ctx.stroke();
+			}
+
 			if (isRunning) {
-				// 🔥 Spawn based on timestamp queue
+				const activeNotes = activeNotesRef.current;
+
+				// 🔥 Spawn notes when within preempt window
 				while (
 					upcomingNotesRef.current.length > 0 &&
-					upcomingNotesRef.current[0] - travelTime <= now
+					now >= upcomingNotesRef.current[0] - travelTime
 				) {
 					const scheduledTime = upcomingNotesRef.current.shift()!;
 
 					activeNotes.push({
-						id: noteId++,
+						id: noteIdRef.current++,
 						scheduledTime,
 						spawnTime: scheduledTime - travelTime,
 					});
 				}
 
-				activeNotes = activeNotes.filter((note) => {
-					// Miss detection
-					if (now - note.scheduledTime > HIT_WINDOWS.MEH) {
+				// 🔥 Update & render notes
+				activeNotesRef.current = activeNotes.filter((note) => {
+					if (now - note.scheduledTime > windows.MEH) {
 						registerMiss();
 						return false;
 					}
@@ -132,11 +155,11 @@ export default function VisualizerCanvas({
 					const progress = (now - note.spawnTime) / travelTime;
 
 					if (progress < 0) return true;
-					if (progress >= 1.2) return false;
+					if (progress > 1.2) return false;
 
 					const x = startX + progress * (centerX - startX);
 
-					ctx.fillStyle = "#3ddc97";
+					ctx.fillStyle = "#22d3ee";
 					ctx.beginPath();
 					ctx.arc(x, centerY, 20, 0, Math.PI * 2);
 					ctx.fill();
@@ -155,7 +178,23 @@ export default function VisualizerCanvas({
 			window.removeEventListener("resize", resize);
 			if (rafRef.current) cancelAnimationFrame(rafRef.current);
 		};
-	}, [msPerGrid, upcomingNotesRef, isRunning, registerHit, registerMiss]);
+	}, [
+		msPerGrid,
+		upcomingNotesRef,
+		isRunning,
+		registerHit,
+		registerMiss,
+		getGrade,
+		windows,
+	]);
 
-	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;
+	return (
+		<canvas
+			ref={canvasRef}
+			style={{
+				width: "100%",
+				height: "250px",
+			}}
+		/>
+	);
 }

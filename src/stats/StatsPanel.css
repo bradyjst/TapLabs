@@ -1,0 +1,38 @@
+.stats-panel {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.stat-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.label {
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.value {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.value.early {
+	color: var(--early);
+}
+
+.value.late {
+	color: var(--late);
+}
+
+.value.neutral {
+	color: var(--perfect);
+}

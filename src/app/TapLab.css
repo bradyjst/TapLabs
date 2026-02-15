@@ -1,0 +1,20 @@
+.app {
+	display: flex;
+	height: 100vh;
+	background: var(--bg);
+	color: var(--text-primary);
+}
+
+.main {
+	flex: 1;
+	padding: 40px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.stats {
+	margin-top: 20px;
+	color: var(--text-muted);
+	font-size: 14px;
+}

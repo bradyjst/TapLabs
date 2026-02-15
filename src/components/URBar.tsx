@@ -1,11 +1,18 @@
 import { useEffect, useRef } from "react";
-import { HIT_WINDOWS } from "../engine/timingConfig";
+import { getHitWindows } from "../engine/timingConfig";
 
 type Props = {
 	recentOffsetsMsRef: React.RefObject<number[]>;
+	od: number;
 };
 
-const URBar = ({ recentOffsetsMsRef }: Props) => {
+const rootStyles = getComputedStyle(document.documentElement);
+
+const perfectColor = rootStyles.getPropertyValue("--perfect").trim();
+const goodColor = rootStyles.getPropertyValue("--good").trim();
+const mehColor = rootStyles.getPropertyValue("--meh").trim();
+
+const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
 
@@ -22,7 +29,7 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 		resize();
 		window.addEventListener("resize", resize);
 
-		const maxVisual = 120; // visual zoom range
+		const maxVisual = 120;
 
 		const draw = () => {
 			const width = canvas.width;
@@ -30,6 +37,7 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 			const centerX = width / 2;
 
 			const offsets = [...recentOffsetsMsRef.current];
+			const windows = getHitWindows(od);
 
 			ctx.clearRect(0, 0, width, height);
 
@@ -41,30 +49,30 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 
 			// ----- Hit Windows -----
 
-			// MEH (largest)
-			ctx.fillStyle = "#333";
+			// MEH
+			ctx.fillStyle = "#2a2a2a";
 			ctx.fillRect(
-				centerX - scale(HIT_WINDOWS.MEH),
+				centerX - scale(windows.MEH),
 				0,
-				scale(HIT_WINDOWS.MEH) * 2,
+				scale(windows.MEH) * 2,
 				height
 			);
 
 			// GOOD
-			ctx.fillStyle = "#555";
+			ctx.fillStyle = "#3a3a3a";
 			ctx.fillRect(
-				centerX - scale(HIT_WINDOWS.GOOD),
+				centerX - scale(windows.GOOD),
 				0,
-				scale(HIT_WINDOWS.GOOD) * 2,
+				scale(windows.GOOD) * 2,
 				height
 			);
 
-			// PERFECT (smallest)
-			ctx.fillStyle = "#777";
+			// PERFECT
+			ctx.fillStyle = "#4a4a4a";
 			ctx.fillRect(
-				centerX - scale(HIT_WINDOWS.PERFECT),
+				centerX - scale(windows.PERFECT),
 				0,
-				scale(HIT_WINDOWS.PERFECT) * 2,
+				scale(windows.PERFECT) * 2,
 				height
 			);
 
@@ -82,13 +90,12 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 				const x = centerX + scale(offset);
 				const abs = Math.abs(offset);
 
-				let color = "#3ddc97"; // PERFECT default
+				let color = perfectColor;
 
-				if (abs > HIT_WINDOWS.PERFECT) color = "#f4d35e"; // GOOD
-				if (abs > HIT_WINDOWS.GOOD) color = "#ff8c42"; // MEH
-				if (abs > HIT_WINDOWS.MEH) color = "#ff4d6d"; // miss
+				if (abs > windows.PERFECT) color = perfectColor;
+				if (abs > windows.GOOD) color = goodColor;
+				if (abs > windows.MEH) color = mehColor;
 
-				// Fade older hits
 				const alpha = offsets.length > 0 ? (index + 1) / offsets.length : 1;
 
 				ctx.globalAlpha = alpha;
@@ -104,7 +111,8 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 
 			ctx.globalAlpha = 1;
 
-			// ----- Draw Mean (Bias Line) -----
+			// ----- Mean Line -----
+
 			if (offsets.length > 0) {
 				const mean = offsets.reduce((a, b) => a + b, 0) / offsets.length;
 
@@ -128,7 +136,7 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 			if (rafRef.current) cancelAnimationFrame(rafRef.current);
 			window.removeEventListener("resize", resize);
 		};
-	}, [recentOffsetsMsRef]);
+	}, [recentOffsetsMsRef, od]);
 
 	return (
 		<canvas
@@ -137,7 +145,7 @@ const URBar = ({ recentOffsetsMsRef }: Props) => {
 				width: "100%",
 				height: "80px",
 				borderRadius: "8px",
-				border: "1px solid #333",
+				border: "1px solid var(--border)",
 			}}
 		/>
 	);
