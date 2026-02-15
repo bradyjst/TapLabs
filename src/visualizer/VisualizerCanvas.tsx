@@ -1,23 +1,27 @@
 import { useEffect, useRef } from "react";
+import { HIT_WINDOWS } from "../engine/timingConfig";
 
 type Props = {
-	msPerGrid: number;
-	lastOffsetRef: React.RefObject<number | null>;
+	msPerGrid: number; // still used to calculate travelTime
 	sessionStartRef: React.RefObject<number>;
+	upcomingNotesRef: React.RefObject<number[]>;
 	isRunning: boolean;
+	registerHit: (offset: number, grade: 300 | 100 | 50) => void;
+	registerMiss: () => void;
 };
 
 type ActiveNote = {
+	id: number;
+	scheduledTime: number;
 	spawnTime: number;
 };
 
-const DEFAULT_PATTERN = [1, 1, 1, 1, 1, 0, 0, 0];
-
 export default function VisualizerCanvas({
 	msPerGrid,
-	lastOffsetRef,
-	sessionStartRef,
+	upcomingNotesRef,
 	isRunning,
+	registerHit,
+	registerMiss,
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
@@ -26,8 +30,53 @@ export default function VisualizerCanvas({
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext("2d")!;
 
-		const travelGrids = 4;
-		const travelTime = msPerGrid * travelGrids;
+		const travelTime = msPerGrid * 4; // visual preempt distance
+
+		let activeNotes: ActiveNote[] = [];
+		let noteId = 0;
+
+		const handleTap = () => {
+			if (!isRunning) return;
+
+			const now = performance.now();
+			if (activeNotes.length === 0) return;
+
+			let closestIndex = -1;
+			let smallestDelta = Infinity;
+
+			activeNotes.forEach((note, index) => {
+				const delta = Math.abs(now - note.scheduledTime);
+				if (delta < smallestDelta) {
+					smallestDelta = delta;
+					closestIndex = index;
+				}
+			});
+
+			if (closestIndex === -1) return;
+
+			const note = activeNotes[closestIndex];
+			const offset = now - note.scheduledTime;
+			const abs = Math.abs(offset);
+
+			let grade: 300 | 100 | 50 | null = null;
+
+			if (abs <= HIT_WINDOWS.PERFECT) grade = 300;
+			else if (abs <= HIT_WINDOWS.GOOD) grade = 100;
+			else if (abs <= HIT_WINDOWS.MEH) grade = 50;
+
+			if (grade !== null) {
+				registerHit(offset, grade);
+				activeNotes.splice(closestIndex, 1);
+			}
+		};
+
+		const keyHandler = (e: KeyboardEvent) => {
+			if (e.code === "KeyZ" || e.code === "KeyX") {
+				handleTap();
+			}
+		};
+
+		window.addEventListener("keydown", keyHandler);
 
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();
@@ -38,16 +87,8 @@ export default function VisualizerCanvas({
 		resize();
 		window.addEventListener("resize", resize);
 
-		let activeNotes: ActiveNote[] = [];
-		let lastGridIndex = -1;
-
 		const draw = () => {
-			const styles = getComputedStyle(document.documentElement);
-			const surface = styles.getPropertyValue("--surface").trim();
-			const accent = styles.getPropertyValue("--accent").trim();
-			const early = styles.getPropertyValue("--early").trim();
-			const late = styles.getPropertyValue("--late").trim();
-			const perfect = styles.getPropertyValue("--perfect").trim();
+			const now = performance.now();
 
 			const width = canvas.width;
 			const height = canvas.height;
@@ -56,68 +97,52 @@ export default function VisualizerCanvas({
 			const startX = width * 0.1;
 
 			ctx.clearRect(0, 0, width, height);
-			ctx.fillStyle = surface;
+			ctx.fillStyle = "#111";
 			ctx.fillRect(0, 0, width, height);
 
-			// Always draw center circle
+			// Circle of truth
+			ctx.strokeStyle = "#fff";
 			ctx.lineWidth = 3;
-			ctx.strokeStyle = accent;
 			ctx.beginPath();
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
 			if (isRunning) {
-				const now = performance.now();
-				const elapsedSinceStart = now - sessionStartRef.current;
-				const gridIndex = Math.floor(elapsedSinceStart / msPerGrid);
+				// 🔥 Spawn based on timestamp queue
+				while (
+					upcomingNotesRef.current.length > 0 &&
+					upcomingNotesRef.current[0] - travelTime <= now
+				) {
+					const scheduledTime = upcomingNotesRef.current.shift()!;
 
-				// Spawn notes
-				if (gridIndex !== lastGridIndex) {
-					lastGridIndex = gridIndex;
-
-					const patternIndex = gridIndex % DEFAULT_PATTERN.length;
-
-					if (DEFAULT_PATTERN[patternIndex] === 1) {
-						activeNotes.push({
-							spawnTime: now,
-						});
-					}
+					activeNotes.push({
+						id: noteId++,
+						scheduledTime,
+						spawnTime: scheduledTime - travelTime,
+					});
 				}
 
-				// Draw notes
 				activeNotes = activeNotes.filter((note) => {
-					const elapsed = now - note.spawnTime;
-					const progress = elapsed / travelTime;
+					// Miss detection
+					if (now - note.scheduledTime > HIT_WINDOWS.MEH) {
+						registerMiss();
+						return false;
+					}
 
-					if (progress >= 1) return false;
+					const progress = (now - note.spawnTime) / travelTime;
+
+					if (progress < 0) return true;
+					if (progress >= 1.2) return false;
 
 					const x = startX + progress * (centerX - startX);
 
-					ctx.fillStyle = accent;
+					ctx.fillStyle = "#3ddc97";
 					ctx.beginPath();
 					ctx.arc(x, centerY, 20, 0, Math.PI * 2);
 					ctx.fill();
 
 					return true;
 				});
-
-				// Hit feedback
-				const offset = lastOffsetRef.current;
-				if (offset != null) {
-					const absOffset = Math.abs(offset);
-					let color = perfect;
-
-					if (absOffset > msPerGrid * 0.15) {
-						color = offset < 0 ? early : late;
-					}
-
-					ctx.globalAlpha = 0.4;
-					ctx.fillStyle = color;
-					ctx.beginPath();
-					ctx.arc(centerX, centerY, 45, 0, Math.PI * 2);
-					ctx.fill();
-					ctx.globalAlpha = 1;
-				}
 			}
 
 			rafRef.current = requestAnimationFrame(draw);
@@ -126,20 +151,11 @@ export default function VisualizerCanvas({
 		rafRef.current = requestAnimationFrame(draw);
 
 		return () => {
-			if (rafRef.current) cancelAnimationFrame(rafRef.current);
+			window.removeEventListener("keydown", keyHandler);
 			window.removeEventListener("resize", resize);
+			if (rafRef.current) cancelAnimationFrame(rafRef.current);
 		};
-	}, [msPerGrid, lastOffsetRef, sessionStartRef, isRunning]);
+	}, [msPerGrid, upcomingNotesRef, isRunning, registerHit, registerMiss]);
 
-	return (
-		<canvas
-			ref={canvasRef}
-			style={{
-				width: "100%",
-				height: "250px",
-				borderRadius: "12px",
-				border: "1px solid var(--border)",
-			}}
-		/>
-	);
+	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;
 }
