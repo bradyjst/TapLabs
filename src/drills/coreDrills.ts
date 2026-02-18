@@ -87,4 +87,52 @@ export const coreDrills: Drill[] = [
       { notes: [0,1,2,3,4,5,6,7,8] },
     ],
   },
+
+    {
+    id: "16burst_200",
+    name: "16 Burst – 200 BPM",
+    difficulty: "expert",
+    bpm: 200,
+    od: 8,
+    timeSig: { beatsPerBar: 4, beatUnit: 4 },
+    resolution: 4,
+    durationBars: 24,
+    bars: [
+      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+    ],
+  },
+
+      {
+    id: "32burst_200",
+    name: "32 Burst – 200 BPM",
+    difficulty: "expert",
+    bpm: 200,
+    od: 8,
+    timeSig: { beatsPerBar: 4, beatUnit: 4 },
+    resolution: 4,
+    durationBars: 24,
+    bars: [
+      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+        {notes: []}
+    ],
+  },
+
+        {
+    id: "64burst_200",
+    name: "64 Burst – 200 BPM",
+    difficulty: "expert",
+    bpm: 200,
+    od: 8,
+    timeSig: { beatsPerBar: 4, beatUnit: 4 },
+    resolution: 4,
+    durationBars: 24,
+    bars: [
+      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+        {notes: []}
+    ],
+  },
 ];
