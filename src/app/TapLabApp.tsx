@@ -1,46 +1,44 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
+import { coreDrills } from "../drills/coreDrills";
+
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads";
+
 import "./TapLab.css";
 
 export default function TapLabApp() {
-	const [bpm, setBpm] = useState(150);
-	const [burstCount, setBurstCount] = useState(5);
-	const [gapBeats, setGapBeats] = useState(2);
-	const [od, setOd] = useState(8);
-	const [snapDivisor, setSnapDivisor] = useState<2 | 3 | 4 | 6 | 8>(4);
+	// 🔥 Selected drill state
+	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
+	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
 
-	const engine = useTapEngine({
-		bpm,
-		burstCount,
-		gapBeats,
-		od,
-		snapDivisor,
-	});
+	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
 
-	// 🔥 Bridge ref so mobile + keyboard use same tap logic
+	const isPracticeMode = bpmOverride !== null;
+
+	const effectiveDrill = useMemo(() => {
+		if (!bpmOverride) return selectedDrill;
+
+		return {
+			...selectedDrill,
+			bpm: bpmOverride,
+		};
+	}, [selectedDrill, bpmOverride]);
+
+	// 🔥 Engine now receives entire drill
+	const engine = useTapEngine(effectiveDrill);
+
 	const tapRef = useRef<() => void>(() => {});
 
 	return (
 		<div className="app">
 			<Sidebar
-				bpm={bpm}
-				setBpm={setBpm}
-				burstCount={burstCount}
-				setBurstCount={setBurstCount}
-				gapBeats={gapBeats}
-				setGapBeats={setGapBeats}
-				od={od}
-				setOd={setOd}
-				snapDivisor={snapDivisor}
-				setSnapDivisor={setSnapDivisor}
-				isRunning={engine.isRunning}
-				start={engine.start}
-				stop={engine.stop}
+				drills={coreDrills}
+				selectedDrillId={selectedDrillId}
+				setSelectedDrillId={setSelectedDrillId}
 			/>
 
 			<main className="main">
@@ -52,15 +50,59 @@ export default function TapLabApp() {
 					registerMiss={engine.registerMiss}
 					getGrade={engine.getGrade}
 					windows={engine.hitWindows}
-					externalTapRef={tapRef} // 🔥 add this prop
+					externalTapRef={tapRef}
+					sessionEndRef={engine.live.sessionEndRef}
+					stop={engine.stop}
 				/>
 
-				<URBar recentOffsetsMsRef={engine.live.recentOffsetsMsRef} od={od} />
+				<URBar
+					recentOffsetsMsRef={engine.live.recentOffsetsMsRef}
+					od={selectedDrill.od}
+				/>
+
+				<div className="session-controls">
+					<div className="drill-controls">
+						{!engine.isRunning ? (
+							<button className="start-btn" onClick={engine.start}>
+								Begin Session
+							</button>
+						) : (
+							<button className="stop-btn" onClick={engine.stop}>
+								Stop Early
+							</button>
+						)}
+					</div>
+
+					<div className="bpm-mod">
+						<label>
+							Tempo Override
+							<input
+								type="number"
+								min={60}
+								max={300}
+								value={bpmOverride ?? selectedDrill.bpm}
+								onChange={(e) => {
+									const value = Number(e.target.value);
+									if (value === selectedDrill.bpm) {
+										setBpmOverride(null);
+									} else {
+										setBpmOverride(value);
+									}
+								}}
+							/>
+						</label>
+
+						{isPracticeMode && (
+							<div className="practice-badge">
+								Practice Mode – Scores Disabled
+							</div>
+						)}
+					</div>
+				</div>
+
 				<MobileTapPads
 					onTap={() => {
-						// fake keyboard trigger
-						const e = new KeyboardEvent("keydown", { code: "KeyZ" });
-						window.dispatchEvent(e);
+						tapRef.current();
 					}}
 				/>
 

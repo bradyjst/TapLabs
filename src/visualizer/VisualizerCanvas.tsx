@@ -15,7 +15,9 @@ type Props = {
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
 
-	// 🔥 NEW
+	sessionEndRef?: React.RefObject<number>;
+	stop?: () => void;
+
 	externalTapRef?: React.MutableRefObject<() => void>;
 };
 
@@ -31,27 +33,30 @@ export default function VisualizerCanvas({
 	isRunning,
 	registerHit,
 	registerMiss,
+	sessionEndRef,
+	stop, // ✅ IMPORTANT: destructure it
 	getGrade,
 	windows,
-	externalTapRef, // 🔥 receive it
+	externalTapRef,
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
-	const lastHitTimeRef = useRef<number>(0);
+
+	// prevents spamming stop() for a few frames before React updates isRunning
+	const stopCalledRef = useRef(false);
 
 	useEffect(() => {
+		stopCalledRef.current = false;
+
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext("2d")!;
-
 		const travelTime = msPerGrid * 4;
 
 		let activeNotes: ActiveNote[] = [];
 		let noteId = 0;
 
-		// 🔥 Unified tap logic
 		const handleTap = () => {
 			if (!isRunning) return;
-
 			const now = performance.now();
 			if (activeNotes.length === 0) return;
 
@@ -74,23 +79,15 @@ export default function VisualizerCanvas({
 
 			if (grade !== null) {
 				registerHit(offset, grade);
-				lastHitTimeRef.current = performance.now();
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
 
-		// 🔥 Wire mobile tap bridge
-		if (externalTapRef) {
-			externalTapRef.current = handleTap;
-		}
+		if (externalTapRef) externalTapRef.current = handleTap;
 
-		// Keyboard
 		const keyHandler = (e: KeyboardEvent) => {
-			if (e.code === "KeyZ" || e.code === "KeyX") {
-				handleTap();
-			}
+			if (e.code === "KeyZ" || e.code === "KeyX") handleTap();
 		};
-
 		window.addEventListener("keydown", keyHandler);
 
 		const resize = () => {
@@ -98,9 +95,14 @@ export default function VisualizerCanvas({
 			canvas.width = rect.width;
 			canvas.height = rect.height;
 		};
-
 		resize();
 		window.addEventListener("resize", resize);
+
+		const tryStop = () => {
+			if (stopCalledRef.current) return;
+			stopCalledRef.current = true;
+			stop?.();
+		};
 
 		const draw = () => {
 			const now = performance.now();
@@ -124,14 +126,29 @@ export default function VisualizerCanvas({
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
-			// Spawn
-			if (isRunning) {
+			// Timer display
+			const endTime = sessionEndRef?.current ?? 0;
+			if (isRunning && endTime) {
+				const remainingMs = Math.max(0, endTime - now);
+				const remainingSec = (remainingMs / 1000).toFixed(1);
+
+				ctx.fillStyle = "rgba(255,255,255,0.8)";
+				ctx.font = "16px system-ui";
+				ctx.fillText(`Time Left: ${remainingSec}s`, width - 140, 30);
+
+				// Time-based stop
+				if (now >= endTime) {
+					tryStop();
+				}
+			}
+
+			// Spawn + draw
+			if (isRunning && !stopCalledRef.current) {
 				while (
 					upcomingNotesRef.current.length > 0 &&
 					upcomingNotesRef.current[0] - travelTime <= now
 				) {
 					const scheduledTime = upcomingNotesRef.current.shift()!;
-
 					activeNotes.push({
 						id: noteId++,
 						scheduledTime,
@@ -146,7 +163,6 @@ export default function VisualizerCanvas({
 					}
 
 					const progress = (now - note.spawnTime) / travelTime;
-
 					if (progress < 0) return true;
 					if (progress >= 1.2) return false;
 
@@ -159,6 +175,11 @@ export default function VisualizerCanvas({
 
 					return true;
 				});
+
+				// ✅ Note-based stop (correct place: AFTER filtering)
+				if (upcomingNotesRef.current.length === 0 && activeNotes.length === 0) {
+					tryStop();
+				}
 			}
 
 			rafRef.current = requestAnimationFrame(draw);
@@ -180,6 +201,8 @@ export default function VisualizerCanvas({
 		getGrade,
 		windows,
 		externalTapRef,
+		sessionEndRef,
+		stop, // ✅ include dependency
 	]);
 
 	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;

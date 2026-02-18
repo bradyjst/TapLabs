@@ -1,14 +1,7 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, useMemo } from "react";
 import { getHitWindows, getGrade } from "./timingConfig";
 import type { HitWindows } from "./timingConfig";
-
-type Config = {
-  bpm: number;
-  burstCount: number;
-  gapBeats: number;
-  od: number;
-  snapDivisor: 2 | 3 | 4 | 6 | 8;
-};
+import type { Drill } from "../types";
 
 type RunningStats = {
   n: number;
@@ -33,18 +26,51 @@ function stdDev(stats: RunningStats) {
   return Math.sqrt(stats.m2 / (stats.n - 1));
 }
 
-export function useTapEngine({
-  bpm,
-  burstCount,
-  gapBeats,
-  od,
-  snapDivisor,
-}: Config) {
+/**
+ * 🔥 NEW MUSICAL PATTERN BUILDER
+ * Uses time signature + resolution grid
+ */
+function buildPatternTimes(
+  drill: Drill,
+  sessionStartMs: number
+) {
+  const beatLength = 60000 / drill.bpm;
+  const barLength = beatLength * drill.timeSig.beatsPerBar;
+
+  const gridSize = beatLength / drill.resolution;
+  const gridsPerBar =
+    drill.timeSig.beatsPerBar * drill.resolution;
+
+  const times: number[] = [];
+
+  const totalBars = drill.durationBars;
+
+  for (let barCounter = 0; barCounter < totalBars; barCounter++) {
+    const barIndex = barCounter % drill.bars.length;
+
+    const barStart =
+      sessionStartMs +
+      barCounter * barLength;
+
+    const bar = drill.bars[barIndex];
+
+    for (const gridIndex of bar.notes) {
+      if (gridIndex >= gridsPerBar) continue;
+
+      times.push(barStart + gridIndex * gridSize);
+    }
+  }
+
+  return times;
+}
+
+export function useTapEngine(drill: Drill) {
   const [isRunning, setIsRunning] = useState(false);
 
   const sessionStartRef = useRef<number>(0);
   const metronomeStartRef = useRef<number>(0);
   const upcomingNotesRef = useRef<number[]>([]);
+  const sessionEndRef = useRef<number>(0);
 
   const offsetsStatsRef = useRef<RunningStats>(createStats());
   const lastOffsetRef = useRef<number | null>(null);
@@ -61,13 +87,21 @@ export function useTapEngine({
 
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  const beatLength = 60000 / bpm;
-  const interval = beatLength / snapDivisor;
+  const beatLength = useMemo(
+    () => 60000 / drill.bpm,
+    [drill.bpm]
+  );
 
-  // 🔥 This replaces subdivision grid
-  const msPerGrid = interval;
 
-  const hitWindows: HitWindows = getHitWindows(od);
+  // 🔥 Grid resolution based purely on drill
+  const msPerGrid = useMemo(() => {
+    return beatLength / drill.resolution;
+  }, [beatLength, drill.resolution]);
+
+  const hitWindows: HitWindows = useMemo(
+    () => getHitWindows(drill.od),
+    [drill.od]
+  );
 
   const ensureAudio = () => {
     if (!audioCtxRef.current) {
@@ -109,7 +143,7 @@ export function useTapEngine({
     osc.stop(ctx.currentTime + 0.02);
   }, []);
 
-  // Metronome
+  // 🔥 Musical metronome (respects time signature)
   useEffect(() => {
     if (!isRunning) return;
 
@@ -123,7 +157,9 @@ export function useTapEngine({
 
       if (beatIndex !== lastBeat) {
         lastBeat = beatIndex;
-        playClick(beatIndex % 4 === 0);
+
+        const beatsPerBar = drill.timeSig.beatsPerBar;
+        playClick(beatIndex % beatsPerBar === 0);
       }
 
       raf = requestAnimationFrame(tick);
@@ -131,7 +167,7 @@ export function useTapEngine({
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [isRunning, beatLength, playClick]);
+  }, [isRunning, beatLength, playClick, drill.timeSig.beatsPerBar]);
 
   const start = useCallback(() => {
     offsetsStatsRef.current = createStats();
@@ -143,25 +179,29 @@ export function useTapEngine({
     missRef.current = 0;
 
     const now = performance.now();
-    const countInBeats = 4;
+    const countInBeats = drill.timeSig.beatsPerBar;
 
     metronomeStartRef.current = now;
-    sessionStartRef.current = now + beatLength * countInBeats;
+    sessionStartRef.current =
+      now + beatLength * countInBeats;
 
-    let timeCursor = sessionStartRef.current;
-    const pattern: number[] = [];
+    
+const barLength =
+  beatLength * drill.timeSig.beatsPerBar;
 
-    for (let i = 0; i < 30; i++) {
-      for (let n = 0; n < burstCount; n++) {
-        pattern.push(timeCursor + n * interval);
-      }
+sessionEndRef.current =
+  sessionStartRef.current +
+  barLength * drill.durationBars;
 
-      timeCursor += beatLength * gapBeats;
-    }
 
-    upcomingNotesRef.current = pattern;
+ upcomingNotesRef.current = buildPatternTimes(
+  drill,
+  sessionStartRef.current
+);
+
+
     setIsRunning(true);
-  }, [beatLength, burstCount, gapBeats, interval]);
+  }, [beatLength, drill]);
 
   const stop = useCallback(() => {
     setIsRunning(false);
@@ -176,7 +216,8 @@ export function useTapEngine({
 
       alignmentStdDevRef.current = stdDev(offsetsStatsRef.current);
       meanOffsetRef.current = offsetsStatsRef.current.mean;
-      unstableRateRef.current = alignmentStdDevRef.current * 10;
+      unstableRateRef.current =
+        alignmentStdDevRef.current * 10;
 
       recentOffsetsMsRef.current.push(offset);
       if (recentOffsetsMsRef.current.length > 200) {
@@ -219,7 +260,8 @@ export function useTapEngine({
       hit100Ref,
       hit50Ref,
       missRef,
-      sessionStartRef,
+    sessionStartRef,
+  sessionEndRef,
     },
   };
 }
