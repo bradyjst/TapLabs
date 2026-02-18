@@ -10,6 +10,10 @@
 	position: relative;
 }
 
+.sidebar h2 {
+	margin-bottom: 10px;
+}
+
 .section {
 	margin-bottom: 24px;
 }

@@ -8,7 +8,14 @@ type SidebarProps = {
 	setSelectedDrillId: (id: string) => void;
 };
 
-const sections: Difficulty[] = ["easy", "medium", "hard", "expert", "weekly"];
+const sections: Difficulty[] = [
+	"easy",
+	"medium",
+	"hard",
+	"expert",
+	"extreme",
+	"weekly",
+];
 
 export default function Sidebar({
 	drills,

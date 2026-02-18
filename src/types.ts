@@ -3,6 +3,7 @@ export type Difficulty =
   | "medium"
   | "hard"
   | "expert"
+  |  "extreme"
   | "weekly";
 
 export type TimeSignature = {
