@@ -96,9 +96,10 @@ export const coreDrills: Drill[] = [
     od: 8,
     timeSig: { beatsPerBar: 4, beatUnit: 4 },
     resolution: 4,
-    durationBars: 24,
+    durationBars: 14,
     bars: [
       { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+      {notes: []}
     ],
   },
 
