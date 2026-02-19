@@ -1,6 +1,7 @@
 import "./Sidebar.css";
 import type { Drill, Difficulty } from "../types";
 import { analyzeDrill } from "../drills/analyzeDrill";
+import AuthButton from "../components/AuthButton/AuthButton";
 
 type SidebarProps = {
 	drills: Drill[];
@@ -24,8 +25,9 @@ export default function Sidebar({
 }: SidebarProps) {
 	return (
 		<aside className="sidebar">
-			<h2>TapLabs</h2>
-
+			<div className="taplabsheader">
+				<h2>TapLabs</h2> <AuthButton />
+			</div>
 			{sections.map((section) => {
 				const sectionDrills = drills.filter((d) => d.difficulty === section);
 

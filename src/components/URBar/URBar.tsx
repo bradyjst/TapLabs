@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { getHitWindows } from "../engine/timingConfig";
+import { getHitWindows } from "../../engine/timingConfig";
 
 type Props = {
 	recentOffsetsMsRef: React.RefObject<number[]>;
@@ -55,7 +55,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				centerX - scale(windows.MEH),
 				0,
 				scale(windows.MEH) * 2,
-				height
+				height,
 			);
 
 			// GOOD
@@ -64,7 +64,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				centerX - scale(windows.GOOD),
 				0,
 				scale(windows.GOOD) * 2,
-				height
+				height,
 			);
 
 			// PERFECT
@@ -73,7 +73,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				centerX - scale(windows.PERFECT),
 				0,
 				scale(windows.PERFECT) * 2,
-				height
+				height,
 			);
 
 			// Center line

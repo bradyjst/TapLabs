@@ -1,0 +1,125 @@
+.auth-modal {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 999;
+	animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.auth-box {
+	background: rgba(20, 20, 25, 0.9);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 14px;
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 280px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+	animation: popIn 0.15s ease;
+}
+
+@keyframes popIn {
+	from {
+		transform: scale(0.96);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.auth-box h3 {
+	margin: 0;
+	text-align: center;
+	font-weight: 500;
+}
+
+.auth-box input {
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	color: white;
+	padding: 8px 10px;
+	border-radius: 8px;
+	font-size: 13px;
+	outline: none;
+	transition: border 0.15s ease;
+}
+
+.auth-box input:focus {
+	border-color: rgba(100, 200, 255, 0.5);
+}
+
+.google-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: white;
+	color: black;
+	border: none;
+	border-radius: 8px;
+	padding: 8px;
+	font-size: 13px;
+	cursor: pointer;
+	transition: transform 0.1s ease;
+}
+
+.google-btn:hover {
+	transform: scale(1.02);
+}
+
+.google-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.email-btn {
+	background: rgba(100, 200, 255, 0.2);
+	border: 1px solid rgba(100, 200, 255, 0.4);
+	color: white;
+	border-radius: 8px;
+	padding: 8px;
+	font-size: 13px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.email-btn:hover {
+	background: rgba(100, 200, 255, 0.3);
+	box-shadow: 0 0 6px rgba(100, 200, 255, 0.4);
+}
+
+.email-btn.alt {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.close-btn {
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 11px;
+	cursor: pointer;
+}
+
+.divider {
+	text-align: center;
+	font-size: 11px;
+	opacity: 0.6;
+	margin: 4px 0;
+}

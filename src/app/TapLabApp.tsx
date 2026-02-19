@@ -1,14 +1,13 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
-
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
-import URBar from "../components/URBar";
+import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
-import MobileTapPads from "../components/MobileTapPads";
-
+import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import "./TapLab.css";
+import { supabase } from "../lib/supabase";
 
 export default function TapLabApp() {
 	// 🔥 Selected drill state
@@ -32,6 +31,18 @@ export default function TapLabApp() {
 	const engine = useTapEngine(effectiveDrill);
 
 	const tapRef = useRef<() => void>(() => {});
+
+	useEffect(() => {
+		const { data: listener } = supabase.auth.onAuthStateChange(
+			(_event, session) => {
+				console.log("SESSION:", session);
+			},
+		);
+
+		return () => {
+			listener.subscription.unsubscribe();
+		};
+	}, []);
 
 	return (
 		<div className="app">
