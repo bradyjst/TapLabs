@@ -6,6 +6,7 @@ import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
+import { initHitSound } from "../lib/hitSound";
 import "./TapLab.css";
 import { supabase } from "../lib/supabase";
 
@@ -74,7 +75,13 @@ export default function TapLabApp() {
 				<div className="session-controls">
 					<div className="drill-controls">
 						{!engine.isRunning ? (
-							<button className="start-btn" onClick={engine.start}>
+							<button
+								className="start-btn"
+								onClick={async () => {
+									await initHitSound(); // 🔥 unlock browser audio
+									engine.start();
+								}}
+							>
 								Begin Session
 							</button>
 						) : (
