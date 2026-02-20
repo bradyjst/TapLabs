@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
 import { useAuth } from "../context/useAuth";
@@ -9,7 +9,6 @@ import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import { initHitSound } from "../lib/hitSound";
 import "./TapLab.css";
-import { supabase } from "../lib/supabase";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
@@ -34,18 +33,6 @@ export default function TapLabApp() {
 	const engine = useTapEngine(effectiveDrill);
 
 	const tapRef = useRef<() => void>(() => {});
-
-	useEffect(() => {
-		const { data: listener } = supabase.auth.onAuthStateChange(
-			(_event, session) => {
-				console.log("SESSION:", session);
-			},
-		);
-
-		return () => {
-			listener.subscription.unsubscribe();
-		};
-	}, []);
 
 	return (
 		<div className="app">
