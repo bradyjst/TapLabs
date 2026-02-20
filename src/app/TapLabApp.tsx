@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
+import { useAuth } from "../context/useAuth";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
@@ -11,6 +12,7 @@ import "./TapLab.css";
 import { supabase } from "../lib/supabase";
 
 export default function TapLabApp() {
+	const { user } = useAuth();
 	// 🔥 Selected drill state
 	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
@@ -65,6 +67,9 @@ export default function TapLabApp() {
 					externalTapRef={tapRef}
 					sessionEndRef={engine.live.sessionEndRef}
 					stop={engine.stop}
+					drill={effectiveDrill}
+					engine={engine}
+					userId={user?.id}
 				/>
 
 				<URBar
@@ -85,9 +90,12 @@ export default function TapLabApp() {
 								Begin Session
 							</button>
 						) : (
-							<button className="stop-btn" onClick={engine.stop}>
-								Stop Early
-							</button>
+							<button
+								className="stop-btn"
+								onClick={() => {
+									engine.stop();
+								}}
+							></button>
 						)}
 					</div>
 

@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "react";
+import { submitSession } from "../lib/submitSession";
+import type { Drill } from "../types";
+import type { TapEngine } from "../engine/useTapEngine";
 
 type HitWindows = {
 	PERFECT: number;
@@ -7,6 +10,10 @@ type HitWindows = {
 };
 
 type Props = {
+	drill: Drill;
+	engine: TapEngine;
+	userId?: string;
+
 	msPerGrid: number;
 	upcomingNotesRef: React.RefObject<number[]>;
 	isRunning: boolean;
@@ -17,7 +24,6 @@ type Props = {
 
 	sessionEndRef?: React.RefObject<number>;
 	stop?: () => void;
-
 	externalTapRef?: React.MutableRefObject<() => void>;
 };
 
@@ -28,13 +34,16 @@ type ActiveNote = {
 };
 
 export default function VisualizerCanvas({
+	drill,
+	engine,
+	userId,
 	msPerGrid,
 	upcomingNotesRef,
 	isRunning,
 	registerHit,
 	registerMiss,
 	sessionEndRef,
-	stop, // ✅ IMPORTANT: destructure it
+
 	getGrade,
 	windows,
 	externalTapRef,
@@ -42,12 +51,53 @@ export default function VisualizerCanvas({
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
 
-	// prevents spamming stop() for a few frames before React updates isRunning
-	const stopCalledRef = useRef(false);
+	// 🔥 prevents double submit
+	const submittedRef = useRef(false);
+
+	// 🔥 LIVE ENGINE REF (avoids stale stats)
+	const engineRef = useRef(engine);
+	useEffect(() => {
+		engineRef.current = engine;
+	}, [engine]);
+
+	// 🔥 SUBMIT WHEN SESSION ENDS (natural OR early stop)
+	useEffect(() => {
+		if (!isRunning && !submittedRef.current) {
+			submittedRef.current = true;
+
+			if (!userId) return;
+
+			const live = engineRef.current.live;
+
+			console.log("Submitting:", {
+				h300: live.hit300Ref.current,
+				h100: live.hit100Ref.current,
+				h50: live.hit50Ref.current,
+				miss: live.missRef.current,
+			});
+
+			submitSession({
+				userId,
+				drillId: drill.id,
+				bpm: drill.bpm,
+				h300: live.hit300Ref.current,
+				h100: live.hit100Ref.current,
+				h50: live.hit50Ref.current,
+				miss: live.missRef.current,
+				meanOffset: live.meanOffsetRef.current,
+				unstableRate: live.unstableRateRef.current,
+			});
+		}
+	}, [isRunning, userId, drill]);
+
+	// 🔁 reset submit flag on new session
+	useEffect(() => {
+		if (isRunning) {
+			submittedRef.current = false;
+		}
+	}, [isRunning]);
 
 	useEffect(() => {
-		stopCalledRef.current = false;
-
 		const canvas = canvasRef.current!;
 		const ctx = canvas.getContext("2d")!;
 		const travelTime = msPerGrid * 4;
@@ -98,12 +148,6 @@ export default function VisualizerCanvas({
 		resize();
 		window.addEventListener("resize", resize);
 
-		const tryStop = () => {
-			if (stopCalledRef.current) return;
-			stopCalledRef.current = true;
-			stop?.();
-		};
-
 		const draw = () => {
 			const now = performance.now();
 
@@ -115,18 +159,15 @@ export default function VisualizerCanvas({
 
 			ctx.clearRect(0, 0, width, height);
 
-			// Background
 			ctx.fillStyle = "#0f172a";
 			ctx.fillRect(0, 0, width, height);
 
-			// Circle of truth
 			ctx.strokeStyle = "#ffffff";
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
-			// Timer display
 			const endTime = sessionEndRef?.current ?? 0;
 			if (isRunning && endTime) {
 				const remainingMs = Math.max(0, endTime - now);
@@ -135,15 +176,9 @@ export default function VisualizerCanvas({
 				ctx.fillStyle = "rgba(255,255,255,0.8)";
 				ctx.font = "16px system-ui";
 				ctx.fillText(`Time Left: ${remainingSec}s`, width - 140, 30);
-
-				// Time-based stop
-				if (now >= endTime) {
-					tryStop();
-				}
 			}
 
-			// Spawn + draw
-			if (isRunning && !stopCalledRef.current) {
+			if (isRunning) {
 				while (
 					upcomingNotesRef.current.length > 0 &&
 					upcomingNotesRef.current[0] - travelTime <= now
@@ -175,11 +210,6 @@ export default function VisualizerCanvas({
 
 					return true;
 				});
-
-				// ✅ Note-based stop (correct place: AFTER filtering)
-				if (upcomingNotesRef.current.length === 0 && activeNotes.length === 0) {
-					tryStop();
-				}
 			}
 
 			rafRef.current = requestAnimationFrame(draw);
@@ -202,7 +232,6 @@ export default function VisualizerCanvas({
 		windows,
 		externalTapRef,
 		sessionEndRef,
-		stop, // ✅ include dependency
 	]);
 
 	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;

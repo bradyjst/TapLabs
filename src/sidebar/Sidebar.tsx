@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import "./Sidebar.css";
 import type { Drill, Difficulty } from "../types";
 import { analyzeDrill } from "../drills/analyzeDrill";
 import AuthButton from "../components/AuthButton/AuthButton";
+import { useAuth } from "../context/useAuth";
+import { getBestGrades } from "../lib/getBestGrades";
 
 type SidebarProps = {
 	drills: Drill[];
@@ -23,14 +26,23 @@ export default function Sidebar({
 	selectedDrillId,
 	setSelectedDrillId,
 }: SidebarProps) {
+	const { user } = useAuth();
+	const [bestGrades, setBestGrades] = useState<Record<string, string>>({});
+
+	useEffect(() => {
+		if (!user) return;
+		getBestGrades(user.id).then(setBestGrades);
+	}, [user]);
+
 	return (
 		<aside className="sidebar">
 			<div className="taplabsheader">
-				<h2>TapLabs</h2> <AuthButton />
+				<h2>TapLabs</h2>
+				<AuthButton />
 			</div>
+
 			{sections.map((section) => {
 				const sectionDrills = drills.filter((d) => d.difficulty === section);
-
 				if (sectionDrills.length === 0) return null;
 
 				return (
@@ -49,7 +61,17 @@ export default function Sidebar({
 											}`}
 											onClick={() => setSelectedDrillId(drill.id)}
 										>
-											{drill.name}
+											<div className="drill-row">
+												<span>{drill.name}</span>
+
+												{bestGrades[drill.id] && (
+													<span
+														className={`grade-badge grade-${bestGrades[drill.id]}`}
+													>
+														{bestGrades[drill.id]}
+													</span>
+												)}
+											</div>
 										</button>
 
 										<div className="drill-popout">

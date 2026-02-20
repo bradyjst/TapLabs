@@ -235,3 +235,5 @@ export function useTapEngine(drill: Drill) {
 		},
 	};
 }
+
+export type TapEngine = ReturnType<typeof useTapEngine>;
