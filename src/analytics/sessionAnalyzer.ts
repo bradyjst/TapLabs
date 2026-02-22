@@ -110,58 +110,70 @@ function segmentTaps(taps: TapEvent[], segments: number) {
 /* ---------------------------------- */
 
 function computeGallopingRisk(taps: TapEvent[]) {
-  // Need enough taps from both sides
-  if (taps.length < 20) return 0;
+  if (taps.length < 30) return 0;
 
-  let n = 0;
-  let sumX = 0;   // side sign
-  let sumY = 0;   // offset
-  let sumXX = 0;
-  let sumYY = 0;
-  let sumXY = 0;
+  // ---------- 1️⃣ Mean Bias Between Fingers ----------
+  const left = taps.filter(t => t.side === "left").map(t => t.offset);
+  const right = taps.filter(t => t.side === "right").map(t => t.offset);
 
-  let leftCount = 0;
-  let rightCount = 0;
+  if (left.length < 5 || right.length < 5) return 0;
 
-  for (const t of taps) {
-    const x = t.side === "left" ? 1 : -1;
-    const y = t.offset;
+  const leftMean = left.reduce((a, b) => a + b, 0) / left.length;
+  const rightMean = right.reduce((a, b) => a + b, 0) / right.length;
 
-    if (t.side === "left") leftCount++;
-    else rightCount++;
+  const meanBias = Math.abs(leftMean - rightMean); // ms difference
 
-    n++;
-    sumX += x;
-    sumY += y;
-    sumXX += x * x;
-    sumYY += y * y;
-    sumXY += x * y;
-  }
+  // Normalize bias (tune 12–18 depending on feel)
+  const biasScore = Math.min(1, meanBias / 15);
 
-  // If one side barely used, don’t call it galloping
-  if (leftCount < 5 || rightCount < 5) return 0;
 
-  const denom = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
-  if (denom === 0) return 0;
-
-  const r = (n * sumXY - sumX * sumY) / denom; // -1..1
-
-  // |r| near 1 => strong L/R bias (gallop)
-  const strength = Math.min(1, Math.abs(r));
-
-  // Optional: require actual alternation to matter
-  let alternations = 0;
+  // ---------- 2️⃣ Interval Alternation Detection ----------
+  const intervals: number[] = [];
   for (let i = 1; i < taps.length; i++) {
-    if (taps[i].side !== taps[i - 1].side) alternations++;
+    intervals.push(taps[i].timestamp - taps[i - 1].timestamp);
   }
-  const altRate = alternations / (taps.length - 1); // 0..1
 
-  // Map to 0..100 with a soft threshold so small bias doesn't punish
-  const threshold = 0.25; // tune: 0.2–0.35 feels good
-  const gated = Math.max(0, (strength - threshold) / (1 - threshold));
+  let alternatingStrength = 0;
+  let count = 0;
 
-  const risk = gated * altRate * 100;
-  return Math.round(Math.min(100, risk));
+  for (let i = 2; i < intervals.length; i++) {
+    const a = intervals[i - 2];
+    const b = intervals[i - 1];
+    const c = intervals[i];
+
+    const diff1 = Math.abs(a - b);
+    const diff2 = Math.abs(b - c);
+
+    // If pattern is a-b-a style, diff1 and diff2 both large
+    if (diff1 > 3 && diff2 > 3) {
+      alternatingStrength += 1;
+    }
+
+    count++;
+  }
+
+  const intervalScore = count > 0 ? alternatingStrength / count : 0;
+
+
+  // ---------- 3️⃣ Combine ----------
+  const combined = (biasScore * 0.6) + (intervalScore * 0.4);
+
+  // ---------- 4️⃣ Confidence Scaling ----------
+  const confidence = Math.min(1, taps.length / 200);
+  const finalRisk = Math.round(Math.min(100, combined * confidence * 100));
+
+console.log("Gallop Debug:", {
+  tapCount: taps.length,
+  leftMean,
+  rightMean,
+  meanBias,
+  biasScore,
+  intervalScore,
+  confidence,
+  finalRisk,
+});
+
+return finalRisk;
 
 }
 
