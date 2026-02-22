@@ -43,7 +43,7 @@ export default function VisualizerCanvas({
 	registerHit,
 	registerMiss,
 	sessionEndRef,
-
+	stop,
 	getGrade,
 	windows,
 	externalTapRef,
@@ -51,30 +51,25 @@ export default function VisualizerCanvas({
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
 
-	// 🔥 prevents double submit
 	const submittedRef = useRef(false);
 
-	// 🔥 LIVE ENGINE REF (avoids stale stats)
 	const engineRef = useRef(engine);
 	useEffect(() => {
 		engineRef.current = engine;
 	}, [engine]);
 
-	// 🔥 SUBMIT WHEN SESSION ENDS (natural OR early stop)
+	// ✅ SUBMIT ONLY IF NATURALLY COMPLETED
 	useEffect(() => {
-		if (!isRunning && !submittedRef.current) {
+		if (
+			!isRunning &&
+			!submittedRef.current &&
+			engineRef.current.live.completedRef.current
+		) {
 			submittedRef.current = true;
 
 			if (!userId) return;
 
 			const live = engineRef.current.live;
-
-			console.log("Submitting:", {
-				h300: live.hit300Ref.current,
-				h100: live.hit100Ref.current,
-				h50: live.hit50Ref.current,
-				miss: live.missRef.current,
-			});
 
 			submitSession({
 				userId,
@@ -90,7 +85,6 @@ export default function VisualizerCanvas({
 		}
 	}, [isRunning, userId, drill]);
 
-	// 🔁 reset submit flag on new session
 	useEffect(() => {
 		if (isRunning) {
 			submittedRef.current = false;
@@ -158,7 +152,6 @@ export default function VisualizerCanvas({
 			const startX = width * 0.1;
 
 			ctx.clearRect(0, 0, width, height);
-
 			ctx.fillStyle = "#0f172a";
 			ctx.fillRect(0, 0, width, height);
 
@@ -169,6 +162,14 @@ export default function VisualizerCanvas({
 			ctx.stroke();
 
 			const endTime = sessionEndRef?.current ?? 0;
+
+			// ✅ NATURAL COMPLETION DETECTION
+			if (isRunning && endTime && now >= endTime) {
+				engineRef.current.live.completedRef.current = true;
+				stop?.(); // stops engine cleanly
+				return;
+			}
+
 			if (isRunning && endTime) {
 				const remainingMs = Math.max(0, endTime - now);
 				const remainingSec = (remainingMs / 1000).toFixed(1);
@@ -232,6 +233,7 @@ export default function VisualizerCanvas({
 		windows,
 		externalTapRef,
 		sessionEndRef,
+		stop,
 	]);
 
 	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;

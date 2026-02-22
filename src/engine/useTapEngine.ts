@@ -63,6 +63,9 @@ export function useTapEngine(drill: Drill) {
 	const upcomingNotesRef = useRef<number[]>([]);
 	const sessionEndRef = useRef<number>(0);
 
+	// 🔥 NEW — tracks natural completion
+	const completedRef = useRef(false);
+
 	const offsetsStatsRef = useRef<RunningStats>(createStats());
 	const lastOffsetRef = useRef<number | null>(null);
 	const recentOffsetsMsRef = useRef<number[]>([]);
@@ -130,6 +133,9 @@ export function useTapEngine(drill: Drill) {
 	}, [isRunning, beatLength, playClick, drill.timeSig.beatsPerBar]);
 
 	const start = useCallback(() => {
+		// 🔥 reset completion on new session
+		completedRef.current = false;
+
 		offsetsStatsRef.current = createStats();
 		recentOffsetsMsRef.current = [];
 
@@ -232,6 +238,9 @@ export function useTapEngine(drill: Drill) {
 			missRef,
 			sessionStartRef,
 			sessionEndRef,
+
+			// 🔥 NEW
+			completedRef,
 		},
 	};
 }
