@@ -88,7 +88,9 @@ export default function TapLabApp() {
 								onClick={() => {
 									engine.stop();
 								}}
-							></button>
+							>
+								Quit Early
+							</button>
 						)}
 					</div>
 
