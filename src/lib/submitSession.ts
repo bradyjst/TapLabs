@@ -28,13 +28,10 @@ export async function submitSession(data: {
 			user_id: data.userId,
 			drill_id: data.drillId,
 			bpm: data.bpm,
-
-			// 🔥 MATCHES DB EXACTLY
 			hit_300: data.h300,
 			hit_100: data.h100,
 			hit_50: data.h50,
 			miss: data.miss,
-
 			accuracy,
 			mean_offset: data.meanOffset,
 			unstable_rate: data.unstableRate,
@@ -44,7 +41,7 @@ export async function submitSession(data: {
 
 	if (error) {
 		console.error("SESSION INSERT FAILED:", error);
-		alert(JSON.stringify(error, null, 2));
+		alert("Please sign in to submit a score");
 		return false;
 	}
 

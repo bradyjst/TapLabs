@@ -17,6 +17,21 @@ export const coreDrills: Drill[] = [
     ],
   },
 
+
+  {
+    id: "burst5_160_test",
+    name: "5 Burst – 160 BPM test",
+    difficulty: "easy",
+    bpm: 160,
+    od: 6,
+    timeSig: { beatsPerBar: 4, beatUnit: 4 },
+    resolution: 4,
+    durationBars: 4,
+    bars: [
+      { notes: [0,1,2,3,4] }, // Beat 1 burst
+    ],
+  },
+
   {
     id: "burst5_180",
     name: "5 Burst – 180 BPM",

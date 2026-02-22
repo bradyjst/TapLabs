@@ -1,5 +1,9 @@
 import { useEffect, useRef } from "react";
 import { submitSession } from "../lib/submitSession";
+import {
+	analyzeSession,
+	type SessionAnalytics,
+} from "../analytics/sessionAnalyzer";
 import type { Drill } from "../types";
 import type { TapEngine } from "../engine/useTapEngine";
 
@@ -9,28 +13,31 @@ type HitWindows = {
 	MEH: number;
 };
 
+type NoteSide = "left" | "right" | "either";
+
 type Props = {
 	drill: Drill;
 	engine: TapEngine;
 	userId?: string;
-
 	msPerGrid: number;
-	upcomingNotesRef: React.RefObject<number[]>;
+	upcomingNotesRef: React.RefObject<
+		(number | { time: number; side?: NoteSide })[]
+	>;
 	isRunning: boolean;
-	registerHit: (offset: number, grade: 300 | 100 | 50) => void;
-	registerMiss: () => void;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
-
+	onSessionComplete?: (analytics: SessionAnalytics | null) => void;
 	sessionEndRef?: React.RefObject<number>;
 	stop?: () => void;
 	externalTapRef?: React.MutableRefObject<() => void>;
+	isPracticeMode: boolean;
 };
 
 type ActiveNote = {
 	id: number;
 	scheduledTime: number;
 	spawnTime: number;
+	side: NoteSide;
 };
 
 export default function VisualizerCanvas({
@@ -40,13 +47,13 @@ export default function VisualizerCanvas({
 	msPerGrid,
 	upcomingNotesRef,
 	isRunning,
-	registerHit,
-	registerMiss,
+	isPracticeMode,
 	sessionEndRef,
 	stop,
 	getGrade,
 	windows,
 	externalTapRef,
+	onSessionComplete,
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
@@ -58,38 +65,52 @@ export default function VisualizerCanvas({
 		engineRef.current = engine;
 	}, [engine]);
 
-	// ✅ SUBMIT ONLY IF NATURALLY COMPLETED
+	/* ----------------------------- */
+	/* SUBMIT ON NATURAL COMPLETE   */
+	/* ----------------------------- */
+
 	useEffect(() => {
 		if (
 			!isRunning &&
 			!submittedRef.current &&
-			engineRef.current.live.completedRef.current
+			engineRef.current.live.completedRef?.current
 		) {
 			submittedRef.current = true;
-
-			if (!userId) return;
+			const effectiveUserId = userId ?? "dev-user-123";
 
 			const live = engineRef.current.live;
+			const taps = engineRef.current.live.tapEventsRef.current;
 
-			submitSession({
-				userId,
-				drillId: drill.id,
-				bpm: drill.bpm,
-				h300: live.hit300Ref.current,
-				h100: live.hit100Ref.current,
-				h50: live.hit50Ref.current,
-				miss: live.missRef.current,
-				meanOffset: live.meanOffsetRef.current,
-				unstableRate: live.unstableRateRef.current,
-			});
+			const analytics = analyzeSession(taps);
+
+			if (onSessionComplete) {
+				onSessionComplete(analytics);
+			}
+			if (isPracticeMode) {
+				submitSession({
+					userId: effectiveUserId,
+					drillId: drill.id,
+					bpm: drill.bpm,
+					h300: live.hit300Ref.current,
+					h100: live.hit100Ref.current,
+					h50: live.hit50Ref.current,
+					miss: live.missRef.current,
+					meanOffset: live.meanOffsetRef.current,
+					unstableRate: live.unstableRateRef.current,
+				});
+			}
 		}
-	}, [isRunning, userId, drill]);
+	}, [isRunning, userId, drill, onSessionComplete, isPracticeMode]);
 
 	useEffect(() => {
 		if (isRunning) {
 			submittedRef.current = false;
 		}
 	}, [isRunning]);
+
+	/* ----------------------------- */
+	/* MAIN EFFECT                   */
+	/* ----------------------------- */
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
@@ -99,8 +120,9 @@ export default function VisualizerCanvas({
 		let activeNotes: ActiveNote[] = [];
 		let noteId = 0;
 
-		const handleTap = () => {
+		const handleTap = (side: "left" | "right") => {
 			if (!isRunning) return;
+
 			const now = performance.now();
 			if (activeNotes.length === 0) return;
 
@@ -121,25 +143,43 @@ export default function VisualizerCanvas({
 			const offset = now - note.scheduledTime;
 			const grade = getGrade(offset);
 
+			if (note.side !== "either" && side !== note.side) {
+				engine.registerMiss();
+				return;
+			}
+
 			if (grade !== null) {
-				registerHit(offset, grade);
+				engine.registerHit(offset, grade, side);
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
 
-		if (externalTapRef) externalTapRef.current = handleTap;
+		if (externalTapRef) {
+			externalTapRef.current = () => handleTap("left");
+		}
 
 		const keyHandler = (e: KeyboardEvent) => {
-			if (e.code === "KeyZ" || e.code === "KeyX") handleTap();
+			if (e.code === "KeyZ") handleTap("left");
+			if (e.code === "KeyX") handleTap("right");
 		};
+
 		window.addEventListener("keydown", keyHandler);
 
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();
-			canvas.width = rect.width;
-			canvas.height = rect.height;
+			const dpr = window.devicePixelRatio || 1;
+
+			canvas.width = Math.floor(rect.width * dpr);
+			canvas.height = Math.floor(rect.height * dpr);
+
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		};
+
 		resize();
+
+		const ro = new ResizeObserver(() => resize());
+		ro.observe(canvas);
+
 		window.addEventListener("resize", resize);
 
 		const draw = () => {
@@ -163,11 +203,11 @@ export default function VisualizerCanvas({
 
 			const endTime = sessionEndRef?.current ?? 0;
 
-			// ✅ NATURAL COMPLETION DETECTION
 			if (isRunning && endTime && now >= endTime) {
-				engineRef.current.live.completedRef.current = true;
-				stop?.(); // stops engine cleanly
-				return;
+				if (engineRef.current.live.completedRef) {
+					engineRef.current.live.completedRef.current = true;
+				}
+				stop?.();
 			}
 
 			if (isRunning && endTime) {
@@ -182,23 +222,35 @@ export default function VisualizerCanvas({
 			if (isRunning) {
 				while (
 					upcomingNotesRef.current.length > 0 &&
-					upcomingNotesRef.current[0] - travelTime <= now
+					(typeof upcomingNotesRef.current[0] === "number"
+						? upcomingNotesRef.current[0]
+						: upcomingNotesRef.current[0].time) -
+						travelTime <=
+						now
 				) {
-					const scheduledTime = upcomingNotesRef.current.shift()!;
+					const raw = upcomingNotesRef.current.shift()!;
+
+					const scheduledTime = typeof raw === "number" ? raw : raw.time;
+
+					const side: NoteSide =
+						typeof raw === "number" ? "either" : (raw.side ?? "either");
+
 					activeNotes.push({
 						id: noteId++,
 						scheduledTime,
 						spawnTime: scheduledTime - travelTime,
+						side,
 					});
 				}
 
 				activeNotes = activeNotes.filter((note) => {
 					if (now - note.scheduledTime > windows.MEH) {
-						registerMiss();
+						engine.registerMiss();
 						return false;
 					}
 
 					const progress = (now - note.spawnTime) / travelTime;
+
 					if (progress < 0) return true;
 					if (progress >= 1.2) return false;
 
@@ -227,13 +279,12 @@ export default function VisualizerCanvas({
 		msPerGrid,
 		upcomingNotesRef,
 		isRunning,
-		registerHit,
-		registerMiss,
 		getGrade,
 		windows,
 		externalTapRef,
 		sessionEndRef,
 		stop,
+		engine,
 	]);
 
 	return <canvas ref={canvasRef} style={{ width: "100%", height: "250px" }} />;

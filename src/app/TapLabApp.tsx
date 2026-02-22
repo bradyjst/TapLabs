@@ -8,18 +8,20 @@ import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import { initHitSound } from "../lib/hitSound";
+import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import "./TapLab.css";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
-	// 🔥 Selected drill state
 	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
-
+	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
-
-	const isPracticeMode = bpmOverride !== null;
-
+	const [isPracticeMode] = useState<boolean>(bpmOverride !== null);
+	const tapRef = useRef<() => void>(() => {});
+	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
+		null,
+	);
 	const effectiveDrill = useMemo(() => {
 		if (!bpmOverride) return selectedDrill;
 
@@ -28,14 +30,12 @@ export default function TapLabApp() {
 			bpm: bpmOverride,
 		};
 	}, [selectedDrill, bpmOverride]);
-
-	// 🔥 Engine now receives entire drill
 	const engine = useTapEngine(effectiveDrill);
 
-	const tapRef = useRef<() => void>(() => {});
-
 	return (
-		<div className="app">
+		<div
+			className={`app ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"}`}
+		>
 			<Sidebar
 				drills={coreDrills}
 				selectedDrillId={selectedDrillId}
@@ -43,12 +43,16 @@ export default function TapLabApp() {
 			/>
 
 			<main className="main">
+				<button
+					className="sidebar-toggle-floating"
+					onClick={() => setSidebarOpen((v) => !v)}
+				>
+					{sidebarOpen ? "◀" : "▶"}
+				</button>
 				<VisualizerCanvas
 					msPerGrid={engine.msPerGrid}
 					upcomingNotesRef={engine.upcomingNotesRef}
 					isRunning={engine.isRunning}
-					registerHit={engine.registerHit}
-					registerMiss={engine.registerMiss}
 					getGrade={engine.getGrade}
 					windows={engine.hitWindows}
 					externalTapRef={tapRef}
@@ -57,6 +61,8 @@ export default function TapLabApp() {
 					drill={effectiveDrill}
 					engine={engine}
 					userId={user?.id}
+					onSessionComplete={setLastAnalytics}
+					isPracticeMode={isPracticeMode}
 				/>
 
 				<URBar
@@ -119,11 +125,7 @@ export default function TapLabApp() {
 					}}
 				/>
 
-				<StatsPanel
-					alignmentSD={engine.live.alignmentStdDevRef.current}
-					unstableRate={engine.live.unstableRateRef.current}
-					meanOffset={engine.live.meanOffsetRef.current}
-				/>
+				<StatsPanel data={lastAnalytics} isPaid={true} />
 			</main>
 		</div>
 	);

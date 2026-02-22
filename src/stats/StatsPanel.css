@@ -1,38 +1,83 @@
 .stats-panel {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 14px;
+	background: #0f172a;
+	border-radius: 12px;
+	padding: 16px;
+	margin-top: 16px;
+}
+
+.stats-section {
+	margin-bottom: 20px;
+}
+
+.stats-section h3 {
+	margin-bottom: 10px;
+	font-size: 15px;
+	font-weight: 600;
+	opacity: 0.9;
 }
 
 .stat-row {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	padding: 6px 0;
+	font-size: 14px;
 }
 
 .label {
-	font-size: 13px;
-	color: var(--text-muted);
+	opacity: 0.8;
 }
 
 .value {
-	font-size: 16px;
 	font-weight: 600;
-	color: var(--text-primary);
 }
 
-.value.early {
-	color: var(--early);
+.neutral {
+	color: #22d3ee;
 }
 
-.value.late {
-	color: var(--late);
+.early {
+	color: #f87171;
 }
 
-.value.neutral {
-	color: var(--perfect);
+.late {
+	color: #facc15;
+}
+
+.good {
+	color: #4ade80;
+}
+
+.medium {
+	color: #facc15;
+}
+
+.bad {
+	color: #f87171;
+}
+
+.locked {
+	opacity: 0.6;
+}
+
+.locked-text {
+	font-size: 13px;
+	opacity: 0.7;
+}
+
+.empty {
+	text-align: center;
+	opacity: 0.7;
+}
+
+.stats-section h4 {
+	margin-top: 16px;
+	margin-bottom: 8px;
+	font-size: 13px;
+	opacity: 0.8;
+}
+.chart-shell {
+	width: 100%;
+	height: 250px;
+	overflow: hidden; /* prevents tooltip from creating scrollbars */
+	position: relative; /* keeps tooltip positioning sane */
 }

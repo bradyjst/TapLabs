@@ -32,4 +32,48 @@ html,
 body,
 #root {
 	height: 100%;
+	overflow-x: hidden;
+	background: var(--bg);
+}
+
+/* ===== Scrollbars: Sidebar + TapLabsApp only ===== */
+
+.sidebar,
+.taplabapp {
+	scrollbar-width: thin; /* Firefox */
+	scrollbar-color: var(--grid) transparent;
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.sidebar::-webkit-scrollbar,
+.taplabapp::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.taplabapp::-webkit-scrollbar-track {
+	background: transparent; /* keep your bg showing through */
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.taplabapp::-webkit-scrollbar-thumb {
+	background: var(--grid);
+	border-radius: 999px;
+	border: 2px solid transparent; /* creates padding look */
+	background-clip: content-box;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.taplabapp::-webkit-scrollbar-thumb:hover {
+	background: var(--border);
+	background-clip: content-box;
+}
+
+.sidebar::-webkit-scrollbar-corner,
+.taplabapp::-webkit-scrollbar-corner {
+	background: transparent;
+}
+.sidebar::-webkit-scrollbar {
+	width: 7px;
 }
