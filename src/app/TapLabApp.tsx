@@ -17,7 +17,7 @@ export default function TapLabApp() {
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
-	const [isPracticeMode] = useState<boolean>(bpmOverride !== null);
+	const isPracticeMode = bpmOverride !== null;
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null,
