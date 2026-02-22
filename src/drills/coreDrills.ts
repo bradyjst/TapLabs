@@ -1,4 +1,4 @@
-import type { Drill } from "../types";
+import type { Drill } from "../types/types";
 
 export const coreDrills: Drill[] = [
 

@@ -1,4 +1,4 @@
-import type { Drill } from "../types";
+import type { Drill } from "../types/types";
 
 function resolutionToSubdivision(resolution: number) {
   const value = resolution * 4;

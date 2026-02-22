@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Sidebar.css";
-import type { Drill, Difficulty } from "../types";
+import type { Drill, Difficulty } from "../types/types";
 import { analyzeDrill } from "../drills/analyzeDrill";
 import AuthButton from "../components/AuthButton/AuthButton";
 import { useAuth } from "../context/useAuth";

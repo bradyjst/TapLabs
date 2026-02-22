@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect, useMemo } from "react";
 import { getHitWindows, getGrade } from "./timingConfig";
 import type { HitWindows } from "./timingConfig";
-import type { Drill } from "../types";
+import type { Drill } from "../types/types";
 import { playHitSound, playAccentHit, getAudioCtx } from "../lib/hitSound";
 
 /* ---------------------------------- */

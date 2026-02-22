@@ -4,7 +4,7 @@ import {
 	analyzeSession,
 	type SessionAnalytics,
 } from "../analytics/sessionAnalyzer";
-import type { Drill } from "../types";
+import type { Drill } from "../types/types";
 import type { TapEngine } from "../engine/useTapEngine";
 
 type HitWindows = {
@@ -20,9 +20,6 @@ type Props = {
 	engine: TapEngine;
 	userId?: string;
 	msPerGrid: number;
-	upcomingNotesRef: React.RefObject<
-		(number | { time: number; side?: NoteSide })[]
-	>;
 	isRunning: boolean;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
@@ -31,6 +28,9 @@ type Props = {
 	stop?: () => void;
 	externalTapRef?: React.MutableRefObject<() => void>;
 	isPracticeMode: boolean;
+	upcomingNotesRef: React.RefObject<
+		(number | { time: number; side?: NoteSide })[]
+	>;
 };
 
 type ActiveNote = {
@@ -86,7 +86,12 @@ export default function VisualizerCanvas({
 			if (onSessionComplete) {
 				onSessionComplete(analytics);
 			}
-			if (isPracticeMode) {
+			gtag("event", "session_complete", {
+				drill: drill.id,
+				ur: live.unstableRateRef.current,
+				practice: isPracticeMode,
+			});
+			if (!isPracticeMode) {
 				submitSession({
 					userId: effectiveUserId,
 					drillId: drill.id,
