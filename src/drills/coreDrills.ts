@@ -1,186 +1,92 @@
 import type { Drill } from "../types/types";
 
-export const coreDrills: Drill[] = [
+/* ---------------------------------- */
+/* ----------- CONFIG --------------- */
+/* ---------------------------------- */
 
-  // 🔹 5 Burst Series (lighter / control focus)
-  {
-    id: "burst5_160",
-    name: "5 Burst – 160 BPM",
-    difficulty: "easy",
-    bpm: 160,
-    od: 6,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 12,
-    bars: [
-      { notes: [0,1,2,3,4] }, // Beat 1 burst
-    ],
-  },
+// Midpoints for your sidebar buckets
+const BPM_VALUES = [110, 140, 170, 200, 230, 260, 300];
 
-
-  {
-    id: "burst5_160_test",
-    name: "5 Burst – 160 BPM test",
-    difficulty: "easy",
-    bpm: 160,
-    od: 6,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 4,
-    bars: [
-      { notes: [0,1,2,3,4] }, // Beat 1 burst
-    ],
-  },
-
-  {
-    id: "burst5_180",
-    name: "5 Burst – 180 BPM",
-    difficulty: "medium",
-    bpm: 180,
-    od: 7,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 16,
-    bars: [
-      { notes: [0,1,2,3,4] },
-    ],
-  },
-
-  {
-    id: "burst5_200",
-    name: "5 Burst – 200 BPM",
-    difficulty: "hard",
-    bpm: 200,
-    od: 8,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 20,
-    bars: [
-      { notes: [0,1,2,3,4] },
-    ],
-  },
-
-  // 🔹 9 Burst Series (denser / stamina focus)
-  {
-    id: "burst9_160",
-    name: "9 Burst – 160 BPM",
-    difficulty: "medium",
-    bpm: 160,
-    od: 7,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 16,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8] },
-    ],
-  },
-
-  {
-    id: "burst9_180",
-    name: "9 Burst – 180 BPM",
-    difficulty: "hard",
-    bpm: 180,
-    od: 8,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 20,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8] },
-    ],
-  },
-
-  {
-    id: "burst9_200",
-    name: "9 Burst – 200 BPM",
-    difficulty: "expert",
-    bpm: 200,
-    od: 9,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 24,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8] },
-    ],
-  },
-
-    {
-    id: "16burst_200",
-    name: "16 Burst – 200 BPM",
-    difficulty: "expert",
-    bpm: 200,
-    od: 8,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 14,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-      {notes: []}
-    ],
-  },
-
-      {
-    id: "32burst_200",
-    name: "32 Burst – 200 BPM",
-    difficulty: "expert",
-    bpm: 200,
-    od: 8,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 24,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        {notes: []}
-    ],
-  },
-
-        {
-    id: "64burst_200",
-    name: "64 Burst – 200 BPM",
-    difficulty: "expert",
-    bpm: 200,
-    od: 8,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 24,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        {notes: []}
-    ],
-  },
-
-          {
-    id: "256stream_200",
-    name: "256 DeathStream – 200 BPM",
-    difficulty: "extreme",
-    bpm: 200,
-    od: 7,
-    timeSig: { beatsPerBar: 4, beatUnit: 4 },
-    resolution: 4,
-    durationBars: 18,
-    bars: [
-      { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-             { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-             { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-             { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-            { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        { notes: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        {notes: []},
-    
-        
-    ],
-  },
+// You now control recovery + structure here
+const BURST_TYPES = [
+  { length: 3,  label: "3 Burst",  recoveryBars: 1 },
+  { length: 5,  label: "5 Burst",  recoveryBars: 1 },
+  { length: 7,  label: "7 Burst",  recoveryBars: 0 }, // tighter
+  { length: 9,  label: "9 Burst",  recoveryBars: 0 },
+  { length: 13, label: "13 Burst", recoveryBars: 0 },
+  { length: 16, label: "16 Notes", recoveryBars: 0 },
+  { length: 32, label: "32 Notes", recoveryBars: 0 },
 ];
+
+/* ---------------------------------- */
+/* ----------- HELPERS -------------- */
+/* ---------------------------------- */
+
+function buildBurstNotes(length: number): number[] {
+  return Array.from({ length }, (_, i) => i);
+}
+
+function buildBars(length: number, recoveryBars: number) {
+  const bars = [];
+
+  // Primary burst bar
+  bars.push({ notes: buildBurstNotes(length) });
+
+  // Optional recovery bars
+  for (let i = 0; i < recoveryBars; i++) {
+    bars.push({ notes: [] });
+  }
+
+  return bars;
+}
+
+function calculateOD(bpm: number): number {
+  const base = 6;
+  const scale = Math.floor((bpm - 100) / 40);
+  return Math.min(10, base + scale);
+}
+
+function calculateDurationBars(length: number): number {
+  if (length <= 5) return 12;
+  if (length <= 9) return 16;
+  if (length <= 16) return 20;
+  return 24;
+}
+
+function generateBurstDrill(
+  bpm: number,
+  burstLength: number,
+  label: string,
+  recoveryBars: number
+): Drill {
+  return {
+    id: `burst${burstLength}_${bpm}`,
+    name: `${label} – ${bpm} BPM`,
+    difficulty: "easy",
+    bpm,
+    od: calculateOD(bpm),
+    timeSig: { beatsPerBar: 4, beatUnit: 4 },
+    resolution: 4,
+    durationBars: calculateDurationBars(burstLength),
+    bars: buildBars(burstLength, recoveryBars),
+  };
+}
+
+/* ---------------------------------- */
+/* --------- GENERATE SET ----------- */
+/* ---------------------------------- */
+
+export const coreDrills: Drill[] = [];
+
+for (const bpm of BPM_VALUES) {
+  for (const burst of BURST_TYPES) {
+    coreDrills.push(
+      generateBurstDrill(
+        bpm,
+        burst.length,
+        burst.label,
+        burst.recoveryBars
+      )
+    );
+  }
+}

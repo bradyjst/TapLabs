@@ -150,3 +150,46 @@
 .sidebar > * {
 	direction: ltr;
 }
+
+/* SECTION BUTTON */
+
+.section-title {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	background: transparent;
+	border: none;
+	padding: 10px 12px;
+
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+
+	color: var(--text-primary);
+	cursor: pointer;
+
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.section-title:hover {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.section-title.open {
+	color: #22d3ee; /* match your note color */
+}
+
+/* Chevron animation */
+
+.chevron {
+	transition: transform 0.2s ease;
+	font-size: 12px;
+	opacity: 0.7;
+}
+
+.section-title.open .chevron {
+	transform: rotate(90deg);
+	opacity: 1;
+}

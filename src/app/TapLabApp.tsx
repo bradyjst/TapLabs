@@ -20,7 +20,7 @@ export default function TapLabApp() {
 	const isPracticeMode = bpmOverride !== null;
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
-		null,
+		null
 	);
 	const effectiveDrill = useMemo(() => {
 		if (!bpmOverride) return selectedDrill;
@@ -43,91 +43,93 @@ export default function TapLabApp() {
 			/>
 
 			<main className="main">
-				<button
-					className="sidebar-toggle-floating"
-					onClick={() => setSidebarOpen((v) => !v)}
-				>
-					{sidebarOpen ? "◀" : "▶"}
-				</button>
-				<VisualizerCanvas
-					msPerGrid={engine.msPerGrid}
-					upcomingNotesRef={engine.upcomingNotesRef}
-					isRunning={engine.isRunning}
-					getGrade={engine.getGrade}
-					windows={engine.hitWindows}
-					externalTapRef={tapRef}
-					sessionEndRef={engine.live.sessionEndRef}
-					stop={engine.stop}
-					drill={effectiveDrill}
-					engine={engine}
-					userId={user?.id}
-					onSessionComplete={setLastAnalytics}
-					isPracticeMode={isPracticeMode}
-				/>
+				<div className="main-inner">
+					<button
+						className="sidebar-toggle-floating"
+						onClick={() => setSidebarOpen((v) => !v)}
+					>
+						{sidebarOpen ? "◀" : "▶"}
+					</button>
+					<VisualizerCanvas
+						msPerGrid={engine.msPerGrid}
+						upcomingNotesRef={engine.upcomingNotesRef}
+						isRunning={engine.isRunning}
+						getGrade={engine.getGrade}
+						windows={engine.hitWindows}
+						externalTapRef={tapRef}
+						sessionEndRef={engine.live.sessionEndRef}
+						stop={engine.stop}
+						drill={effectiveDrill}
+						engine={engine}
+						userId={user?.id}
+						onSessionComplete={setLastAnalytics}
+						isPracticeMode={isPracticeMode}
+					/>
 
-				<URBar
-					recentOffsetsMsRef={engine.live.recentOffsetsMsRef}
-					od={selectedDrill.od}
-				/>
+					<URBar
+						recentOffsetsMsRef={engine.live.recentOffsetsMsRef}
+						od={selectedDrill.od}
+					/>
 
-				<div className="session-controls">
-					<div className="drill-controls">
-						{!engine.isRunning ? (
-							<button
-								className="start-btn"
-								onClick={async () => {
-									await initHitSound(); // 🔥 unlock browser audio
-									engine.start();
-								}}
-							>
-								Begin Session
-							</button>
-						) : (
-							<button
-								className="stop-btn"
-								onClick={() => {
-									engine.stop();
-								}}
-							>
-								Quit Early
-							</button>
-						)}
+					<div className="session-controls">
+						<div className="drill-controls">
+							{!engine.isRunning ? (
+								<button
+									className="start-btn"
+									onClick={async () => {
+										await initHitSound(); // 🔥 unlock browser audio
+										engine.start();
+									}}
+								>
+									Begin Session
+								</button>
+							) : (
+								<button
+									className="stop-btn"
+									onClick={() => {
+										engine.stop();
+									}}
+								>
+									Quit Early
+								</button>
+							)}
+						</div>
+
+						<div className="bpm-mod">
+							<label>
+								Tempo Override
+								<input
+									type="number"
+									min={60}
+									max={300}
+									value={bpmOverride ?? selectedDrill.bpm}
+									onChange={(e) => {
+										const value = Number(e.target.value);
+										if (value === selectedDrill.bpm) {
+											setBpmOverride(null);
+										} else {
+											setBpmOverride(value);
+										}
+									}}
+								/>
+							</label>
+
+							{isPracticeMode && (
+								<div className="practice-badge">
+									Practice Mode – Scores Disabled
+								</div>
+							)}
+						</div>
 					</div>
 
-					<div className="bpm-mod">
-						<label>
-							Tempo Override
-							<input
-								type="number"
-								min={60}
-								max={300}
-								value={bpmOverride ?? selectedDrill.bpm}
-								onChange={(e) => {
-									const value = Number(e.target.value);
-									if (value === selectedDrill.bpm) {
-										setBpmOverride(null);
-									} else {
-										setBpmOverride(value);
-									}
-								}}
-							/>
-						</label>
+					<MobileTapPads
+						onTap={() => {
+							tapRef.current();
+						}}
+					/>
 
-						{isPracticeMode && (
-							<div className="practice-badge">
-								Practice Mode – Scores Disabled
-							</div>
-						)}
-					</div>
+					<StatsPanel data={lastAnalytics} isPaid={true} />
 				</div>
-
-				<MobileTapPads
-					onTap={() => {
-						tapRef.current();
-					}}
-				/>
-
-				<StatsPanel data={lastAnalytics} isPaid={true} />
 			</main>
 		</div>
 	);
