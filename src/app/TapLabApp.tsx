@@ -47,6 +47,10 @@ export default function TapLabApp() {
 
 			<main className="main">
 				<div className="main-inner">
+					<div className="banner">
+						This site is currently in beta. Your scores may not permanently
+						save, and the site may recieve significant changes.
+					</div>
 					<div className="controls-row">
 						<button
 							className="sidebar-toggle-floating"
@@ -161,7 +165,7 @@ export default function TapLabApp() {
 						}}
 					/>
 
-					<StatsPanel data={lastAnalytics} isPaid={true} />
+					<StatsPanel data={lastAnalytics} isPaid={false} />
 				</div>
 			</main>
 		</div>

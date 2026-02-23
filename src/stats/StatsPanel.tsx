@@ -58,7 +58,9 @@ export default function StatsPanel({ data, isPaid = false }: Props) {
 
 				<StatRow
 					label="Early / Late"
-					value={`${(earlyPercent * 100).toFixed(0)}% / ${(latePercent * 100).toFixed(0)}%`}
+					value={`${(earlyPercent * 100).toFixed(0)}% / ${(
+						latePercent * 100
+					).toFixed(0)}%`}
 				/>
 
 				<StatRow label="Left Mean" value={`${leftMean.toFixed(2)} ms`} />
@@ -67,35 +69,37 @@ export default function StatsPanel({ data, isPaid = false }: Props) {
 			</div>
 
 			{/* ADVANCED SECTION */}
-			<div className={`stats-section advanced ${!isPaid ? "locked" : ""}`}>
-				<h3>Advanced Diagnostics {isPaid ? "" : "🔒"}</h3>
+			<div className="hidden">
+				<div className={`stats-section advanced ${!isPaid ? "locked" : ""}`}>
+					<h3>Advanced Diagnostics {isPaid ? "" : "🔒"}</h3>
 
-				{isPaid ? (
-					<>
+					{isPaid ? (
 						<>
-							<h4>Timing Distribution</h4>
-							<HistogramChart histogram={data.histogram} />
+							<>
+								<h4>Timing Distribution</h4>
+								<HistogramChart histogram={data.histogram} />
 
-							<h4>Drift Over Session</h4>
-							<DriftCurveChart driftCurve={data.driftCurve} />
+								<h4>Drift Over Session</h4>
+								<DriftCurveChart driftCurve={data.driftCurve} />
+							</>
+							<StatRow
+								label="Consistency Score"
+								value={consistencyScore.toFixed(0)}
+								highlight={getConsistencyClass(consistencyScore)}
+							/>
+
+							<StatRow
+								label="Galloping Risk"
+								value={`${gallopingRisk.toFixed(0)}%`}
+								highlight={getRiskClass(gallopingRisk)}
+							/>
 						</>
-						<StatRow
-							label="Consistency Score"
-							value={consistencyScore.toFixed(0)}
-							highlight={getConsistencyClass(consistencyScore)}
-						/>
-
-						<StatRow
-							label="Galloping Risk"
-							value={`${gallopingRisk.toFixed(0)}%`}
-							highlight={getRiskClass(gallopingRisk)}
-						/>
-					</>
-				) : (
-					<p className="locked-text">
-						Unlock deep rhythm diagnostics and performance curves.
-					</p>
-				)}
+					) : (
+						<p className="locked-text">
+							Unlock deep rhythm diagnostics and performance curves.
+						</p>
+					)}
+				</div>
 			</div>
 		</div>
 	);

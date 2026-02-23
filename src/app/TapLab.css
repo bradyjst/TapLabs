@@ -291,3 +291,10 @@
 	background: rgba(168, 85, 247, 0.1);
 	border-color: rgb(168, 85, 247);
 }
+
+.banner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 10px;
+}
