@@ -20,6 +20,15 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 
 		const maxVisual = 120;
 
+		// 🔥 Pull theme ONCE instead of every frame
+		const rootStyles = getComputedStyle(document.documentElement);
+		const perfectColor =
+			rootStyles.getPropertyValue("--perfect").trim() || "#3ddc97";
+		const goodColor = rootStyles.getPropertyValue("--good").trim() || "#ffd166";
+		const mehColor = rootStyles.getPropertyValue("--meh").trim() || "#ff5c7a";
+		const borderColor =
+			rootStyles.getPropertyValue("--border").trim() || "rgba(255,255,255,0.2)";
+
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();
 			canvas.width = rect.width;
@@ -34,35 +43,28 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			const height = canvas.height;
 			const centerX = width / 2;
 
-			const offsets = recentOffsetsMsRef.current ?? [];
-			const windows = getHitWindows(od);
+			const offsetsRaw = recentOffsetsMsRef.current;
 
-			// Pull theme colors INSIDE draw (so theme changes apply, and no SSR/module weirdness)
-			const rootStyles = getComputedStyle(document.documentElement);
-			const perfectColor =
-				rootStyles.getPropertyValue("--perfect").trim() || "#3ddc97";
-			const goodColor =
-				rootStyles.getPropertyValue("--good").trim() || "#ffd166";
-			const mehColor = rootStyles.getPropertyValue("--meh").trim() || "#ff5c7a";
-			const borderColor =
-				rootStyles.getPropertyValue("--border").trim() ||
-				"rgba(255,255,255,0.2)";
+			// ✅ HARD CAP SAFETY (prevents runaway array)
+			const offsets =
+				offsetsRaw.length > 120
+					? offsetsRaw.slice(offsetsRaw.length - 120)
+					: offsetsRaw;
+
+			const windows = getHitWindows(od);
 
 			const scale = (ms: number) => (ms / maxVisual) * (width / 2);
 
-			// Clear
 			ctx.clearRect(0, 0, width, height);
 
-			// Background (subtle vertical gradient)
-			{
-				const bg = ctx.createLinearGradient(0, 0, 0, height);
-				bg.addColorStop(0, "#0b0c10");
-				bg.addColorStop(1, "#10121a");
-				ctx.fillStyle = bg;
-				ctx.fillRect(0, 0, width, height);
-			}
+			// Background
+			const bg = ctx.createLinearGradient(0, 0, 0, height);
+			bg.addColorStop(0, "#0b0c10");
+			bg.addColorStop(1, "#10121a");
+			ctx.fillStyle = bg;
+			ctx.fillRect(0, 0, width, height);
 
-			// Subtle grid
+			// Grid
 			ctx.strokeStyle = "rgba(255,255,255,0.05)";
 			ctx.lineWidth = 1;
 			for (let ms = -maxVisual; ms <= maxVisual; ms += 30) {
@@ -73,7 +75,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				ctx.stroke();
 			}
 
-			// Glow windows (MEH -> GOOD -> PERFECT)
+			// Windows
 			const drawWindow = (ms: number, color: string, alpha: number) => {
 				const half = scale(ms);
 				const g = ctx.createLinearGradient(
@@ -96,7 +98,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			drawWindow(windows.GOOD, goodColor, 0.1);
 			drawWindow(windows.PERFECT, perfectColor, 0.12);
 
-			// Center line (clean + slightly glowing)
+			// Center line
 			ctx.save();
 			ctx.strokeStyle = borderColor;
 			ctx.lineWidth = 2;
@@ -108,21 +110,17 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			ctx.stroke();
 			ctx.restore();
 
-			// Hits (newest brightest)
+			// Hits
+			const glowCutoff = offsets.length - 20; // ✅ only newest 20 glow
+
 			for (let i = 0; i < offsets.length; i++) {
 				const offset = offsets[i];
 				const abs = Math.abs(offset);
 				const x = centerX + scale(offset);
 
-				// Correct grading logic:
-				// inside PERFECT => perfectColor
-				// else if inside GOOD => goodColor
-				// else if inside MEH => mehColor
-				// else => mehColor (or you can make it darker)
 				let color = mehColor;
 				if (abs <= windows.PERFECT) color = perfectColor;
 				else if (abs <= windows.GOOD) color = goodColor;
-				else if (abs <= windows.MEH) color = mehColor;
 
 				const alpha = offsets.length > 0 ? 1 - i / offsets.length : 1;
 
@@ -130,20 +128,24 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				ctx.globalAlpha = alpha;
 				ctx.strokeStyle = color;
 				ctx.lineWidth = 3;
-				ctx.shadowColor = color;
-				ctx.shadowBlur = 10;
+
+				// 🔥 Only glow recent hits
+				if (i >= glowCutoff) {
+					ctx.shadowColor = color;
+					ctx.shadowBlur = 10;
+				}
 
 				ctx.beginPath();
 				ctx.moveTo(x, height * 0.2);
 				ctx.lineTo(x, height * 0.8);
 				ctx.stroke();
-
 				ctx.restore();
 			}
 
-			// Mean line (smoothed)
+			// Mean line
 			if (offsets.length > 0) {
 				const rawMean = offsets.reduce((a, b) => a + b, 0) / offsets.length;
+
 				smoothedMeanRef.current += (rawMean - smoothedMeanRef.current) * 0.12;
 
 				const meanX = centerX + scale(smoothedMeanRef.current);
