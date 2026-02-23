@@ -6,6 +6,7 @@ import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
+import { useTheme } from "../theme/useTheme";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import { initHitSound } from "../lib/hitSound";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
@@ -17,6 +18,8 @@ export default function TapLabApp() {
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
+	const [visualStyle, setVisualStyle] = useState<string>("minimal");
+	const { setPreset } = useTheme();
 	const isPracticeMode = bpmOverride !== null;
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
@@ -44,12 +47,41 @@ export default function TapLabApp() {
 
 			<main className="main">
 				<div className="main-inner">
-					<button
-						className="sidebar-toggle-floating"
-						onClick={() => setSidebarOpen((v) => !v)}
-					>
-						{sidebarOpen ? "◀" : "▶"}
-					</button>
+					<div className="controls-row">
+						<button
+							className="sidebar-toggle-floating"
+							onClick={() => setSidebarOpen((v) => !v)}
+						>
+							{sidebarOpen ? "◀" : "▶"}
+						</button>
+						<button
+							className={`visual-toggle ${visualStyle}`}
+							onClick={() =>
+								setVisualStyle(
+									visualStyle === "minimal" ? "approach" : "minimal"
+								)
+							}
+						>
+							{visualStyle === "minimal"
+								? "Switch to Approach Mode"
+								: "Switch to Minimal Mode"}
+						</button>
+						<div className="theme-selector">
+							<button
+								className={`theme-button cyan`}
+								onClick={() => setPreset("cyan")}
+							>
+								Cyan
+							</button>
+
+							<button
+								className={`theme-button violet`}
+								onClick={() => setPreset("violet")}
+							>
+								Violet
+							</button>
+						</div>
+					</div>
 					<VisualizerCanvas
 						msPerGrid={engine.msPerGrid}
 						upcomingNotesRef={engine.upcomingNotesRef}
@@ -64,6 +96,7 @@ export default function TapLabApp() {
 						userId={user?.id}
 						onSessionComplete={setLastAnalytics}
 						isPracticeMode={isPracticeMode}
+						visualStyle={visualStyle}
 					/>
 
 					<URBar

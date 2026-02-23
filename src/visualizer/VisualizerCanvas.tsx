@@ -6,6 +6,7 @@ import {
 } from "../analytics/sessionAnalyzer";
 import type { Drill } from "../types/types";
 import type { TapEngine } from "../engine/useTapEngine";
+import "./VisualizerCanvas.css";
 
 type HitWindows = {
 	PERFECT: number;
@@ -21,6 +22,7 @@ type Props = {
 	userId?: string;
 	msPerGrid: number;
 	isRunning: boolean;
+	visualStyle: string;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
 	onSessionComplete?: (analytics: SessionAnalytics | null) => void;
@@ -38,8 +40,14 @@ type ActiveNote = {
 	scheduledTime: number;
 	spawnTime: number;
 	side: NoteSide;
-	pulseAt?: number;
-	consumed?: boolean;
+};
+
+type FloatingFace = {
+	id: number;
+	grade: 300 | 100 | 50;
+	spawnTime: number;
+	vx: number;
+	vy: number;
 };
 
 export default function VisualizerCanvas({
@@ -51,6 +59,7 @@ export default function VisualizerCanvas({
 	isRunning,
 	isPracticeMode,
 	sessionEndRef,
+	visualStyle,
 	stop,
 	getGrade,
 	windows,
@@ -60,17 +69,25 @@ export default function VisualizerCanvas({
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
 	const cssSizeRef = useRef({ w: 0, h: 0 });
-	const lastHitTimeRef = useRef<number>(0);
+
 	const submittedRef = useRef(false);
 	const engineRef = useRef(engine);
+
+	// Center pulse is driven by "last hit time"
+	const lastHitTimeRef = useRef<number>(0);
+
+	// Floating faces (each hit is its own particle)
+	const floatingFacesRef = useRef<FloatingFace[]>([]);
+	const faceIdRef = useRef(0);
 
 	useEffect(() => {
 		engineRef.current = engine;
 	}, [engine]);
 
-	/* ----------------------------- */
-	/* SUBMIT LOGIC                 */
-	/* ----------------------------- */
+	const getVar = (name: string) =>
+		getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+	/* ---------------- SUBMIT LOGIC ---------------- */
 
 	useEffect(() => {
 		if (
@@ -113,19 +130,23 @@ export default function VisualizerCanvas({
 		if (isRunning) submittedRef.current = false;
 	}, [isRunning]);
 
-	/* ----------------------------- */
-	/* MAIN CANVAS EFFECT           */
-	/* ----------------------------- */
+	/* ---------------- MAIN EFFECT ---------------- */
 
 	useEffect(() => {
-		const canvas = canvasRef.current!;
-		const ctx = canvas.getContext("2d")!;
-		const travelTime = msPerGrid * 4;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
 
 		let activeNotes: ActiveNote[] = [];
 		let noteId = 0;
 
-		/* ---------- Retina Setup ---------- */
+		const travelMultiplier =
+			parseFloat(getVar("--note-travel-multiplier")) || 8;
+		const travelTime = msPerGrid * travelMultiplier;
+
+		/* ---------- Retina ---------- */
 
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();
@@ -151,6 +172,7 @@ export default function VisualizerCanvas({
 
 		const handleTap = (side: "left" | "right") => {
 			if (!isRunning) return;
+
 			const now = performance.now();
 			if (!activeNotes.length) return;
 
@@ -158,7 +180,6 @@ export default function VisualizerCanvas({
 			let smallestDelta = Infinity;
 
 			activeNotes.forEach((note, i) => {
-				if (note.consumed) return;
 				const delta = Math.abs(now - note.scheduledTime);
 				if (delta < smallestDelta) {
 					smallestDelta = delta;
@@ -180,8 +201,26 @@ export default function VisualizerCanvas({
 			if (grade !== null) {
 				engine.registerHit(offset, grade, side);
 
+				// trigger center pulse
 				lastHitTimeRef.current = now;
 
+				const spreadDeg = 130;
+				const spreadRad = (spreadDeg * Math.PI) / 180;
+				const halfSpread = spreadRad / 2;
+
+				const angle = -Math.PI / 2 + (Math.random() * spreadRad - halfSpread);
+
+				const speed = 90 + Math.random() * 80;
+
+				floatingFacesRef.current.push({
+					id: faceIdRef.current++,
+					grade,
+					spawnTime: now,
+					vx: Math.cos(angle) * speed,
+					vy: Math.sin(angle) * speed,
+				});
+
+				// consume the note immediately
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
@@ -197,7 +236,7 @@ export default function VisualizerCanvas({
 
 		window.addEventListener("keydown", keyHandler);
 
-		/* ---------- Draw Loop ---------- */
+		/* ---------- Draw ---------- */
 
 		const draw = () => {
 			const now = performance.now();
@@ -208,30 +247,61 @@ export default function VisualizerCanvas({
 				return;
 			}
 
+			// Theme vars
+			const bgColor = getVar("--bg");
+			const accent = getVar("--accent");
+			const accentSoft = getVar("--accent-soft");
+			const noteColor = getVar("--note-color") || accent;
+			const approachColor = getVar("--approach-color");
+			const textPrimary = getVar("--text-primary");
+			const textMuted = getVar("--text-muted");
+			const borderWidth = parseFloat(getVar("--note-border-width")) || 4;
+
 			const centerX = width / 2;
 			const centerY = height / 2;
 			const startX = width * 0.1;
 
 			ctx.clearRect(0, 0, width, height);
-			ctx.fillStyle = "#0f172a";
+			ctx.fillStyle = bgColor;
 			ctx.fillRect(0, 0, width, height);
 
-			// 🔥 Center Pulse
-			const elapsed = now - lastHitTimeRef.current;
-			let scale = 1;
+			/* ----- Countdown Timer ----- */
 
-			if (elapsed < 120) {
-				const t = elapsed / 120;
+			const endTime = sessionEndRef?.current ?? 0;
+			if (isRunning && endTime) {
+				const remainingMs = Math.max(0, endTime - now);
+
+				ctx.save();
+				ctx.fillStyle = textMuted;
+				ctx.font = "bold 14px system-ui";
+				ctx.textAlign = "right";
+				ctx.textBaseline = "top";
+				ctx.fillText(`${(remainingMs / 1000).toFixed(1)}s`, width - 16, 16);
+				ctx.restore();
+
+				if (remainingMs <= 0) {
+					engineRef.current.live.completedRef.current = true;
+					stop?.();
+				}
+			}
+
+			/* ----- Center Pulse + Circle of Truth ----- */
+
+			const pulseElapsed = now - lastHitTimeRef.current;
+			let pulseScale = 1;
+
+			if (pulseElapsed < 120) {
+				const t = pulseElapsed / 120;
 				const easeOut = 1 - Math.pow(1 - t, 3);
-				scale = 1 + 0.25 * (1 - easeOut);
+				pulseScale = 1 + 0.25 * (1 - easeOut);
 			}
 
 			ctx.save();
 			ctx.translate(centerX, centerY);
-			ctx.scale(scale, scale);
+			ctx.scale(pulseScale, pulseScale);
 			ctx.translate(-centerX, -centerY);
 
-			ctx.strokeStyle = "#ffffff";
+			ctx.strokeStyle = accent;
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
@@ -239,25 +309,45 @@ export default function VisualizerCanvas({
 
 			ctx.restore();
 
-			const endTime = sessionEndRef?.current ?? 0;
+			/* ----- Floating Faces (multi) ----- */
 
-			if (isRunning && endTime && now >= endTime) {
-				engineRef.current.live.completedRef.current = true;
-				stop?.();
-			}
+			const faceDuration = 600;
 
-			if (isRunning && endTime) {
-				const remainingMs = Math.max(0, endTime - now);
-				ctx.fillStyle = "rgba(255,255,255,0.8)";
-				ctx.font = "16px system-ui";
-				ctx.fillText(
-					`Time Left: ${(remainingMs / 1000).toFixed(1)}s`,
-					width - 140,
-					30
-				);
-			}
+			floatingFacesRef.current = floatingFacesRef.current.filter((face) => {
+				const elapsed = now - face.spawnTime;
+				if (elapsed > faceDuration) return false;
 
-			/* ---------- Spawn Notes ---------- */
+				const t = elapsed / 1000; // seconds
+
+				const x = centerX + face.vx * t;
+				const y = centerY - 60 + face.vy * t;
+
+				const opacity = 1 - elapsed / faceDuration;
+
+				let text = ":)";
+				let color = getVar("--perfect");
+
+				if (face.grade === 100) {
+					text = ":|";
+					color = getVar("--early");
+				} else if (face.grade === 50) {
+					text = ":(";
+					color = getVar("--late");
+				}
+
+				ctx.save();
+				ctx.globalAlpha = opacity;
+				ctx.fillStyle = color;
+				ctx.font = "bold 26px system-ui";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillText(text, x, y);
+				ctx.restore();
+
+				return true;
+			});
+
+			/* ----- Spawn + Draw Notes ----- */
 
 			if (isRunning) {
 				while (
@@ -282,43 +372,61 @@ export default function VisualizerCanvas({
 					});
 				}
 
-				/* ---------- Update & Draw Notes ---------- */
-
 				activeNotes = activeNotes.filter((note) => {
-					if (!note.consumed && now - note.scheduledTime > windows.MEH) {
+					if (now - note.scheduledTime > windows.MEH) {
 						engine.registerMiss();
 						return false;
-					}
-
-					if (note.consumed && note.pulseAt) {
-						if (now - note.pulseAt > 100) return false;
 					}
 
 					const progress = (now - note.spawnTime) / travelTime;
 					if (progress < 0 || progress >= 1.2) return progress < 1.2;
 
 					const x = startX + progress * (centerX - startX);
+					const radius = 22;
 
-					let scale = 1;
+					// Approach ring
+					if (visualStyle === "approach") {
+						const total = note.scheduledTime - note.spawnTime;
+						const remaining = note.scheduledTime - now;
+						const t = 1 - remaining / total;
+						const clamped = Math.max(0, Math.min(1, t));
+						const approachScale = 2 - clamped;
 
-					if (note.pulseAt) {
-						const elapsed = now - note.pulseAt;
-						if (elapsed < 1) {
-							const t = elapsed / 100;
-							const easeOut = 1 - Math.pow(1 - t, 3);
-							scale = 1 + 0.35 * (1 - easeOut);
-						}
+						ctx.save();
+						ctx.translate(x, centerY);
+						ctx.scale(approachScale, approachScale);
+						ctx.translate(-x, -centerY);
+
+						ctx.strokeStyle = approachColor;
+						ctx.lineWidth = 3;
+						ctx.beginPath();
+						ctx.arc(x, centerY, radius, 0, Math.PI * 2);
+						ctx.stroke();
+						ctx.restore();
 					}
 
+					// Note
 					ctx.save();
 					ctx.translate(x, centerY);
-					ctx.scale(scale, scale);
-					ctx.translate(-x, -centerY);
 
-					ctx.fillStyle = "#22d3ee";
+					ctx.fillStyle = accentSoft;
 					ctx.beginPath();
-					ctx.arc(x, centerY, 20, 0, Math.PI * 2);
+					ctx.arc(0, 0, radius, 0, Math.PI * 2);
 					ctx.fill();
+
+					ctx.strokeStyle = noteColor;
+					ctx.lineWidth = borderWidth;
+					ctx.beginPath();
+					ctx.arc(0, 0, radius, 0, Math.PI * 2);
+					ctx.stroke();
+
+					ctx.fillStyle = textPrimary;
+					ctx.font = "bold 14px system-ui";
+					ctx.textAlign = "center";
+					ctx.textBaseline = "middle";
+
+					const notesPerBar = drill.bars[0].notes.length || 1;
+					ctx.fillText(String((note.id % notesPerBar) + 1), 0, 0);
 
 					ctx.restore();
 
@@ -347,12 +455,13 @@ export default function VisualizerCanvas({
 		sessionEndRef,
 		stop,
 		engine,
+		drill.bars,
+		visualStyle,
 	]);
 
 	return (
-		<canvas
-			ref={canvasRef}
-			style={{ width: "100%", height: "250px", display: "block" }}
-		/>
+		<div className="visualizer-wrapper">
+			<canvas ref={canvasRef} className="visualizer-canvas" />
+		</div>
 	);
 }

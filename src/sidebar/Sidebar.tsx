@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "./Sidebar.css";
 import type { Drill } from "../types/types";
 import { analyzeDrill } from "../drills/analyzeDrill";
@@ -43,12 +43,30 @@ export default function Sidebar({
 		}));
 	};
 
+	// 🔥 NEW: Get currently selected drill
+	const selectedDrill = useMemo(
+		() => drills.find((d) => d.id === selectedDrillId),
+		[drills, selectedDrillId]
+	);
+
+	const selectedMeta = selectedDrill ? analyzeDrill(selectedDrill) : null;
+
 	return (
 		<aside className="sidebar">
 			<div className="taplabsheader">
 				<h2>TapLabs</h2>
 				<AuthButton />
 			</div>
+
+			{/* 🔥 Current Drill Display */}
+			{selectedDrill && selectedMeta && (
+				<div className="current-drill">
+					<div className="current-title">{selectedDrill.name}</div>
+					<div className="current-meta">
+						{selectedMeta.bpm} BPM • OD {selectedMeta.od}
+					</div>
+				</div>
+			)}
 
 			{BPM_BUCKETS.map((bucket) => {
 				const label =

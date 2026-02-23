@@ -31,12 +31,8 @@
 	width: 320px;
 	min-width: 320px;
 	overflow: auto;
-	transition:
-		width 200ms ease,
-		min-width 200ms ease,
-		padding 200ms ease,
-		border 200ms ease,
-		transform 200ms ease;
+	transition: width 200ms ease, min-width 200ms ease, padding 200ms ease,
+		border 200ms ease, transform 200ms ease;
 }
 
 .app.sidebar-collapsed .sidebar {
@@ -48,12 +44,8 @@
 
 	/* slide it out so it doesn't eat clicks */
 	transform: translateX(-100%);
-	transition:
-		width 200ms ease,
-		min-width 200ms ease,
-		padding 200ms ease,
-		border 200ms ease,
-		transform 200ms ease;
+	transition: width 200ms ease, min-width 200ms ease, padding 200ms ease,
+		border 200ms ease, transform 200ms ease;
 }
 
 /* When collapsed, give main a bit more room */
@@ -179,15 +171,13 @@
 }
 
 .sidebar-toggle-floating {
-	position: absolute;
-	top: 20px;
-	left: 1px;
-	z-index: 1000;
-
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	background: var(--surface);
 	border: 1px solid var(--border);
 	color: var(--text-primary);
-
+	transform: translateX(-5px);
 	padding: 6px 10px;
 	border-radius: 8px;
 	cursor: pointer;
@@ -197,4 +187,107 @@
 .sidebar-toggle-floating:hover {
 	border-color: var(--accent);
 	background: var(--accent-soft);
+}
+
+.visual-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 14px;
+	font-size: 13px;
+	font-weight: 600;
+
+	border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text-primary);
+
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.visual-toggle:hover {
+	background: rgba(255, 255, 255, 0.08);
+	transform: translateY(-1px);
+}
+
+.visual-toggle:active {
+	transform: translateY(0px);
+}
+
+/* Mode accent colors */
+
+.visual-toggle.minimal {
+	border-color: rgba(34, 211, 238, 0.4);
+}
+
+.visual-toggle.approach {
+	border-color: rgba(168, 85, 247, 0.4);
+}
+
+.controls-row {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+/* Container */
+
+.theme-selector {
+	display: flex;
+	gap: 10px;
+	margin: 10px 0;
+}
+
+/* Base Button */
+
+.theme-button {
+	padding: 8px 14px;
+	font-size: 13px;
+	font-weight: 600;
+
+	border-radius: 8px;
+	border: 1px solid var(--border);
+
+	background: var(--surface);
+	color: var(--text-primary);
+
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+/* Hover */
+
+.theme-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Active press */
+
+.theme-button:active {
+	transform: translateY(0px);
+}
+
+/* Cyan Variant */
+
+.theme-button.cyan {
+	border-color: rgba(34, 211, 238, 0.4);
+}
+
+.theme-button.cyan:hover {
+	background: rgba(34, 211, 238, 0.1);
+	border-color: rgb(34, 211, 238);
+}
+
+/* Violet Variant */
+
+.theme-button.violet {
+	border-color: rgba(168, 85, 247, 0.4);
+}
+
+.theme-button.violet:hover {
+	background: rgba(168, 85, 247, 0.1);
+	border-color: rgb(168, 85, 247);
 }

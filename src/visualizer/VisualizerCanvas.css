@@ -1,0 +1,31 @@
+.visualizer-wrapper {
+	position: relative;
+	width: 100%;
+	height: 250px;
+	overflow: hidden;
+
+	background-image: var(--visualizer-bg-image);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+
+	/* optional aesthetic polish */
+	border-radius: 12px;
+}
+
+.visualizer-canvas {
+	width: 100%;
+	height: 100%;
+	display: block;
+
+	/* allow background to show through */
+	background: transparent;
+}
+
+.visualizer-wrapper::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	pointer-events: none;
+}

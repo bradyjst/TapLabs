@@ -9,30 +9,35 @@ const BPM_VALUES = [110, 140, 170, 200, 230, 260, 300];
 
 // You now control recovery + structure here
 const BURST_TYPES = [
-  { length: 3,  label: "3 Burst",  recoveryBars: 1 },
-  { length: 5,  label: "5 Burst",  recoveryBars: 1 },
-  { length: 7,  label: "7 Burst",  recoveryBars: 0 }, // tighter
+  { length: 3,  label: "3 Burst",  recoveryBars: 0 },
+  { length: 5,  label: "5 Burst",  recoveryBars: 0 },
+  { length: 7,  label: "7 Burst",  recoveryBars: 0 },
   { length: 9,  label: "9 Burst",  recoveryBars: 0 },
   { length: 13, label: "13 Burst", recoveryBars: 0 },
-  { length: 16, label: "16 Notes", recoveryBars: 0 },
-  { length: 32, label: "32 Notes", recoveryBars: 0 },
+  { length: 16, label: "16 Notes", recoveryBars: 1 },
+  { length: 96, label: "96 Notes", recoveryBars: 1 },
+  { length: 192, label: "192 Notes", recoveryBars: 2 },
 ];
 
 /* ---------------------------------- */
 /* ----------- HELPERS -------------- */
 /* ---------------------------------- */
 
-function buildBurstNotes(length: number): number[] {
-  return Array.from({ length }, (_, i) => i);
-}
 
 function buildBars(length: number, recoveryBars: number) {
   const bars = [];
+  const maxPerBar = 16; // 4 beats × 4 resolution
 
-  // Primary burst bar
-  bars.push({ notes: buildBurstNotes(length) });
+  let remaining = length;
 
-  // Optional recovery bars
+  while (remaining > 0) {
+    const notesThisBar = Math.min(maxPerBar, remaining);
+    bars.push({
+      notes: Array.from({ length: notesThisBar }, (_, i) => i),
+    });
+    remaining -= notesThisBar;
+  }
+
   for (let i = 0; i < recoveryBars; i++) {
     bars.push({ notes: [] });
   }
