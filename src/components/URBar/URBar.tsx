@@ -18,9 +18,7 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		const maxVisual = 120;
-
-		// 🔥 Pull theme ONCE instead of every frame
+		// Pull theme once
 		const rootStyles = getComputedStyle(document.documentElement);
 		const perfectColor =
 			rootStyles.getPropertyValue("--perfect").trim() || "#3ddc97";
@@ -43,15 +41,18 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			const height = canvas.height;
 			const centerX = width / 2;
 
-			const offsetsRaw = recentOffsetsMsRef.current;
+			const offsetsRaw = recentOffsetsMsRef.current ?? [];
 
-			// ✅ HARD CAP SAFETY (prevents runaway array)
+			// Hard cap to last 120 hits
 			const offsets =
 				offsetsRaw.length > 120
 					? offsetsRaw.slice(offsetsRaw.length - 120)
 					: offsetsRaw;
 
 			const windows = getHitWindows(od);
+
+			// 🔥 Scale relative to OD
+			const maxVisual = windows.MEH * 1.2;
 
 			const scale = (ms: number) => (ms / maxVisual) * (width / 2);
 
@@ -64,10 +65,13 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			ctx.fillStyle = bg;
 			ctx.fillRect(0, 0, width, height);
 
-			// Grid
+			// 🔥 Adaptive grid
+			const gridStep = Math.round(maxVisual / 6);
+
 			ctx.strokeStyle = "rgba(255,255,255,0.05)";
 			ctx.lineWidth = 1;
-			for (let ms = -maxVisual; ms <= maxVisual; ms += 30) {
+
+			for (let ms = -maxVisual; ms <= maxVisual; ms += gridStep) {
 				const x = centerX + scale(ms);
 				ctx.beginPath();
 				ctx.moveTo(x, 0);
@@ -111,10 +115,14 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			ctx.restore();
 
 			// Hits
-			const glowCutoff = offsets.length - 20; // ✅ only newest 20 glow
+			const glowCutoff = offsets.length - 20;
 
 			for (let i = 0; i < offsets.length; i++) {
-				const offset = offsets[i];
+				const rawOffset = offsets[i];
+
+				// 🔥 Clamp to visual range
+				const offset = Math.max(-maxVisual, Math.min(maxVisual, rawOffset));
+
 				const abs = Math.abs(offset);
 				const x = centerX + scale(offset);
 
@@ -129,7 +137,6 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				ctx.strokeStyle = color;
 				ctx.lineWidth = 3;
 
-				// 🔥 Only glow recent hits
 				if (i >= glowCutoff) {
 					ctx.shadowColor = color;
 					ctx.shadowBlur = 10;
