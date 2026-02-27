@@ -25,12 +25,18 @@ export default function ProfileModal({ onClose }: Props) {
 			const { data } = await supabase.auth.getSession();
 			const token = data.session?.access_token;
 
+			if (!token) {
+				console.error("User not logged in");
+				return;
+			}
+
 			const res = await fetch(
 				"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/checkout",
 				{
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
 					},
 				}
 			);
@@ -39,6 +45,8 @@ export default function ProfileModal({ onClose }: Props) {
 
 			if (json.url) {
 				window.location.href = json.url;
+			} else {
+				console.error(json);
 			}
 		} catch (err) {
 			console.error("Checkout failed", err);
