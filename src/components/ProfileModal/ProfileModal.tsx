@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { signOut } from "../../lib/auth";
 import { useAuth } from "../../context/useAuth";
 import "./ProfileModal.css";
+import { supabase } from "../../lib/supabase";
 
 interface Props {
 	onClose: () => void;
@@ -18,6 +19,31 @@ export default function ProfileModal({ onClose }: Props) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
+
+	async function startCheckout() {
+		try {
+			const { data } = await supabase.auth.getSession();
+			const token = data.session?.access_token;
+
+			const res = await fetch(
+				"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/create-checkout",
+				{
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+
+			const json = await res.json();
+
+			if (json.url) {
+				window.location.href = json.url;
+			}
+		} catch (err) {
+			console.error("Checkout failed", err);
+		}
+	}
 
 	if (!user) return null;
 
@@ -56,7 +82,9 @@ export default function ProfileModal({ onClose }: Props) {
 						<span className="value free">Free User</span>
 					</div>
 
-					<button className="upgrade-btn">Become a Member</button>
+					<button onClick={startCheckout} className="upgrade-btn">
+						Become a Member
+					</button>
 				</div>
 
 				<div className="profile-section">
