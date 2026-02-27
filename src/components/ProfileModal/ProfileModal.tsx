@@ -26,7 +26,7 @@ export default function ProfileModal({ onClose }: Props) {
 			const token = data.session?.access_token;
 
 			const res = await fetch(
-				"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/create-checkout",
+				"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/checkout",
 				{
 					method: "POST",
 					headers: {
