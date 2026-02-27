@@ -24,6 +24,7 @@ export default function ProfileModal({ onClose }: Props) {
 		try {
 			const { data } = await supabase.auth.getSession();
 			const token = data.session?.access_token;
+			console.log(token);
 
 			if (!token) {
 				console.error("User not logged in");
@@ -40,8 +41,6 @@ export default function ProfileModal({ onClose }: Props) {
 					},
 				}
 			);
-
-			console.log(token);
 
 			const json = await res.json();
 
