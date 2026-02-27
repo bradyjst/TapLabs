@@ -1,12 +1,82 @@
-.stats-panel {
-	background: #0f172a;
-	border-radius: 12px;
-	padding: 16px;
-	margin-top: 16px;
+/* ========================================= */
+/* ============ MODAL OVERLAY ============== */
+/* ========================================= */
+
+.stats-modal-overlay {
+	position: fixed;
+	inset: 0;
+
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(4px);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	z-index: 1000;
 }
 
+/* ========================================= */
+/* ============== MODAL BODY =============== */
+/* ========================================= */
+
+.stats-panel {
+	width: min(620px, 92vw);
+	max-height: 85vh;
+
+	background: var(--surface);
+
+	border-radius: 14px;
+	border: 1px solid var(--border);
+
+	padding: 22px;
+
+	overflow-y: auto;
+
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+	/* smooth modal animation */
+	animation: statsModalIn 0.18s ease-out;
+}
+
+/* ========================================= */
+/* ============== HEADER =================== */
+/* ========================================= */
+
+.stats-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	margin-bottom: 14px;
+}
+
+.stats-header h2 {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.stats-close {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+
+	font-size: 20px;
+	cursor: pointer;
+
+	transition: color 0.15s ease;
+}
+
+.stats-close:hover {
+	color: var(--text-primary);
+}
+
+/* ========================================= */
+/* ============== SECTIONS ================= */
+/* ========================================= */
+
 .stats-section {
-	margin-bottom: 20px;
+	margin-bottom: 22px;
 }
 
 .stats-section h3 {
@@ -16,10 +86,24 @@
 	opacity: 0.9;
 }
 
+.stats-section h4 {
+	margin-top: 16px;
+	margin-bottom: 8px;
+	font-size: 13px;
+	opacity: 0.8;
+}
+
+/* ========================================= */
+/* =============== ROWS ==================== */
+/* ========================================= */
+
 .stat-row {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+
 	padding: 6px 0;
+
 	font-size: 14px;
 }
 
@@ -30,6 +114,10 @@
 .value {
 	font-weight: 600;
 }
+
+/* ========================================= */
+/* =============== COLORS ================== */
+/* ========================================= */
 
 .neutral {
 	color: #22d3ee;
@@ -55,8 +143,13 @@
 	color: #f87171;
 }
 
+/* ========================================= */
+/* =============== LOCKED ================== */
+/* ========================================= */
+
 .locked {
-	opacity: 0.6;
+	opacity: 0.55;
+	pointer-events: none;
 }
 
 .locked-text {
@@ -64,24 +157,41 @@
 	opacity: 0.7;
 }
 
+/* ========================================= */
+/* =============== EMPTY =================== */
+/* ========================================= */
+
 .empty {
 	text-align: center;
 	opacity: 0.7;
 }
 
-.stats-section h4 {
-	margin-top: 16px;
-	margin-bottom: 8px;
-	font-size: 13px;
-	opacity: 0.8;
-}
+/* ========================================= */
+/* =============== CHARTS ================== */
+/* ========================================= */
+
 .chart-shell {
 	width: 100%;
 	height: 250px;
-	overflow: hidden; /* prevents tooltip from creating scrollbars */
-	position: relative; /* keeps tooltip positioning sane */
+
+	overflow: hidden;
+	position: relative;
+
+	margin-top: 8px;
+	margin-bottom: 12px;
 }
 
-.hidden {
-	display: none;
+/* ========================================= */
+/* ============ MODAL ANIMATION ============ */
+/* ========================================= */
+
+@keyframes statsModalIn {
+	from {
+		transform: translateY(18px) scale(0.98);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0px) scale(1);
+		opacity: 1;
+	}
 }

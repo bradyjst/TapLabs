@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./StatsPanel.css";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import HistogramChart from "../components/Charts/HistogramChart";
@@ -6,16 +7,20 @@ import DriftCurveChart from "../components/Charts/DriftCurveChart";
 type Props = {
 	data: SessionAnalytics | null;
 	isPaid?: boolean;
+	onClose: () => void;
 };
 
-export default function StatsPanel({ data, isPaid = false }: Props) {
-	if (!data) {
-		return (
-			<div className="stats-panel empty">
-				<p>Complete a session to see analytics.</p>
-			</div>
-		);
-	}
+export default function StatsPanel({ data, isPaid = false, onClose }: Props) {
+	useEffect(() => {
+		const handler = (e: KeyboardEvent) => {
+			if (e.key === "Escape") onClose();
+		};
+
+		window.addEventListener("keydown", handler);
+		return () => window.removeEventListener("keydown", handler);
+	}, [onClose]);
+
+	if (!data) return null;
 
 	const {
 		meanOffset,
@@ -38,50 +43,66 @@ export default function StatsPanel({ data, isPaid = false }: Props) {
 		Math.abs(meanOffset) < 2 ? "neutral" : meanOffset < 0 ? "early" : "late";
 
 	return (
-		<div className="stats-panel">
-			{/* FREE SECTION */}
-			<div className="stats-section free">
-				<h3>Session Summary</h3>
+		<div className="stats-modal-overlay" onClick={onClose}>
+			<div className="stats-panel" onClick={(e) => e.stopPropagation()}>
+				<div className="stats-header">
+					<h2>Session Stats</h2>
+					<button className="stats-close" onClick={onClose}>
+						✕
+					</button>
+				</div>
 
-				<StatRow label="Total Hits" value={totalTaps} />
+				{/* FREE SECTION */}
 
-				<StatRow label="Timing Spread" value={`${stdDev.toFixed(2)} ms`} />
-				<StatRow label="Unstable Rate" value={unstableRate.toFixed(0)} />
+				<div className="stats-section free">
+					<h3>Session Summary</h3>
 
-				<StatRow
-					label="Mean Offset"
-					value={`${meanOffset.toFixed(2)} ms`}
-					highlight={driftClass}
-				/>
+					<StatRow label="Total Hits" value={totalTaps} />
 
-				<StatRow label="Drift" value={driftLabel} highlight={driftClass} />
+					<StatRow label="Timing Spread" value={`${stdDev.toFixed(2)} ms`} />
 
-				<StatRow
-					label="Early / Late"
-					value={`${(earlyPercent * 100).toFixed(0)}% / ${(
-						latePercent * 100
-					).toFixed(0)}%`}
-				/>
+					<StatRow label="Unstable Rate" value={unstableRate.toFixed(0)} />
 
-				<StatRow label="Left Mean" value={`${leftMean.toFixed(2)} ms`} />
-				<StatRow label="Right Mean" value={`${rightMean.toFixed(2)} ms`} />
-				<StatRow label="Imbalance" value={`${imbalancePercent.toFixed(1)}%`} />
-			</div>
+					<StatRow
+						label="Mean Offset"
+						value={`${meanOffset.toFixed(2)} ms`}
+						highlight={driftClass}
+					/>
 
-			{/* ADVANCED SECTION */}
-			<div className="hidden">
+					<StatRow label="Drift" value={driftLabel} highlight={driftClass} />
+
+					<StatRow
+						label="Early / Late"
+						value={`${(earlyPercent * 100).toFixed(0)}% / ${(
+							latePercent * 100
+						).toFixed(0)}%`}
+					/>
+
+					<StatRow label="Left Mean" value={`${leftMean.toFixed(2)} ms`} />
+
+					<StatRow label="Right Mean" value={`${rightMean.toFixed(2)} ms`} />
+
+					<StatRow
+						label="Imbalance"
+						value={`${imbalancePercent.toFixed(1)}%`}
+					/>
+				</div>
+
+				{/* ADVANCED SECTION */}
+
 				<div className={`stats-section advanced ${!isPaid ? "locked" : ""}`}>
-					<h3>Advanced Diagnostics {isPaid ? "" : "🔒"}</h3>
+					<h3>Advanced Diagnostics {isPaid ? "" : " 🔒"}</h3>
 
 					{isPaid ? (
 						<>
-							<>
-								<h4>Timing Distribution</h4>
-								<HistogramChart histogram={data.histogram} />
+							<h4>Timing Distribution</h4>
 
-								<h4>Drift Over Session</h4>
-								<DriftCurveChart driftCurve={data.driftCurve} />
-							</>
+							<HistogramChart histogram={data.histogram} />
+
+							<h4>Drift Over Session</h4>
+
+							<DriftCurveChart driftCurve={data.driftCurve} />
+
 							<StatRow
 								label="Consistency Score"
 								value={consistencyScore.toFixed(0)}
@@ -127,7 +148,7 @@ function StatRow({
 }
 
 /* ------------------ */
-/* Helpers            */
+/* Helpers */
 /* ------------------ */
 
 function getConsistencyClass(score: number) {

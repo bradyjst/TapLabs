@@ -1,4 +1,5 @@
 export type TapLabsTheme = {
+  visualizerOverlay: string;
   // base surfaces
   bg: string;
   surface: string;

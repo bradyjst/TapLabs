@@ -73,21 +73,60 @@ export default function VisualizerCanvas({
 	const submittedRef = useRef(false);
 	const engineRef = useRef(engine);
 
-	// Center pulse is driven by "last hit time"
 	const lastHitTimeRef = useRef<number>(0);
 
-	// Floating faces (each hit is its own particle)
 	const floatingFacesRef = useRef<FloatingFace[]>([]);
 	const faceIdRef = useRef(0);
+
+	/* ---------- THEME CACHE ---------- */
+
+	const themeRef = useRef({
+		bg: "",
+		accent: "",
+		accentSoft: "",
+		noteColor: "",
+		approachColor: "",
+		textPrimary: "",
+		textMuted: "",
+		perfect: "",
+		early: "",
+		late: "",
+	});
+
+	useEffect(() => {
+		const updateTheme = () => {
+			const styles = getComputedStyle(document.documentElement);
+
+			themeRef.current = {
+				bg: styles.getPropertyValue("--bg").trim(),
+				accent: styles.getPropertyValue("--accent").trim(),
+				accentSoft: styles.getPropertyValue("--accent-soft").trim(),
+				noteColor: styles.getPropertyValue("--note-color").trim(),
+				approachColor: styles.getPropertyValue("--approach-color").trim(),
+				textPrimary: styles.getPropertyValue("--text-primary").trim(),
+				textMuted: styles.getPropertyValue("--text-muted").trim(),
+				perfect: styles.getPropertyValue("--perfect").trim(),
+				early: styles.getPropertyValue("--early").trim(),
+				late: styles.getPropertyValue("--late").trim(),
+			};
+		};
+
+		updateTheme();
+
+		const observer = new MutationObserver(updateTheme);
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["style"],
+		});
+
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		engineRef.current = engine;
 	}, [engine]);
 
-	const getVar = (name: string) =>
-		getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-	/* ---------------- SUBMIT LOGIC ---------------- */
+	/* ---------- SUBMIT LOGIC ---------- */
 
 	useEffect(() => {
 		if (
@@ -130,7 +169,7 @@ export default function VisualizerCanvas({
 		if (isRunning) submittedRef.current = false;
 	}, [isRunning]);
 
-	/* ---------------- MAIN EFFECT ---------------- */
+	/* ---------- MAIN EFFECT ---------- */
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -142,8 +181,10 @@ export default function VisualizerCanvas({
 		let activeNotes: ActiveNote[] = [];
 		let noteId = 0;
 
+		const styles = getComputedStyle(document.documentElement);
 		const travelMultiplier =
-			parseFloat(getVar("--note-travel-multiplier")) || 8;
+			parseFloat(styles.getPropertyValue("--note-travel-multiplier")) || 8;
+
 		const travelTime = msPerGrid * travelMultiplier;
 
 		/* ---------- Retina ---------- */
@@ -164,8 +205,10 @@ export default function VisualizerCanvas({
 		};
 
 		resize();
+
 		const ro = new ResizeObserver(resize);
 		ro.observe(canvas);
+
 		window.addEventListener("resize", resize);
 
 		/* ---------- Input ---------- */
@@ -201,7 +244,6 @@ export default function VisualizerCanvas({
 			if (grade !== null) {
 				engine.registerHit(offset, grade, side);
 
-				// trigger center pulse
 				lastHitTimeRef.current = now;
 
 				const spreadDeg = 130;
@@ -220,7 +262,6 @@ export default function VisualizerCanvas({
 					vy: Math.sin(angle) * speed,
 				});
 
-				// consume the note immediately
 				activeNotes.splice(closestIndex, 1);
 			}
 		};
@@ -247,27 +288,28 @@ export default function VisualizerCanvas({
 				return;
 			}
 
-			// Theme vars
-			const bgColor = getVar("--bg");
-			const accent = getVar("--accent");
-			const accentSoft = getVar("--accent-soft");
-			const noteColor = getVar("--note-color") || accent;
-			const approachColor = getVar("--approach-color");
-			const textPrimary = getVar("--text-primary");
-			const textMuted = getVar("--text-muted");
-			const borderWidth = parseFloat(getVar("--note-border-width")) || 4;
+			const {
+				accent,
+				accentSoft,
+				noteColor,
+				approachColor,
+				textPrimary,
+				textMuted,
+				perfect,
+				early,
+				late,
+			} = themeRef.current;
 
 			const centerX = width / 2;
 			const centerY = height / 2;
 			const startX = width * 0.1;
 
 			ctx.clearRect(0, 0, width, height);
-			ctx.fillStyle = bgColor;
-			ctx.fillRect(0, 0, width, height);
 
-			/* ----- Countdown Timer ----- */
+			/* ---------- Countdown ---------- */
 
 			const endTime = sessionEndRef?.current ?? 0;
+
 			if (isRunning && endTime) {
 				const remainingMs = Math.max(0, endTime - now);
 
@@ -285,9 +327,10 @@ export default function VisualizerCanvas({
 				}
 			}
 
-			/* ----- Center Pulse + Circle of Truth ----- */
+			/* ---------- Center Circle ---------- */
 
 			const pulseElapsed = now - lastHitTimeRef.current;
+
 			let pulseScale = 1;
 
 			if (pulseElapsed < 120) {
@@ -297,19 +340,21 @@ export default function VisualizerCanvas({
 			}
 
 			ctx.save();
+
 			ctx.translate(centerX, centerY);
 			ctx.scale(pulseScale, pulseScale);
 			ctx.translate(-centerX, -centerY);
 
 			ctx.strokeStyle = accent;
 			ctx.lineWidth = 3;
+
 			ctx.beginPath();
 			ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
 			ctx.stroke();
 
 			ctx.restore();
 
-			/* ----- Floating Faces (multi) ----- */
+			/* ---------- Floating Faces ---------- */
 
 			const faceDuration = 600;
 
@@ -317,7 +362,7 @@ export default function VisualizerCanvas({
 				const elapsed = now - face.spawnTime;
 				if (elapsed > faceDuration) return false;
 
-				const t = elapsed / 1000; // seconds
+				const t = elapsed / 1000;
 
 				const x = centerX + face.vx * t;
 				const y = centerY - 60 + face.vy * t;
@@ -325,29 +370,31 @@ export default function VisualizerCanvas({
 				const opacity = 1 - elapsed / faceDuration;
 
 				let text = ":)";
-				let color = getVar("--perfect");
+				let color = perfect;
 
 				if (face.grade === 100) {
 					text = ":|";
-					color = getVar("--early");
+					color = early;
 				} else if (face.grade === 50) {
 					text = ":(";
-					color = getVar("--late");
+					color = late;
 				}
 
 				ctx.save();
+
 				ctx.globalAlpha = opacity;
 				ctx.fillStyle = color;
 				ctx.font = "bold 26px system-ui";
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";
 				ctx.fillText(text, x, y);
+
 				ctx.restore();
 
 				return true;
 			});
 
-			/* ----- Spawn + Draw Notes ----- */
+			/* ---------- Spawn Notes ---------- */
 
 			if (isRunning) {
 				while (
@@ -379,12 +426,12 @@ export default function VisualizerCanvas({
 					}
 
 					const progress = (now - note.spawnTime) / travelTime;
+
 					if (progress < 0 || progress >= 1.2) return progress < 1.2;
 
 					const x = startX + progress * (centerX - startX);
 					const radius = 22;
 
-					// Approach ring
 					if (visualStyle === "approach") {
 						const total = note.scheduledTime - note.spawnTime;
 						const remaining = note.scheduledTime - now;
@@ -399,33 +446,39 @@ export default function VisualizerCanvas({
 
 						ctx.strokeStyle = approachColor;
 						ctx.lineWidth = 3;
+
 						ctx.beginPath();
 						ctx.arc(x, centerY, radius, 0, Math.PI * 2);
 						ctx.stroke();
+
 						ctx.restore();
 					}
 
-					// Note
 					ctx.save();
 					ctx.translate(x, centerY);
 
 					ctx.fillStyle = accentSoft;
+
 					ctx.beginPath();
 					ctx.arc(0, 0, radius, 0, Math.PI * 2);
 					ctx.fill();
 
 					ctx.strokeStyle = noteColor;
-					ctx.lineWidth = borderWidth;
+
+					ctx.lineWidth = 4;
+
 					ctx.beginPath();
 					ctx.arc(0, 0, radius, 0, Math.PI * 2);
 					ctx.stroke();
 
 					ctx.fillStyle = textPrimary;
+
 					ctx.font = "bold 14px system-ui";
 					ctx.textAlign = "center";
 					ctx.textBaseline = "middle";
 
 					const notesPerBar = drill.bars[0].notes.length || 1;
+
 					ctx.fillText(String((note.id % notesPerBar) + 1), 0, 0);
 
 					ctx.restore();
@@ -443,6 +496,7 @@ export default function VisualizerCanvas({
 			window.removeEventListener("keydown", keyHandler);
 			window.removeEventListener("resize", resize);
 			ro.disconnect();
+
 			if (rafRef.current) cancelAnimationFrame(rafRef.current);
 		};
 	}, [

@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from "react";
 import "./Sidebar.css";
 import type { Drill } from "../types/types";
 import { analyzeDrill } from "../drills/analyzeDrill";
-import AuthButton from "../components/AuthButton/AuthButton";
 import { useAuth } from "../context/useAuth";
 import { getBestGrades } from "../lib/getBestGrades";
 
@@ -16,10 +15,10 @@ const BPM_BUCKETS = [
 	{ min: 100, max: 120 },
 	{ min: 130, max: 150 },
 	{ min: 160, max: 180 },
-	{ min: 200, max: 220 },
-	{ min: 230, max: 250 },
-	{ min: 260, max: 280 },
-	{ min: 300, max: Infinity },
+	{ min: 190, max: 210 },
+	{ min: 220, max: 240 },
+	{ min: 250, max: 270 },
+	{ min: 280, max: 300 },
 ];
 
 export default function Sidebar({
@@ -43,7 +42,7 @@ export default function Sidebar({
 		}));
 	};
 
-	// 🔥 NEW: Get currently selected drill
+	// NEW: Get currently selected drill
 	const selectedDrill = useMemo(
 		() => drills.find((d) => d.id === selectedDrillId),
 		[drills, selectedDrillId]
@@ -55,7 +54,6 @@ export default function Sidebar({
 		<aside className="sidebar">
 			<div className="taplabsheader">
 				<h2>TapLabs</h2>
-				<AuthButton />
 			</div>
 
 			{/* 🔥 Current Drill Display */}

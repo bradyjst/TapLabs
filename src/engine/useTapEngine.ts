@@ -167,7 +167,7 @@ export function useTapEngine(drill: Drill) {
     offsetsStatsRef.current = createStats();
     recentOffsetsMsRef.current = [];
     tapEventsRef.current = [];
-completedRef.current = false;
+    completedRef.current = false;
     hit300Ref.current = 0;
     hit100Ref.current = 0;
     hit50Ref.current = 0;

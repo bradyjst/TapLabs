@@ -2,29 +2,39 @@ import { useRef, useState, useMemo } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
 import { useAuth } from "../context/useAuth";
+import { initHitSound } from "../lib/hitSound";
+import { Settings } from "../options/Settings";
+import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
-import { useTheme } from "../theme/useTheme";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
-import { initHitSound } from "../lib/hitSound";
-import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import "./TapLab.css";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
+
 	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+
+	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
+
+	const [statsOpen, setStatsOpen] = useState(false);
+
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
+
 	const [visualStyle, setVisualStyle] = useState<string>("minimal");
-	const { setPreset } = useTheme();
-	const isPracticeMode = bpmOverride !== null;
+
 	const tapRef = useRef<() => void>(() => {});
+
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null
 	);
+
+	const isPracticeMode = bpmOverride !== null;
+
 	const effectiveDrill = useMemo(() => {
 		if (!bpmOverride) return selectedDrill;
 
@@ -33,6 +43,7 @@ export default function TapLabApp() {
 			bpm: bpmOverride,
 		};
 	}, [selectedDrill, bpmOverride]);
+
 	const engine = useTapEngine(effectiveDrill);
 
 	return (
@@ -49,15 +60,17 @@ export default function TapLabApp() {
 				<div className="main-inner">
 					<div className="banner">
 						This site is currently in beta. Your scores may not permanently
-						save, and the site may recieve significant changes.
+						save, and the site may receive significant changes.
 					</div>
+
 					<div className="controls-row">
 						<button
 							className="sidebar-toggle-floating"
 							onClick={() => setSidebarOpen((v) => !v)}
 						>
-							{sidebarOpen ? "◀" : "▶"}
+							Drill Select
 						</button>
+
 						<button
 							className={`visual-toggle ${visualStyle}`}
 							onClick={() =>
@@ -70,22 +83,15 @@ export default function TapLabApp() {
 								? "Switch to Approach Mode"
 								: "Switch to Minimal Mode"}
 						</button>
-						<div className="theme-selector">
-							<button
-								className={`theme-button cyan`}
-								onClick={() => setPreset("cyan")}
-							>
-								Cyan
-							</button>
 
-							<button
-								className={`theme-button violet`}
-								onClick={() => setPreset("violet")}
-							>
-								Violet
-							</button>
-						</div>
+						<button
+							className="sidebar-toggle-floating"
+							onClick={() => setSettingsBarOpen((v) => !v)}
+						>
+							Settings
+						</button>
 					</div>
+
 					<VisualizerCanvas
 						msPerGrid={engine.msPerGrid}
 						upcomingNotesRef={engine.upcomingNotesRef}
@@ -98,9 +104,12 @@ export default function TapLabApp() {
 						drill={effectiveDrill}
 						engine={engine}
 						userId={user?.id}
-						onSessionComplete={setLastAnalytics}
 						isPracticeMode={isPracticeMode}
 						visualStyle={visualStyle}
+						onSessionComplete={(analytics) => {
+							setLastAnalytics(analytics);
+							setStatsOpen(true);
+						}}
 					/>
 
 					<URBar
@@ -114,19 +123,14 @@ export default function TapLabApp() {
 								<button
 									className="start-btn"
 									onClick={async () => {
-										await initHitSound(); // 🔥 unlock browser audio
+										await initHitSound();
 										engine.start();
 									}}
 								>
 									Begin Session
 								</button>
 							) : (
-								<button
-									className="stop-btn"
-									onClick={() => {
-										engine.stop();
-									}}
-								>
+								<button className="stop-btn" onClick={() => engine.stop()}>
 									Quit Early
 								</button>
 							)}
@@ -142,6 +146,7 @@ export default function TapLabApp() {
 									value={bpmOverride ?? selectedDrill.bpm}
 									onChange={(e) => {
 										const value = Number(e.target.value);
+
 										if (value === selectedDrill.bpm) {
 											setBpmOverride(null);
 										} else {
@@ -164,10 +169,20 @@ export default function TapLabApp() {
 							tapRef.current();
 						}}
 					/>
-
-					<StatsPanel data={lastAnalytics} isPaid={false} />
 				</div>
 			</main>
+
+			{/* SETTINGS PANEL */}
+			<Settings isOpen={settingsBarOpen} />
+
+			{/* STATS MODAL */}
+			{statsOpen && (
+				<StatsPanel
+					data={lastAnalytics}
+					isPaid={false}
+					onClose={() => setStatsOpen(false)}
+				/>
+			)}
 		</div>
 	);
 }

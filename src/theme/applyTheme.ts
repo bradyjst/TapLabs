@@ -21,8 +21,12 @@ export function applyTheme(theme: TapLabsTheme) {
 
   root.style.setProperty("--note-color", theme.noteColor);
   root.style.setProperty("--approach-color", theme.approachColor);
-  root.style.setProperty(
+ root.style.setProperty(
   "--visualizer-bg-image",
-  `url("${theme.backgroundImage || ""}")`
+  theme.backgroundImage || "none"
+);
+root.style.setProperty(
+  "--visualizer-overlay",
+  theme.visualizerOverlay || "rgba(0,0,0,0.5)"
 );
 }

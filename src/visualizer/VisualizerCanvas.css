@@ -3,29 +3,29 @@
 	width: 100%;
 	height: 250px;
 	overflow: hidden;
+	border-radius: 12px;
+}
+
+.visualizer-wrapper::before {
+	content: "";
+	position: absolute;
+	inset: 0;
 
 	background-image: var(--visualizer-bg-image);
 	background-size: cover;
 	background-position: center;
-	background-repeat: no-repeat;
 
-	/* optional aesthetic polish */
-	border-radius: 12px;
+	filter: brightness(0.4);
+
+	z-index: 0;
 }
 
 .visualizer-canvas {
+	position: relative;
 	width: 100%;
 	height: 100%;
 	display: block;
 
-	/* allow background to show through */
 	background: transparent;
-}
-
-.visualizer-wrapper::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.5);
-	pointer-events: none;
+	z-index: 1;
 }
