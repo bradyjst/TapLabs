@@ -7,14 +7,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 
 	useEffect(() => {
-		supabase.auth.getUser().then(({ data }) => {
-			setUser(data.user);
+		// 🔹 Load user from stored session
+		supabase.auth.getSession().then(({ data }) => {
+			setUser(data.session?.user ?? null);
 		});
 
+		// 🔹 Listen for auth changes
 		const { data: listener } = supabase.auth.onAuthStateChange(
 			(_event, session) => {
 				setUser(session?.user ?? null);
-			},
+			}
 		);
 
 		return () => {
