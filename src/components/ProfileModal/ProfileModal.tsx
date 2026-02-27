@@ -41,6 +41,8 @@ export default function ProfileModal({ onClose }: Props) {
 				}
 			);
 
+			console.log(token);
+
 			const json = await res.json();
 
 			if (json.url) {
