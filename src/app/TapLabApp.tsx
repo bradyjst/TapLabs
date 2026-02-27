@@ -15,21 +15,14 @@ import AuthButton from "../components/AuthButton/AuthButton";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
-
 	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
 	const [drillModalOpen, setDrillModalOpen] = useState(false);
-
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
-
 	const [statsOpen, setStatsOpen] = useState(false);
-
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
-
 	const [visualStyle, setVisualStyle] = useState<string>("minimal");
-
 	const tapRef = useRef<() => void>(() => {});
-
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null
 	);
@@ -75,18 +68,7 @@ export default function TapLabApp() {
 							Drill Select
 						</button>
 
-						<button
-							className={`visual-toggle ${visualStyle}`}
-							onClick={() =>
-								setVisualStyle(
-									visualStyle === "minimal" ? "approach" : "minimal"
-								)
-							}
-						>
-							{visualStyle === "minimal"
-								? "Switch to Approach Mode"
-								: "Switch to Minimal Mode"}
-						</button>
+						<AuthButton />
 
 						<button
 							className="sidebar-toggle-floating"
@@ -94,7 +76,10 @@ export default function TapLabApp() {
 						>
 							Settings
 						</button>
-						<AuthButton />
+					</div>
+
+					<div className="current-drill-display">
+						<h4>{effectiveDrill.name}</h4>
 					</div>
 
 					<VisualizerCanvas
@@ -177,12 +162,12 @@ export default function TapLabApp() {
 				</div>
 			</main>
 
-			{/* SETTINGS PANEL */}
 			<Settings
 				isOpen={settingsBarOpen}
 				onClose={() => setSettingsBarOpen(false)}
+				visualStyle={visualStyle}
+				setVisualStyle={setVisualStyle}
 			/>
-
 			{/* STATS MODAL */}
 			{statsOpen && (
 				<StatsPanel

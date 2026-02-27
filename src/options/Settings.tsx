@@ -5,10 +5,16 @@ import "./Settings.css";
 interface SettingsProps {
 	isOpen: boolean;
 	onClose: () => void;
+	visualStyle: string;
+	setVisualStyle: (style: string) => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
-	// ESC closes modal
+export const Settings: React.FC<SettingsProps> = ({
+	isOpen,
+	onClose,
+	visualStyle,
+	setVisualStyle,
+}) => {
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -22,10 +28,7 @@ export const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
 
 	return (
 		<div className="settings-modal-overlay" onClick={onClose}>
-			<aside
-				className="settings-container"
-				onClick={(e) => e.stopPropagation()}
-			>
+			<div className="settings-container" onClick={(e) => e.stopPropagation()}>
 				<div className="settingsheader">
 					<h2>Settings</h2>
 
@@ -34,8 +37,23 @@ export const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
 					</button>
 				</div>
 
-				<ThemeSelector />
-			</aside>
+				<div className="settings-section">
+					<h3>Theme</h3>
+					<ThemeSelector />
+				</div>
+
+				<div className="settings-section">
+					<h3>Visualizer Mode</h3>
+
+					<select
+						value={visualStyle}
+						onChange={(e) => setVisualStyle(e.target.value)}
+					>
+						<option value="minimal">Minimal</option>
+						<option value="approach">Approach</option>
+					</select>
+				</div>
+			</div>
 		</div>
 	);
 };

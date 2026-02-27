@@ -6,6 +6,7 @@ export default function ThemeSelector() {
 
 	return (
 		<div className="theme-selector">
+			<h2>Theme Selector</h2>
 			{Object.keys(THEMES).map((name) => {
 				const themeName = name as ThemeName;
 

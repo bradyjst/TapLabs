@@ -1,29 +1,43 @@
 .auth-btn {
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: var(--surface);
+	border: 1px solid var(--border);
+
 	color: var(--text-primary);
+
 	padding: 6px 12px;
 	font-size: 12px;
+
 	border-radius: 8px;
 	cursor: pointer;
-	transition: all 0.15s ease;
+
+	transition: background 0.15s ease, border 0.15s ease, transform 0.12s ease;
 	backdrop-filter: blur(6px);
 }
 
+/* Hover */
+
 .auth-btn:hover {
-	background: rgba(255, 255, 255, 0.1);
-	border-color: rgba(255, 255, 255, 0.2);
+	background: var(--grid);
+	border-color: var(--accent-border);
 }
+
+/* Click */
 
 .auth-btn:active {
 	transform: scale(0.96);
 }
 
+/* Logged in state */
+
 .auth-btn.logged-in {
-	background: rgba(100, 200, 255, 0.15);
-	border-color: rgba(100, 200, 255, 0.4);
+	background: var(--accent-soft);
+	border-color: var(--accent-border);
+	color: var(--accent);
 }
 
+/* Logged in hover */
+
 .auth-btn.logged-in:hover {
-	box-shadow: 0 0 6px rgba(100, 200, 255, 0.4);
+	box-shadow: 0 0 6px var(--accent-soft);
+	background: var(--accent-soft);
 }

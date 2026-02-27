@@ -1,70 +1,23 @@
 /* ========================================= */
-/* ============ MODAL OVERLAY ============== */
-/* ========================================= */
-
-.settings-modal-overlay {
-	position: fixed;
-	inset: 0;
-
-	background: rgba(0, 0, 0, 0.55);
-	backdrop-filter: blur(4px);
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	z-index: 1000;
-}
-
-/* ========================================= */
-/* =============== PANEL =================== */
+/* ============== SETTINGS SECTIONS ======== */
 /* ========================================= */
 
 .settings-container {
 	width: min(420px, 92vw);
 	max-height: 85vh;
-
 	background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
-
-	padding: 18px 16px;
-
-	border-radius: 14px;
 	border: 1px solid var(--border);
-
-	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-
+	border-radius: 14px;
 	overflow-y: auto;
-
-	animation: settingsModalIn 0.18s ease-out;
+	padding: 18px 16px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
-
-/* Scrollbar */
-
-.settings-container::-webkit-scrollbar {
-	width: 6px;
-}
-
-.settings-container::-webkit-scrollbar-thumb {
-	background: var(--border);
-	border-radius: 4px;
-}
-
-/* ========================================= */
-/* ============== HEADER =================== */
-/* ========================================= */
 
 .settingsheader {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 14px;
-}
-
-.settings-container h2 {
-	font-size: 16px;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	color: var(--text-primary);
 }
 
 .settings-close {
@@ -81,17 +34,70 @@
 	color: var(--text-primary);
 }
 
+.settings-section {
+	margin-top: 18px;
+	padding: 14px;
+
+	background: var(--surface);
+	border: 1px solid var(--border);
+
+	border-radius: 12px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.settings-section h3 {
+	font-size: 13px;
+	font-weight: 600;
+
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+
+	color: var(--text-muted);
+}
+
+.settings-modal-overlay {
+	position: fixed;
+	inset: 0;
+
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(4px);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	z-index: 1000;
+}
+
 /* ========================================= */
-/* ============ MODAL ANIMATION ============ */
+/* ============== SELECT =================== */
 /* ========================================= */
 
-@keyframes settingsModalIn {
-	from {
-		transform: translateY(20px) scale(0.98);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0) scale(1);
-		opacity: 1;
-	}
+.settings-section select {
+	background: var(--bg);
+	color: var(--text-primary);
+
+	border: 1px solid var(--border);
+	border-radius: 8px;
+
+	padding: 6px 10px;
+
+	font-size: 13px;
+
+	cursor: pointer;
+
+	transition: border 0.15s ease, background 0.15s ease;
+}
+
+.settings-section select:hover {
+	border-color: var(--accent-border);
+}
+
+.settings-section select:focus {
+	outline: none;
+	border-color: var(--accent);
+	box-shadow: 0 0 0 1px var(--accent-soft);
 }

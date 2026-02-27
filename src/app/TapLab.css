@@ -176,15 +176,10 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-
 	background: var(--surface);
 	border: 1px solid var(--border);
 	color: var(--text-primary);
-
-	transform: translateX(-5px);
-
 	padding: 6px 10px;
-
 	border-radius: 8px;
 	cursor: pointer;
 
@@ -197,54 +192,14 @@
 	background: var(--accent-soft);
 }
 
-/* Visual toggle */
-
-.visual-toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	padding: 8px 14px;
-
-	font-size: 13px;
-	font-weight: 600;
-
-	border-radius: 8px;
-
-	border: 1px solid var(--border);
-
-	background: var(--surface);
-	color: var(--text-primary);
-
-	cursor: pointer;
-
-	transition: all 0.2s ease;
-}
-
-.visual-toggle:hover {
-	background: var(--grid);
-	transform: translateY(-1px);
-}
-
-.visual-toggle:active {
-	transform: translateY(0px);
-}
-
-.visual-toggle.minimal {
-	border-color: var(--accent-border);
-}
-
-.visual-toggle.approach {
-	border-color: var(--accent-border);
-}
-
 /* Controls row */
 
 .controls-row {
 	display: flex;
 	gap: 10px;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
 }
 
 /* Theme selector */
@@ -296,5 +251,20 @@
 	margin-bottom: 10px;
 
 	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.current-drill-display {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.current-drill-display h2 {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.current-drill-display span {
+	font-size: 13px;
 	color: var(--text-muted);
 }
