@@ -1,29 +1,41 @@
 /* ========================================= */
-/* =============== SIDEBAR ================= */
+/* ============ MODAL OVERLAY ============== */
+/* ========================================= */
+
+.sidebar-modal-overlay {
+	position: fixed;
+	inset: 0;
+
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(4px);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	z-index: 1000;
+}
+
+/* ========================================= */
+/* =============== PANEL =================== */
 /* ========================================= */
 
 .sidebar {
-	position: absolute;
-	left: 0;
-	top: 0;
-	bottom: 0;
-
-	width: 260px;
+	width: min(520px, 92vw);
+	max-height: 85vh;
 
 	background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
 
 	padding: 18px 14px;
 
-	border-right: 1px solid var(--border);
-	box-shadow: inset -1px 0 0 var(--border);
+	border-radius: 14px;
+	border: 1px solid var(--border);
 
-	z-index: 200;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 
 	overflow-y: auto;
-	overflow-x: visible;
 
-	transform: translateX(-100%);
-	transition: transform 200ms ease;
+	animation: sidebarModalIn 0.18s ease-out;
 }
 
 /* Scrollbar */
@@ -52,6 +64,20 @@
 	font-size: 16px;
 	font-weight: 700;
 	letter-spacing: 0.5px;
+	color: var(--text-primary);
+}
+
+.sidebar-close {
+	background: transparent;
+	border: none;
+
+	color: var(--text-muted);
+	font-size: 20px;
+
+	cursor: pointer;
+}
+
+.sidebar-close:hover {
 	color: var(--text-primary);
 }
 
@@ -302,13 +328,16 @@
 }
 
 /* ========================================= */
-/* ============ RTL SCROLL FIX ============= */
+/* ============ MODAL ANIMATION ============ */
 /* ========================================= */
 
-.sidebar {
-	direction: rtl;
-}
-
-.sidebar > * {
-	direction: ltr;
+@keyframes sidebarModalIn {
+	from {
+		transform: translateY(20px) scale(0.98);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0) scale(1);
+		opacity: 1;
+	}
 }

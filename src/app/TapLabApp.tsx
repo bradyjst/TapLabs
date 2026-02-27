@@ -11,14 +11,15 @@ import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import "./TapLab.css";
+import AuthButton from "../components/AuthButton/AuthButton";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
 
 	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
+	const [drillModalOpen, setDrillModalOpen] = useState(false);
 
-	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
 
 	const [statsOpen, setStatsOpen] = useState(false);
@@ -48,13 +49,16 @@ export default function TapLabApp() {
 
 	return (
 		<div
-			className={`app ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"}`}
+			className={`app ${drillModalOpen ? "sidebar-open" : "sidebar-collapsed"}`}
 		>
-			<Sidebar
-				drills={coreDrills}
-				selectedDrillId={selectedDrillId}
-				setSelectedDrillId={setSelectedDrillId}
-			/>
+			{drillModalOpen && (
+				<Sidebar
+					drills={coreDrills}
+					selectedDrillId={selectedDrillId}
+					setSelectedDrillId={setSelectedDrillId}
+					onClose={() => setDrillModalOpen(false)}
+				/>
+			)}
 
 			<main className="main">
 				<div className="main-inner">
@@ -66,7 +70,7 @@ export default function TapLabApp() {
 					<div className="controls-row">
 						<button
 							className="sidebar-toggle-floating"
-							onClick={() => setSidebarOpen((v) => !v)}
+							onClick={() => setDrillModalOpen(true)}
 						>
 							Drill Select
 						</button>
@@ -90,6 +94,7 @@ export default function TapLabApp() {
 						>
 							Settings
 						</button>
+						<AuthButton />
 					</div>
 
 					<VisualizerCanvas
@@ -173,7 +178,10 @@ export default function TapLabApp() {
 			</main>
 
 			{/* SETTINGS PANEL */}
-			<Settings isOpen={settingsBarOpen} />
+			<Settings
+				isOpen={settingsBarOpen}
+				onClose={() => setSettingsBarOpen(false)}
+			/>
 
 			{/* STATS MODAL */}
 			{statsOpen && (
