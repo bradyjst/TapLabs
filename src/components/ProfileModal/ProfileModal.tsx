@@ -61,6 +61,24 @@ export default function ProfileModal({ onClose }: Props) {
 		}
 	}
 
+	async function openCustomerPortal() {
+		try {
+			const { data, error } =
+				await supabase.functions.invoke("customer-portal");
+
+			if (error) {
+				console.error("Portal error:", error);
+				return;
+			}
+
+			if (data?.url) {
+				window.location.href = data.url;
+			}
+		} catch (err) {
+			console.error("Portal failure:", err);
+		}
+	}
+
 	if (!user) return null;
 
 	const username = user.email?.split("@")[0];
@@ -104,6 +122,12 @@ export default function ProfileModal({ onClose }: Props) {
 					{!isPaid && (
 						<button onClick={startCheckout} className="upgrade-btn">
 							Become a Member
+						</button>
+					)}
+
+					{isPaid && (
+						<button onClick={openCustomerPortal} className="manage-btn">
+							Manage Subscription
 						</button>
 					)}
 				</div>

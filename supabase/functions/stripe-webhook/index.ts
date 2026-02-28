@@ -11,7 +11,6 @@ const supabase = createClient(
 );
 
 Deno.serve(async (req) => {
-
   const signature =
     req.headers.get("stripe-signature") ||
     req.headers.get("Stripe-Signature") ||
@@ -40,25 +39,25 @@ Deno.serve(async (req) => {
 
   switch (event.type) {
 
-    // PAYMENT SUCCESS
-    case "invoice.payment_succeeded": {
+    // USER COMPLETED CHECKOUT
+    case "checkout.session.completed": {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-      const invoice = event.data.object as Stripe.Invoice;
+      const subscriptionId = session.subscription as string;
 
-      if (!invoice.subscription) {
-        console.log("Invoice missing subscription");
+      if (!subscriptionId) {
+        console.log("No subscription attached to session");
         break;
       }
 
-      const subscription = await stripe.subscriptions.retrieve(
-        invoice.subscription as string
-      );
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-      const userId =
-        subscription.metadata?.userId ??
-        (invoice as any).parent?.subscription_details?.metadata?.userId;
+      const customerId = subscription.customer as string;
+
+      const userId = subscription.metadata?.userId;
 
       console.log("UserId resolved:", userId);
+      console.log("CustomerId:", customerId);
 
       if (!userId) {
         console.log("Missing userId metadata");
@@ -67,7 +66,10 @@ Deno.serve(async (req) => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .update({ is_paid: true })
+        .update({
+          is_paid: true,
+          stripe_customer_id: customerId,
+        })
         .eq("id", userId)
         .select();
 
@@ -80,9 +82,8 @@ Deno.serve(async (req) => {
       break;
     }
 
-    // SUB CANCELLED
+    // SUBSCRIPTION CANCELLED
     case "customer.subscription.deleted": {
-
       const subscription = event.data.object as Stripe.Subscription;
 
       const userId = subscription.metadata?.userId;
@@ -111,7 +112,6 @@ Deno.serve(async (req) => {
 
     // PAYMENT FAILED
     case "invoice.payment_failed": {
-
       const invoice = event.data.object as Stripe.Invoice;
 
       if (!invoice.subscription) {
