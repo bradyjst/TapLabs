@@ -21,31 +21,24 @@ export default function ProfileModal({ onClose }: Props) {
 	}, [onClose]);
 
 	async function startCheckout() {
-		const { data } = await supabase.auth.getSession();
+		try {
+			const { data, error } = await supabase.functions.invoke("checkout");
 
-		const token = data.session?.access_token;
-
-		console.log("TOKEN:", token);
-
-		const res = await fetch(
-			"https://nlpjbhfnriutjcrmdswj.supabase.co/functions/v1/checkout",
-			{
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${token}`,
-					"Content-Type": "application/json",
-				},
+			if (error) {
+				console.error("Checkout error:", error);
+				return;
 			}
-		);
 
-		const json = await res.json();
-
-		if (json.url) {
-			window.location.href = json.url;
-		} else {
-			console.error(json);
+			if (data?.url) {
+				window.location.href = data.url;
+			} else {
+				console.error("No checkout URL returned:", data);
+			}
+		} catch (err) {
+			console.error("Unexpected checkout failure:", err);
 		}
 	}
+
 	if (!user) return null;
 
 	const username = user.email?.split("@")[0];
