@@ -62,23 +62,15 @@ export default function ProfileModal({ onClose }: Props) {
 	}
 
 	async function openCustomerPortal() {
-		try {
-			const { data, error } =
-				await supabase.functions.invoke("customer-portal");
+		const { data, error } = await supabase.functions.invoke("customer-portal");
 
-			if (error) {
-				console.error("Portal error:", error);
-				return;
-			}
-
-			if (data?.url) {
-				window.location.href = data.url;
-			}
-		} catch (err) {
-			console.error("Portal failure:", err);
+		if (error) {
+			console.error("Portal error:", error);
+			return;
 		}
-	}
 
+		window.location.href = data.url;
+	}
 	if (!user) return null;
 
 	const username = user.email?.split("@")[0];
