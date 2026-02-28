@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "../../lib/auth";
 import { useAuth } from "../../context/useAuth";
 import "./ProfileModal.css";
@@ -10,6 +10,7 @@ interface Props {
 
 export default function ProfileModal({ onClose }: Props) {
 	const { user } = useAuth();
+	const [isPaid, setIsPaid] = useState<boolean | null>(null);
 
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
@@ -19,6 +20,27 @@ export default function ProfileModal({ onClose }: Props) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
+
+	useEffect(() => {
+		if (!user) return;
+
+		async function loadProfile() {
+			const { data, error } = await supabase
+				.from("profiles")
+				.select("is_paid")
+				.eq("id", user?.id)
+				.single();
+
+			if (error) {
+				console.error("Failed to load profile:", error);
+				return;
+			}
+
+			setIsPaid(data?.is_paid ?? false);
+		}
+
+		loadProfile();
+	}, [user]);
 
 	async function startCheckout() {
 		try {
@@ -73,12 +95,17 @@ export default function ProfileModal({ onClose }: Props) {
 
 					<div className="profile-row">
 						<span className="label">Status</span>
-						<span className="value free">Free User</span>
+
+						<span className={`value ${isPaid ? "member" : "free"}`}>
+							{isPaid === null ? "Loading..." : isPaid ? "Member" : "Free User"}
+						</span>
 					</div>
 
-					<button onClick={startCheckout} className="upgrade-btn">
-						Become a Member
-					</button>
+					{!isPaid && (
+						<button onClick={startCheckout} className="upgrade-btn">
+							Become a Member
+						</button>
+					)}
 				</div>
 
 				<div className="profile-section">
