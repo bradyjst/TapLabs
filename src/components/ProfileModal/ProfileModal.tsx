@@ -21,39 +21,31 @@ export default function ProfileModal({ onClose }: Props) {
 	}, [onClose]);
 
 	async function startCheckout() {
-		try {
-			const { data } = await supabase.auth.getSession();
-			const token = data.session?.access_token;
-			console.log(token);
+		const { data } = await supabase.auth.getSession();
 
-			if (!token) {
-				console.error("User not logged in");
-				return;
+		const token = data.session?.access_token;
+
+		console.log("TOKEN:", token);
+
+		const res = await fetch(
+			"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/checkout",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
 			}
+		);
 
-			const res = await fetch(
-				"https://nlpjbhfnriutjcrmdswj.functions.supabase.co/checkout",
-				{
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+		const json = await res.json();
 
-			const json = await res.json();
-
-			if (json.url) {
-				window.location.href = json.url;
-			} else {
-				console.error(json);
-			}
-		} catch (err) {
-			console.error("Checkout failed", err);
+		if (json.url) {
+			window.location.href = json.url;
+		} else {
+			console.error(json);
 		}
 	}
-
 	if (!user) return null;
 
 	const username = user.email?.split("@")[0];
