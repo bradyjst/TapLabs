@@ -12,7 +12,7 @@ import {
 	CartesianGrid,
 } from "recharts";
 import { useAuth } from "../../context/useAuth";
-import { useProfile } from "../Profile/useProfile";
+import { useProfile } from "./useProfile";
 import { useUserStats } from "../../stats/useUserStats";
 import type { UserStats } from "../../stats/useUserStats";
 import "./Profile.css";
