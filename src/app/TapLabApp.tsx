@@ -3,9 +3,10 @@ import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
 import { useAuth } from "../context/useAuth";
 import { initHitSound } from "../lib/hitSound";
-import { Settings } from "../options/Settings";
+import { Settings } from "../settings/Settings";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import { useProfile } from "../context/useProfile";
+import { useSettings } from "../settings/useSettings";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
@@ -22,12 +23,12 @@ export default function TapLabApp() {
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
 	const [statsOpen, setStatsOpen] = useState(false);
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
-	const [visualStyle, setVisualStyle] = useState<string>("minimal");
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null,
 	);
 	const { isPaid } = useProfile();
+	const { settings, updateSetting } = useSettings();
 
 	const isPracticeMode = bpmOverride !== null;
 
@@ -97,7 +98,7 @@ export default function TapLabApp() {
 						engine={engine}
 						userId={user?.id}
 						isPracticeMode={isPracticeMode}
-						visualStyle={visualStyle}
+						visualStyle={settings.visualStyle}
 						onSessionComplete={(analytics) => {
 							setLastAnalytics(analytics);
 							setStatsOpen(true);
@@ -167,8 +168,8 @@ export default function TapLabApp() {
 			<Settings
 				isOpen={settingsBarOpen}
 				onClose={() => setSettingsBarOpen(false)}
-				visualStyle={visualStyle}
-				setVisualStyle={setVisualStyle}
+				visualStyle={settings.visualStyle}
+				setVisualStyle={(style) => updateSetting("visualStyle", style)}
 			/>
 			{/* STATS MODAL */}
 			{statsOpen && (

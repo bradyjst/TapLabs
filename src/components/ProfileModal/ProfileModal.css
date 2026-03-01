@@ -149,3 +149,137 @@
 .manage-btn:active {
 	transform: scale(0.98);
 }
+
+/* ===== Add these to your existing ProfileModal.css ===== */
+
+/* Stat Cards Grid */
+.stats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.6rem;
+	margin-bottom: 1rem;
+}
+
+.stat-card {
+	background: var(--grid);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.2rem;
+}
+
+.stat-card-value {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.stat-card-label {
+	font-size: 0.7rem;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+/* Accent value highlight */
+.value.accent {
+	color: var(--accent);
+}
+
+/* Loading / Empty states */
+.stats-loading,
+.stats-empty {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	padding: 0.5rem 0;
+}
+
+/* Hit Breakdown Bar */
+.hit-breakdown {
+	margin-top: 1rem;
+}
+
+.hit-bar {
+	display: flex;
+	height: 10px;
+	border-radius: 5px;
+	overflow: hidden;
+	background: var(--grid);
+}
+
+.hit-segment {
+	min-width: 1px;
+	transition: width 0.3s ease;
+}
+
+.hit-segment.perfect {
+	background: var(--perfect);
+}
+
+.hit-segment.good {
+	background: #4ade80;
+}
+
+.hit-segment.ok {
+	background: var(--early);
+}
+
+.hit-segment.miss {
+	background: var(--late);
+}
+
+/* Hit Legend */
+.hit-legend {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-top: 0.5rem;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-size: 0.7rem;
+	color: var(--text-muted);
+}
+
+.legend-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+}
+
+.legend-dot.perfect {
+	background: var(--perfect);
+}
+
+.legend-dot.good {
+	background: #4ade80;
+}
+
+.legend-dot.ok {
+	background: var(--early);
+}
+
+.legend-dot.miss {
+	background: var(--late);
+}
+
+/* Membership info link */
+.membership-info-link {
+	display: block;
+	text-align: center;
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.membership-info-link:hover {
+	color: var(--accent);
+}
