@@ -1,0 +1,508 @@
+.profile-page {
+	min-height: 100vh;
+	color: var(--text-primary);
+}
+
+.profile-page-inner {
+	max-width: 1100px;
+	width: 90%;
+	margin: 0 auto;
+	padding: 2.5rem 0 4rem;
+}
+
+.profile-back-link {
+	display: inline-block;
+	margin-bottom: 2rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.profile-back-link:hover {
+	color: var(--accent);
+}
+
+/* ===== Header ===== */
+
+.profile-page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 1.5rem;
+}
+
+.profile-identity h1 {
+	font-size: 2rem;
+	font-weight: 700;
+	margin-bottom: 0.25rem;
+}
+
+.profile-email {
+	display: block;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+.profile-joined {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+	opacity: 0.6;
+	margin-top: 0.2rem;
+}
+
+.profile-badges {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.badge {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 0.35rem 0.75rem;
+	border-radius: 6px;
+}
+
+.badge.member {
+	background: var(--accent-soft);
+	color: var(--accent);
+	border: 1px solid var(--accent-border);
+}
+
+.badge.free {
+	background: var(--grid);
+	color: var(--text-muted);
+	border: 1px solid var(--border);
+}
+
+/* ===== Section Cards ===== */
+
+.profile-section-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	padding: 1.5rem;
+	margin-bottom: 1.25rem;
+}
+
+.profile-section-card h2 {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--text-muted);
+	margin-bottom: 1.25rem;
+}
+
+.section-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.section-card-header h2 {
+	margin-bottom: 0;
+}
+
+.section-edit-btn {
+	background: none;
+	border: 1px solid var(--border);
+	color: var(--text-muted);
+	font-size: 0.8rem;
+	padding: 0.3rem 0.75rem;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.section-edit-btn:hover {
+	border-color: var(--accent-border);
+	color: var(--accent);
+}
+
+/* ===== osu! Section ===== */
+
+.osu-section {
+	margin-bottom: 1.25rem;
+}
+
+.osu-link {
+	display: inline-block;
+	margin-top: 0.75rem;
+	color: var(--accent);
+	text-decoration: none;
+	font-size: 0.9rem;
+	word-break: break-all;
+}
+
+.osu-link:hover {
+	text-decoration: underline;
+}
+
+.osu-empty {
+	margin-top: 0.75rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+.osu-edit-form {
+	margin-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+}
+
+.osu-input {
+	width: 100%;
+	padding: 0.6rem 0.8rem;
+	font-size: 0.9rem;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	color: var(--text-primary);
+	outline: none;
+	transition: border-color 0.15s ease;
+}
+
+.osu-input:focus {
+	border-color: var(--accent-border);
+}
+
+.osu-input::placeholder {
+	color: var(--text-muted);
+	opacity: 0.5;
+}
+
+.osu-error {
+	font-size: 0.8rem;
+	color: var(--late);
+}
+
+.osu-edit-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.osu-save-btn {
+	padding: 0.5rem 1.2rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	background: var(--accent);
+	color: var(--bg);
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: opacity 0.15s ease;
+}
+
+.osu-save-btn:hover {
+	opacity: 0.85;
+}
+
+.osu-save-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.osu-cancel-btn {
+	padding: 0.5rem 1rem;
+	font-size: 0.85rem;
+	background: none;
+	border: 1px solid var(--border);
+	color: var(--text-muted);
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.osu-cancel-btn:hover {
+	border-color: var(--text-muted);
+	color: var(--text-primary);
+}
+
+/* ===== Overview Grid ===== */
+
+.overview-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 0.75rem;
+}
+
+.overview-card {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 1rem 0.75rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.3rem;
+	text-align: center;
+}
+
+.overview-card-value {
+	font-size: 1.3rem;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.overview-card-value.accent {
+	color: var(--accent);
+}
+
+.overview-card-label {
+	font-size: 0.65rem;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+/* ===== Charts ===== */
+
+.charts-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.25rem;
+}
+
+.chart-container {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 1.25rem;
+}
+
+.chart-container:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+.chart-container h3 {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 1rem;
+}
+
+.chart-wrapper {
+	width: 100%;
+}
+
+/* ===== Hit Breakdown ===== */
+
+.hit-bar-large {
+	display: flex;
+	height: 14px;
+	border-radius: 7px;
+	overflow: hidden;
+	background: var(--grid);
+	margin-bottom: 1rem;
+}
+
+.hit-seg-large {
+	min-width: 2px;
+	transition: width 0.3s ease;
+}
+
+.hit-seg-large.perfect {
+	background: var(--perfect);
+}
+
+.hit-seg-large.good {
+	background: #4ade80;
+}
+
+.hit-seg-large.ok {
+	background: var(--early);
+}
+
+.hit-seg-large.miss {
+	background: var(--late);
+}
+
+.hit-stats-row {
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
+	flex-wrap: wrap;
+}
+
+.hit-stat-item {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.85rem;
+}
+
+.hit-stat-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+.hit-stat-dot.perfect {
+	background: var(--perfect);
+}
+
+.hit-stat-dot.good {
+	background: #4ade80;
+}
+
+.hit-stat-dot.ok {
+	background: var(--early);
+}
+
+.hit-stat-dot.miss {
+	background: var(--late);
+}
+
+.hit-stat-label {
+	color: var(--text-muted);
+	font-weight: 500;
+}
+
+.hit-stat-value {
+	color: var(--text-primary);
+	font-weight: 600;
+}
+
+.hit-stat-pct {
+	color: var(--text-muted);
+	font-size: 0.75rem;
+}
+
+/* ===== Drill Table ===== */
+
+.drill-table-wrapper {
+	overflow-x: auto;
+}
+
+.drill-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.85rem;
+}
+
+.drill-table th {
+	text-align: left;
+	padding: 0.6rem 0.75rem;
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-muted);
+	border-bottom: 1px solid var(--border);
+}
+
+.drill-table td {
+	padding: 0.55rem 0.75rem;
+	color: var(--text-muted);
+	border-bottom: 1px solid var(--border);
+}
+
+.drill-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+.drill-table tbody tr:hover {
+	background: var(--grid);
+}
+
+.drill-table .drill-name {
+	color: var(--text-primary);
+	font-weight: 500;
+}
+
+.drill-table .accent {
+	color: var(--accent);
+	font-weight: 600;
+}
+
+/* ===== Empty / Loading States ===== */
+
+.profile-loading {
+	text-align: center;
+	padding: 3rem 0;
+	color: var(--text-muted);
+	font-size: 0.95rem;
+}
+
+.profile-empty-state {
+	text-align: center;
+	padding: 4rem 0;
+}
+
+.profile-empty-state h1,
+.profile-empty-state h2 {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--text-primary);
+	margin-bottom: 0.5rem;
+}
+
+.profile-empty-state p {
+	font-size: 0.95rem;
+	color: var(--text-muted);
+	margin-bottom: 1.5rem;
+}
+
+.profile-cta-btn {
+	display: inline-block;
+	padding: 0.7rem 2rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	background: var(--accent);
+	color: var(--bg);
+	border-radius: 8px;
+	text-decoration: none;
+	transition: opacity 0.15s ease;
+}
+
+.profile-cta-btn:hover {
+	opacity: 0.85;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 900px) {
+	.overview-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.charts-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 600px) {
+	.profile-page-inner {
+		width: 95%;
+		padding: 1.5rem 0 3rem;
+	}
+
+	.profile-page-header {
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.profile-identity h1 {
+		font-size: 1.5rem;
+	}
+
+	.overview-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.hit-stats-row {
+		gap: 1rem;
+	}
+
+	.drill-table {
+		font-size: 0.75rem;
+	}
+
+	.drill-table th,
+	.drill-table td {
+		padding: 0.45rem 0.5rem;
+	}
+}

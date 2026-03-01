@@ -284,3 +284,43 @@
 .membership-info-link:hover {
 	color: var(--accent);
 }
+
+/* ===== Append to your existing ProfileModal.css ===== */
+
+.value.accent {
+	color: var(--accent);
+}
+
+.view-profile-link {
+	display: block;
+	text-align: center;
+	margin-top: 0.5rem;
+	padding: 0.6rem;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--accent);
+	text-decoration: none;
+	border: 1px solid var(--accent-border);
+	border-radius: 8px;
+	background: var(--accent-soft);
+	transition: all 0.15s ease;
+}
+
+.view-profile-link:hover {
+	background: var(--accent-border);
+	color: white;
+}
+
+.membership-info-link {
+	display: block;
+	text-align: center;
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.membership-info-link:hover {
+	color: var(--accent);
+}

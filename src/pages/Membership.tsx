@@ -102,7 +102,7 @@ export default function Membership() {
 					<p className="cta-status">Loading...</p>
 				) : isPaid ? (
 					<p className="cta-status">
-						You're already a member — thank you for your support!
+						You're already a member, thank you for your support!
 					</p>
 				) : !user ? (
 					<>
