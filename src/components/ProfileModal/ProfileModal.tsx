@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { signOut } from "../../lib/auth";
 import { useAuth } from "../../context/useAuth";
-import "./ProfileModal.css";
 import { supabase } from "../../lib/supabase";
+import { useProfile } from "../../context/useProfile";
+import "./ProfileModal.css";
 
 interface Props {
 	onClose: () => void;
@@ -10,7 +11,7 @@ interface Props {
 
 export default function ProfileModal({ onClose }: Props) {
 	const { user } = useAuth();
-	const [isPaid, setIsPaid] = useState<boolean | null>(null);
+	const { isPaid, loading } = useProfile();
 
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
@@ -20,27 +21,6 @@ export default function ProfileModal({ onClose }: Props) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
-
-	useEffect(() => {
-		if (!user) return;
-
-		async function loadProfile() {
-			const { data, error } = await supabase
-				.from("profiles")
-				.select("is_paid")
-				.eq("id", user?.id)
-				.single();
-
-			if (error) {
-				console.error("Failed to load profile:", error);
-				return;
-			}
-
-			setIsPaid(data?.is_paid ?? false);
-		}
-
-		loadProfile();
-	}, [user]);
 
 	async function startCheckout() {
 		try {
@@ -71,6 +51,7 @@ export default function ProfileModal({ onClose }: Props) {
 
 		window.location.href = data.url;
 	}
+
 	if (!user) return null;
 
 	const username = user.email?.split("@")[0];
@@ -107,17 +88,17 @@ export default function ProfileModal({ onClose }: Props) {
 						<span className="label">Status</span>
 
 						<span className={`value ${isPaid ? "member" : "free"}`}>
-							{isPaid === null ? "Loading..." : isPaid ? "Member" : "Free User"}
+							{loading ? "Loading..." : isPaid ? "Member" : "Free User"}
 						</span>
 					</div>
 
-					{!isPaid && (
+					{!loading && !isPaid && (
 						<button onClick={startCheckout} className="upgrade-btn">
 							Become a Member
 						</button>
 					)}
 
-					{isPaid && (
+					{!loading && isPaid && (
 						<button onClick={openCustomerPortal} className="manage-btn">
 							Manage Subscription
 						</button>

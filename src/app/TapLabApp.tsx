@@ -5,13 +5,14 @@ import { useAuth } from "../context/useAuth";
 import { initHitSound } from "../lib/hitSound";
 import { Settings } from "../options/Settings";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
+import { useProfile } from "../context/useProfile";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
-import "./TapLab.css";
 import AuthButton from "../components/AuthButton/AuthButton";
+import "./TapLab.css";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
@@ -24,8 +25,9 @@ export default function TapLabApp() {
 	const [visualStyle, setVisualStyle] = useState<string>("minimal");
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
-		null
+		null,
 	);
+	const { isPaid } = useProfile();
 
 	const isPracticeMode = bpmOverride !== null;
 
@@ -172,7 +174,7 @@ export default function TapLabApp() {
 			{statsOpen && (
 				<StatsPanel
 					data={lastAnalytics}
-					isPaid={false}
+					isPaid={isPaid}
 					onClose={() => setStatsOpen(false)}
 				/>
 			)}

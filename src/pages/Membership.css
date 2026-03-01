@@ -1,0 +1,223 @@
+.membership-page {
+	min-height: 100vh;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 3rem 1.5rem 4rem;
+	color: var(--text-primary);
+}
+
+.membership-back-link {
+	display: inline-block;
+	margin-bottom: 2.5rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.membership-back-link:hover {
+	color: var(--accent);
+}
+
+/* -------- Hero -------- */
+
+.membership-hero {
+	text-align: center;
+	margin-bottom: 3.5rem;
+}
+
+.membership-hero h1 {
+	font-size: 2.4rem;
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--text-primary);
+	margin-bottom: 1rem;
+}
+
+.hero-accent {
+	color: var(--accent);
+}
+
+.hero-sub {
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: var(--text-muted);
+	max-width: 520px;
+	margin: 0 auto;
+}
+
+/* -------- Feature Cards -------- */
+
+.membership-features {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.25rem;
+	margin-bottom: 3.5rem;
+}
+
+.feature-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 1.5rem;
+	transition:
+		border-color 0.25s ease,
+		background 0.25s ease;
+}
+
+.feature-card:hover {
+	border-color: var(--accent-border);
+	background: var(--accent-soft);
+}
+
+.feature-icon {
+	font-size: 1.5rem;
+	display: block;
+	margin-bottom: 0.75rem;
+}
+
+.feature-card h3 {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+	font-size: 0.85rem;
+	line-height: 1.55;
+	color: var(--text-muted);
+	margin: 0;
+}
+
+/* -------- Comparison Table -------- */
+
+.membership-comparison {
+	margin-bottom: 3.5rem;
+}
+
+.membership-comparison h2 {
+	font-size: 1.4rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	text-align: center;
+	margin-bottom: 1.25rem;
+}
+
+.comparison-table {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.comparison-row {
+	display: grid;
+	grid-template-columns: 1fr 80px 80px;
+	align-items: center;
+	padding: 0.7rem 1.25rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.comparison-row:last-child {
+	border-bottom: none;
+}
+
+.comparison-row.header {
+	background: var(--grid);
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.comparison-label {
+	font-size: 0.88rem;
+	color: var(--text-muted);
+}
+
+.comparison-check {
+	text-align: center;
+	font-size: 0.95rem;
+}
+
+.comparison-check.yes {
+	color: var(--perfect);
+}
+
+.comparison-check.no {
+	color: var(--border);
+}
+
+/* -------- CTA -------- */
+
+.membership-cta {
+	text-align: center;
+	padding: 2rem 0;
+}
+
+.cta-button {
+	display: inline-block;
+	padding: 0.85rem 2.5rem;
+	font-size: 1rem;
+	font-weight: 600;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	background: var(--accent);
+	color: var(--bg);
+	transition:
+		opacity 0.2s ease,
+		transform 0.15s ease;
+}
+
+.cta-button:hover {
+	opacity: 0.85;
+	transform: translateY(-1px);
+}
+
+.cta-button:active {
+	transform: translateY(0);
+}
+
+.cta-button.secondary {
+	background: var(--grid);
+	color: var(--text-primary);
+	text-decoration: none;
+}
+
+.cta-button.secondary:hover {
+	background: var(--border);
+	opacity: 1;
+}
+
+.cta-status {
+	font-size: 0.95rem;
+	color: var(--text-muted);
+	margin-bottom: 1rem;
+}
+
+.cta-note {
+	font-size: 0.8rem;
+	color: var(--text-muted);
+	opacity: 0.5;
+	margin-top: 0.75rem;
+}
+
+/* -------- Responsive -------- */
+
+@media (max-width: 600px) {
+	.membership-hero h1 {
+		font-size: 1.8rem;
+	}
+
+	.membership-features {
+		grid-template-columns: 1fr;
+	}
+
+	.comparison-row {
+		grid-template-columns: 1fr 60px 60px;
+		padding: 0.6rem 1rem;
+	}
+}
