@@ -15,6 +15,7 @@
 .profile-container {
 	width: min(420px, 92vw);
 	max-height: 85vh;
+	overflow-y: auto;
 
 	background: var(--surface);
 	border: 1px solid var(--border);
