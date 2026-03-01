@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
 	LineChart,
@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../context/useAuth";
 import { useProfile } from "../components/Profile/useProfile";
 import { useUserStats } from "../stats/useUserStats";
+import { computeStats, parseBurstType } from "../stats/useUserStats";
 import type { UserStats } from "../stats/useUserStats";
 import "./Profile.css";
 
@@ -25,7 +26,47 @@ export default function Profile() {
 		loading: profileLoading,
 		updateOsuProfile,
 	} = useProfile();
-	const { stats, loading: statsLoading } = useUserStats();
+	const { stats, sessions, loading: statsLoading } = useUserStats();
+	const [burstFilter, setBurstFilter] = useState<string>("all");
+	const [bpmFilter, setBpmFilter] = useState<string>("all");
+
+	// Derive available filter options from sessions
+	const filterOptions = useMemo(() => {
+		const bursts = new Set<string>();
+		const bpms = new Set<number>();
+
+		for (const s of sessions) {
+			const { burstType, bpm } = parseBurstType(s.drill_id);
+			bursts.add(burstType);
+			bpms.add(bpm);
+		}
+
+		return {
+			bursts: [...bursts].sort((a, b) => {
+				const numA = parseInt(a);
+				const numB = parseInt(b);
+				return numA - numB;
+			}),
+			bpms: [...bpms].sort((a, b) => a - b),
+		};
+	}, [sessions]);
+
+	// Compute filtered stats
+	const filteredStats = useMemo(() => {
+		if (burstFilter === "all" && bpmFilter === "all") return stats;
+		if (sessions.length === 0) return stats;
+
+		const filtered = sessions.filter((s) => {
+			const { burstType, bpm } = parseBurstType(s.drill_id);
+			if (burstFilter !== "all" && burstType !== burstFilter) return false;
+			if (bpmFilter !== "all" && bpm !== Number(bpmFilter)) return false;
+			return true;
+		});
+
+		return computeStats(filtered);
+	}, [sessions, stats, burstFilter, bpmFilter]);
+
+	const hasActiveFilter = burstFilter !== "all" || bpmFilter !== "all";
 
 	if (!user) {
 		return (
@@ -93,10 +134,76 @@ export default function Profile() {
 					</div>
 				) : (
 					<>
-						<StatsOverview stats={stats} />
-						<ChartsSection stats={stats} />
-						<HitBreakdown stats={stats} />
-						<DrillBreakdowns stats={stats} />
+						<div className="profile-section-card filter-bar">
+							<div className="filter-bar-inner">
+								<h2>Filter</h2>
+
+								<div className="filter-controls">
+									<div className="filter-group">
+										<label>Burst Type</label>
+										<select
+											value={burstFilter}
+											onChange={(e) => setBurstFilter(e.target.value)}
+										>
+											<option value="all">All Bursts</option>
+											{filterOptions.bursts.map((b) => (
+												<option key={b} value={b}>
+													{b}
+												</option>
+											))}
+										</select>
+									</div>
+
+									<div className="filter-group">
+										<label>BPM</label>
+										<select
+											value={bpmFilter}
+											onChange={(e) => setBpmFilter(e.target.value)}
+										>
+											<option value="all">All BPMs</option>
+											{filterOptions.bpms.map((bpm) => (
+												<option key={bpm} value={bpm}>
+													{bpm} BPM
+												</option>
+											))}
+										</select>
+									</div>
+
+									{hasActiveFilter && (
+										<button
+											className="filter-clear-btn"
+											onClick={() => {
+												setBurstFilter("all");
+												setBpmFilter("all");
+											}}
+										>
+											Clear Filters
+										</button>
+									)}
+								</div>
+
+								{hasActiveFilter && filteredStats && (
+									<p className="filter-summary">
+										Showing {filteredStats.totalSessions} of{" "}
+										{stats.totalSessions} sessions
+									</p>
+								)}
+							</div>
+						</div>
+
+						{filteredStats && filteredStats.totalSessions > 0 ? (
+							<>
+								<StatsOverview stats={filteredStats} />
+								<ChartsSection stats={filteredStats} />
+								<HitBreakdown stats={filteredStats} />
+								<DrillBreakdowns stats={filteredStats} />
+							</>
+						) : (
+							<div className="profile-empty-state">
+								<h2>No sessions match this filter</h2>
+								<p>Try adjusting your burst type or BPM selection.</p>
+							</div>
+						)}
 					</>
 				)}
 			</div>

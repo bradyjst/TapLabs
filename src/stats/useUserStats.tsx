@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { supabase } from "../lib/supabase";
 
-type Session = {
+export type Session = {
 	drill_id: string;
 	bpm: number;
 	hit_300: number;
@@ -66,14 +66,17 @@ function bestGrade(a: string, b: string): string {
 	return (GRADE_RANK[a] ?? 0) >= (GRADE_RANK[b] ?? 0) ? a : b;
 }
 
-function parseBurstType(drillId: string): { burstType: string; bpm: number } {
+export function parseBurstType(drillId: string): {
+	burstType: string;
+	bpm: number;
+} {
 	// drill IDs are like "burst5_180"
 	const match = drillId.match(/^burst(\d+)_(\d+)$/);
 	if (!match) return { burstType: drillId, bpm: 0 };
 	return { burstType: `${match[1]} Burst`, bpm: Number(match[2]) };
 }
 
-function computeStats(sessions: Session[]): UserStats {
+export function computeStats(sessions: Session[]): UserStats {
 	if (sessions.length === 0) {
 		return {
 			totalSessions: 0,
@@ -275,6 +278,7 @@ function computeStats(sessions: Session[]): UserStats {
 
 export function useUserStats() {
 	const { user } = useAuth();
+	const [sessions, setSessions] = useState<Session[]>([]);
 	const [stats, setStats] = useState<UserStats | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -305,7 +309,9 @@ export function useUserStats() {
 				return;
 			}
 
-			setStats(computeStats(data ?? []));
+			const rows = data ?? [];
+			setSessions(rows);
+			setStats(computeStats(rows));
 			setLoading(false);
 		}
 
@@ -317,8 +323,8 @@ export function useUserStats() {
 	}, [user]);
 
 	if (!user) {
-		return { stats: null, loading: false, error: null };
+		return { stats: null, sessions: [], loading: false, error: null };
 	}
 
-	return { stats, loading, error };
+	return { stats, sessions, loading, error };
 }
