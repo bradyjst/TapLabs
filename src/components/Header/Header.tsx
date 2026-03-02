@@ -26,18 +26,25 @@ export default function Header({
 
 					{/* Nav links */}
 					<nav className="header-nav">
+						<a href="/how-to-use" className="nav-link">
+							How to Use
+						</a>
 						<a href="/resources" className="nav-link">
 							Resources
 						</a>
-						<a href="/changelog" className="nav-link">
-							Changelog
+
+						<a href="/collaborators" className="nav-link">
+							Collaborators
+						</a>
+						<a href="/membership" className="nav-link">
+							Membership
 						</a>
 					</nav>
 
 					{/* Action buttons + auth */}
 					<div className="header-actions">
 						{onCreatorClick && (
-							<button className="header-btn" onClick={onCreatorClick}>
+							<button className="header-action-btn" onClick={onCreatorClick}>
 								+ Create
 							</button>
 						)}

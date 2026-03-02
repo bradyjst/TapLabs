@@ -1,0 +1,208 @@
+.howto-page {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 40px 24px 80px;
+}
+
+.howto-back-link {
+	display: inline-block;
+	font-size: 13px;
+	color: var(--text-muted);
+	text-decoration: none;
+	margin-bottom: 24px;
+}
+
+.howto-back-link:hover {
+	color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.howto-hero {
+	margin-bottom: 32px;
+}
+
+.howto-hero h1 {
+	font-size: 28px;
+	font-weight: 700;
+	margin: 0 0 12px 0;
+}
+
+.howto-intro {
+	font-size: 15px;
+	color: var(--text-muted);
+	line-height: 1.6;
+	margin: 0;
+}
+
+/* ---- Table of Contents ---- */
+.howto-toc {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 40px;
+	padding: 16px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 10px;
+}
+
+.toc-link {
+	font-size: 12px;
+	color: var(--accent, #7c6aed);
+	text-decoration: none;
+	padding: 4px 10px;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	transition: all 0.15s;
+}
+
+.toc-link:hover {
+	border-color: var(--accent, #7c6aed);
+	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
+}
+
+/* ---- Sections ---- */
+.howto-section {
+	margin-bottom: 40px;
+	scroll-margin-top: 24px;
+}
+
+.howto-section h2 {
+	font-size: 20px;
+	font-weight: 700;
+	margin: 0 0 16px 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--border, #2a2a3a);
+}
+
+.howto-section p {
+	font-size: 14px;
+	line-height: 1.7;
+	color: var(--text-muted);
+	margin: 0 0 12px 0;
+}
+
+.howto-section strong {
+	color: var(--text-primary);
+}
+
+/* ---- Grades ---- */
+.howto-grades {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.grade-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--border, #2a2a3a);
+	background: var(--bg-secondary, #16161f);
+}
+
+.grade-face {
+	font-size: 22px;
+	font-weight: 700;
+	flex-shrink: 0;
+	width: 36px;
+	text-align: center;
+}
+
+.grade-300 .grade-face {
+	color: var(--perfect, #4ae87a);
+}
+.grade-100 .grade-face {
+	color: var(--early, #e8c44a);
+}
+.grade-50 .grade-face {
+	color: var(--late, #e85a5a);
+}
+.grade-miss .grade-face {
+	color: var(--text-muted);
+}
+
+.grade-item strong {
+	display: block;
+	font-size: 14px;
+	margin-bottom: 4px;
+}
+
+.grade-item p {
+	margin: 0;
+	font-size: 13px;
+}
+
+/* ---- Metric / Drill blocks ---- */
+.howto-metric,
+.howto-drill {
+	margin-bottom: 16px;
+}
+
+.howto-metric h3,
+.howto-drill h3 {
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0 0 6px 0;
+}
+
+/* ---- Badges ---- */
+.howto-badge {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	padding: 3px 10px;
+	border-radius: 4px;
+	background: var(--accent-soft, rgba(124, 106, 237, 0.15));
+	color: var(--accent, #7c6aed);
+	margin-bottom: 12px;
+}
+
+/* ---- Inline link ---- */
+.howto-inline-link {
+	color: var(--accent, #7c6aed);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.howto-inline-link:hover {
+	color: var(--text-primary);
+}
+
+/* ---- Keyboard keys ---- */
+.howto-keys {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 16px 0;
+}
+
+.key-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 14px;
+	color: var(--text-muted);
+}
+
+.key-row kbd {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 32px;
+	padding: 0 10px;
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--text-primary);
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 6px;
+	box-shadow: 0 2px 0 var(--border, #2a2a3a);
+}

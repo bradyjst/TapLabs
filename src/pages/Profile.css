@@ -598,3 +598,66 @@
 		min-width: 0;
 	}
 }
+
+/* ---- Append these to your existing Profile.css ---- */
+
+/* Upsell blocks */
+.profile-upsell {
+	border: 1px dashed var(--border, #2a2a3a);
+	border-radius: 10px;
+	padding: 32px 24px;
+	margin-bottom: 16px;
+	background: var(--bg-secondary, #16161f);
+}
+
+.upsell-inner {
+	text-align: center;
+	max-width: 320px;
+	margin: 0 auto;
+}
+
+.upsell-lock {
+	font-size: 28px;
+	display: block;
+	margin-bottom: 12px;
+}
+
+.upsell-inner h3 {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0 0 6px 0;
+}
+
+.upsell-inner p {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 0 0 16px 0;
+}
+
+.upsell-btn {
+	display: inline-block;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--accent, #7c6aed);
+	text-decoration: none;
+	padding: 8px 20px;
+	border: 1px solid var(--accent, #7c6aed);
+	border-radius: 8px;
+	transition: all 0.15s;
+}
+
+.upsell-btn:hover {
+	background: var(--accent, #7c6aed);
+	color: #fff;
+}
+
+/* Locked overview cards */
+.overview-card.locked {
+	opacity: 0.5;
+	position: relative;
+}
+
+.overview-card.locked .overview-card-value {
+	filter: blur(0px);
+	font-size: 18px;
+}

@@ -18,6 +18,29 @@ import { computeStats, parseBurstType } from "../stats/useUserStats";
 import type { UserStats } from "../stats/useUserStats";
 import "./Profile.css";
 
+/* ======================== */
+/* Paywall Prompt           */
+/* ======================== */
+
+function MemberUpsell({ feature }: { feature: string }) {
+	return (
+		<div className="profile-upsell">
+			<div className="upsell-inner">
+				<span className="upsell-lock">🔒</span>
+				<h3>{feature}</h3>
+				<p>This feature is available to TapLabs members.</p>
+				<Link to="/membership" className="upsell-btn">
+					View Membership
+				</Link>
+			</div>
+		</div>
+	);
+}
+
+/* ======================== */
+/* Main Page                */
+/* ======================== */
+
 export default function Profile() {
 	const { user } = useAuth();
 	const {
@@ -134,69 +157,82 @@ export default function Profile() {
 					</div>
 				) : (
 					<>
-						<div className="profile-section-card filter-bar">
-							<div className="filter-bar-inner">
-								<h2>Filter</h2>
+						{/* ---- FILTERS (paid) ---- */}
+						{isPaid ? (
+							<div className="profile-section-card filter-bar">
+								<div className="filter-bar-inner">
+									<h2>Filter</h2>
 
-								<div className="filter-controls">
-									<div className="filter-group">
-										<label>Burst Type</label>
-										<select
-											value={burstFilter}
-											onChange={(e) => setBurstFilter(e.target.value)}
-										>
-											<option value="all">All Bursts</option>
-											{filterOptions.bursts.map((b) => (
-												<option key={b} value={b}>
-													{b}
-												</option>
-											))}
-										</select>
+									<div className="filter-controls">
+										<div className="filter-group">
+											<label>Burst Type</label>
+											<select
+												value={burstFilter}
+												onChange={(e) => setBurstFilter(e.target.value)}
+											>
+												<option value="all">All Bursts</option>
+												{filterOptions.bursts.map((b) => (
+													<option key={b} value={b}>
+														{b}
+													</option>
+												))}
+											</select>
+										</div>
+
+										<div className="filter-group">
+											<label>BPM</label>
+											<select
+												value={bpmFilter}
+												onChange={(e) => setBpmFilter(e.target.value)}
+											>
+												<option value="all">All BPMs</option>
+												{filterOptions.bpms.map((bpm) => (
+													<option key={bpm} value={bpm}>
+														{bpm} BPM
+													</option>
+												))}
+											</select>
+										</div>
+
+										{hasActiveFilter && (
+											<button
+												className="filter-clear-btn"
+												onClick={() => {
+													setBurstFilter("all");
+													setBpmFilter("all");
+												}}
+											>
+												Clear Filters
+											</button>
+										)}
 									</div>
 
-									<div className="filter-group">
-										<label>BPM</label>
-										<select
-											value={bpmFilter}
-											onChange={(e) => setBpmFilter(e.target.value)}
-										>
-											<option value="all">All BPMs</option>
-											{filterOptions.bpms.map((bpm) => (
-												<option key={bpm} value={bpm}>
-													{bpm} BPM
-												</option>
-											))}
-										</select>
-									</div>
-
-									{hasActiveFilter && (
-										<button
-											className="filter-clear-btn"
-											onClick={() => {
-												setBurstFilter("all");
-												setBpmFilter("all");
-											}}
-										>
-											Clear Filters
-										</button>
+									{hasActiveFilter && filteredStats && (
+										<p className="filter-summary">
+											Showing {filteredStats.totalSessions} of{" "}
+											{stats.totalSessions} sessions
+										</p>
 									)}
 								</div>
-
-								{hasActiveFilter && filteredStats && (
-									<p className="filter-summary">
-										Showing {filteredStats.totalSessions} of{" "}
-										{stats.totalSessions} sessions
-									</p>
-								)}
 							</div>
-						</div>
+						) : (
+							<MemberUpsell feature="Filters & Drill Breakdown" />
+						)}
 
-						{filteredStats && filteredStats.totalSessions > 0 ? (
+						{/* ---- STATS (free gets basic, paid gets full) ---- */}
+						{isPaid && filteredStats && filteredStats.totalSessions > 0 ? (
 							<>
-								<StatsOverview stats={filteredStats} />
+								<StatsOverview stats={filteredStats} isPaid />
 								<ChartsSection stats={filteredStats} />
 								<HitBreakdown stats={filteredStats} />
 								<DrillBreakdowns stats={filteredStats} />
+							</>
+						) : !isPaid && stats ? (
+							<>
+								<StatsOverview stats={stats} isPaid={false} />
+								<HitBreakdown stats={stats} />
+								<MemberUpsell feature="Progress Charts" />
+								<MemberUpsell feature="Drill Breakdowns" />
 							</>
 						) : (
 							<div className="profile-empty-state">
@@ -339,12 +375,19 @@ function OsuProfileSection({
 /* Stats Overview Cards     */
 /* ======================== */
 
-function StatsOverview({ stats }: { stats: UserStats }) {
+function StatsOverview({
+	stats,
+	isPaid,
+}: {
+	stats: UserStats;
+	isPaid: boolean;
+}) {
 	return (
 		<div className="profile-section-card">
 			<h2>Overview</h2>
 
 			<div className="overview-grid">
+				{/* ---- Always free ---- */}
 				<OverviewCard
 					label="Sessions"
 					value={stats.totalSessions.toLocaleString()}
@@ -353,29 +396,45 @@ function StatsOverview({ stats }: { stats: UserStats }) {
 					label="Total Hits"
 					value={stats.totalHits.toLocaleString()}
 				/>
-				<OverviewCard label="Best Grade" value={stats.bestGrade} />
-				<OverviewCard
-					label="BPM Ceiling"
-					value={stats.bpmCeiling ? `${stats.bpmCeiling}` : "—"}
-					accent
-				/>
 				<OverviewCard
 					label="Avg Accuracy"
 					value={`${(stats.avgAccuracy * 100).toFixed(2)}%`}
 				/>
-				<OverviewCard
-					label="Best Accuracy"
-					value={`${(stats.bestAccuracy * 100).toFixed(2)}%`}
-				/>
 				<OverviewCard label="Avg UR" value={stats.avgUr.toFixed(1)} />
-				<OverviewCard label="Best UR" value={stats.bestUr.toFixed(1)} accent />
 				<OverviewCard
 					label="Hit Rate"
 					value={`${stats.overallHitRate.toFixed(1)}%`}
 				/>
+
+				{/* ---- Member only ---- */}
+				<OverviewCard
+					label="Best UR"
+					value={isPaid ? stats.bestUr.toFixed(1) : "—"}
+					accent={isPaid}
+					locked={!isPaid}
+				/>
+				<OverviewCard
+					label="BPM Ceiling"
+					value={isPaid && stats.bpmCeiling ? `${stats.bpmCeiling}` : "—"}
+					accent={isPaid}
+					locked={!isPaid}
+				/>
+				<OverviewCard
+					label="Best Accuracy"
+					value={isPaid ? `${(stats.bestAccuracy * 100).toFixed(2)}%` : "—"}
+					locked={!isPaid}
+				/>
+				<OverviewCard
+					label="Best Grade"
+					value={isPaid ? stats.bestGrade : "—"}
+					locked={!isPaid}
+				/>
 				<OverviewCard
 					label="Most Played"
-					value={stats.mostPlayedDrill ? `${stats.mostPlayedDrill}` : "—"}
+					value={
+						isPaid && stats.mostPlayedDrill ? `${stats.mostPlayedDrill}` : "—"
+					}
+					locked={!isPaid}
 				/>
 			</div>
 		</div>
@@ -386,15 +445,17 @@ function OverviewCard({
 	label,
 	value,
 	accent,
+	locked,
 }: {
 	label: string;
 	value: string;
 	accent?: boolean;
+	locked?: boolean;
 }) {
 	return (
-		<div className="overview-card">
+		<div className={`overview-card ${locked ? "locked" : ""}`}>
 			<span className={`overview-card-value ${accent ? "accent" : ""}`}>
-				{value}
+				{locked ? "🔒" : value}
 			</span>
 			<span className="overview-card-label">{label}</span>
 		</div>

@@ -7,6 +7,9 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Membership from "./pages/Membership";
 import Profile from "./pages/Profile";
+import HowToUse from "./pages/HowToUse";
+import Collaborators from "./pages/Collaborators";
+import Resources from "./pages/Resources";
 import Layout from "./layout/Layout";
 import "./index.css";
 import { AuthProvider } from "./context/AuthProvider";
@@ -23,6 +26,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 						<Route path="/privacy" element={<Privacy />} />
 						<Route path="/membership" element={<Membership />} />
 						<Route path="/profile" element={<Profile />} />
+						<Route path="/how-to-use" element={<HowToUse />} />
+						<Route path="/collaborators" element={<Collaborators />} />
+						<Route path="/resources" element={<Resources />} />
 					</Route>
 				</Routes>
 			</BrowserRouter>

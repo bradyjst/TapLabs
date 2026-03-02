@@ -46,12 +46,15 @@ type ActiveNote = {
 };
 type FloatingFace = {
 	id: number;
-	grade: 300 | 100 | 50;
+	grade: 300 | 100 | 50 | 0;
 	spawnTime: number;
 	vx: number;
 	vy: number;
 	/** Which side the face floats from in dual mode */
 	hand: "left" | "right";
+	/** Override origin position (for osu mode) */
+	originX?: number;
+	originY?: number;
 };
 type NotePosition = { x: number; y: number };
 
@@ -290,6 +293,7 @@ export default function VisualizerCanvas({
 				visualStyle === "dual" ? note.resolvedHand : note.side;
 			if (expectedSide !== "either" && side !== expectedSide) {
 				engine.registerMiss();
+				spawnMissFace(note.resolvedHand);
 				return;
 			}
 
@@ -303,6 +307,7 @@ export default function VisualizerCanvas({
 				const angle =
 					-Math.PI / 2 + (Math.random() * spreadRad - spreadRad / 2);
 				const speed = 90 + Math.random() * 80;
+				const notePos = notePositionsRef.current.get(note.id);
 				floatingFacesRef.current.push({
 					id: faceIdRef.current++,
 					grade,
@@ -310,6 +315,8 @@ export default function VisualizerCanvas({
 					vx: Math.cos(angle) * speed,
 					vy: Math.sin(angle) * speed,
 					hand: note.resolvedHand,
+					originX: notePos?.x,
+					originY: notePos?.y,
 				});
 				notePositionsRef.current.delete(note.id);
 				activeNotes.splice(closestIndex, 1);
@@ -360,6 +367,28 @@ export default function VisualizerCanvas({
 				dualAlternatorRef.current = hand === "left" ? "right" : "left";
 			}
 			return mirrorHands ? flipHand(hand) : hand;
+		};
+
+		/** Spawn a floating miss indicator */
+		const spawnMissFace = (
+			hand: "left" | "right",
+			originX?: number,
+			originY?: number,
+		) => {
+			const now = performance.now();
+			const spreadRad = (130 * Math.PI) / 180;
+			const angle = -Math.PI / 2 + (Math.random() * spreadRad - spreadRad / 2);
+			const speed = 60 + Math.random() * 50;
+			floatingFacesRef.current.push({
+				id: faceIdRef.current++,
+				grade: 0,
+				spawnTime: now,
+				vx: Math.cos(angle) * speed,
+				vy: Math.sin(angle) * speed,
+				hand,
+				originX,
+				originY,
+			});
 		};
 
 		const draw = () => {
@@ -496,9 +525,10 @@ export default function VisualizerCanvas({
 				const t = elapsed / 1000;
 
 				// In dual mode, faces float from their respective circle
-				const faceOriginX = centerX;
-				let faceOriginY = centerY;
-				if (isDual) {
+				// In osu mode, faces float from the note's position
+				const faceOriginX = face.originX ?? centerX;
+				let faceOriginY = face.originY ?? centerY;
+				if (face.originX == null && face.originY == null && isDual) {
 					const circleGap = Math.min(50, height * 0.18);
 					faceOriginY =
 						face.hand === "left" ? centerY - circleGap : centerY + circleGap;
@@ -513,6 +543,9 @@ export default function VisualizerCanvas({
 					color = early;
 				} else if (face.grade === 50) {
 					text = ":(";
+					color = late;
+				} else if (face.grade === 0) {
+					text = "✕";
 					color = late;
 				}
 				ctx.save();
@@ -569,6 +602,7 @@ export default function VisualizerCanvas({
 					activeNotes = activeNotes.filter((note) => {
 						if (now - note.scheduledTime > windows.MEH) {
 							engine.registerMiss();
+							spawnMissFace(note.resolvedHand);
 							return false;
 						}
 
@@ -618,7 +652,9 @@ export default function VisualizerCanvas({
 				} else if (visualStyle === "osu") {
 					activeNotes = activeNotes.filter((note) => {
 						if (now - note.scheduledTime > windows.MEH) {
+							const missPos = notePositionsRef.current.get(note.id);
 							engine.registerMiss();
+							spawnMissFace(note.resolvedHand, missPos?.x, missPos?.y);
 							notePositionsRef.current.delete(note.id);
 							return false;
 						}
@@ -664,6 +700,7 @@ export default function VisualizerCanvas({
 					activeNotes = activeNotes.filter((note) => {
 						if (now - note.scheduledTime > windows.MEH) {
 							engine.registerMiss();
+							spawnMissFace(note.resolvedHand);
 							return false;
 						}
 						const progress = (now - note.spawnTime) / travelTime;

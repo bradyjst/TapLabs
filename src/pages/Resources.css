@@ -1,0 +1,251 @@
+.resources-page {
+	max-width: 780px;
+	margin: 0 auto;
+	padding: 40px 24px 80px;
+}
+
+.resources-back-link {
+	display: inline-block;
+	font-size: 13px;
+	color: var(--text-muted);
+	text-decoration: none;
+	margin-bottom: 24px;
+}
+
+.resources-back-link:hover {
+	color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.resources-hero {
+	margin-bottom: 24px;
+}
+
+.resources-hero h1 {
+	font-size: 28px;
+	font-weight: 700;
+	margin: 0 0 10px 0;
+}
+
+.resources-intro {
+	font-size: 15px;
+	color: var(--text-muted);
+	line-height: 1.6;
+	margin: 0;
+}
+
+/* ---- Quick nav ---- */
+.resources-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 36px;
+	padding: 14px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 10px;
+}
+
+.resources-nav a {
+	font-size: 12px;
+	color: var(--accent, #7c6aed);
+	text-decoration: none;
+	padding: 4px 10px;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	transition: all 0.15s;
+}
+
+.resources-nav a:hover {
+	border-color: var(--accent, #7c6aed);
+	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
+}
+
+/* ---- Sections ---- */
+.resources-section {
+	margin-bottom: 48px;
+	scroll-margin-top: 24px;
+}
+
+.resources-section h2 {
+	font-size: 20px;
+	font-weight: 700;
+	margin: 0 0 8px 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--border, #2a2a3a);
+}
+
+.section-desc {
+	font-size: 14px;
+	color: var(--text-muted);
+	line-height: 1.6;
+	margin: 0 0 20px 0;
+}
+
+/* ---- Practice Routines ---- */
+.routines-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 16px;
+}
+
+.routine-card {
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 10px;
+	padding: 18px 20px;
+	transition: border-color 0.15s;
+}
+
+.routine-card:hover {
+	border-color: var(--accent, #7c6aed);
+}
+
+.routine-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.routine-header h3 {
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.routine-level {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--accent, #7c6aed);
+	padding: 2px 8px;
+	border-radius: 4px;
+	background: var(--accent-soft, rgba(124, 106, 237, 0.12));
+	white-space: nowrap;
+}
+
+.routine-desc {
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	margin: 0 0 12px 0;
+}
+
+.routine-steps {
+	margin: 0;
+	padding-left: 20px;
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.8;
+}
+
+.routine-steps li {
+	padding-left: 4px;
+}
+
+.routine-steps li::marker {
+	color: var(--accent, #7c6aed);
+	font-weight: 600;
+}
+
+/* ---- Equipment ---- */
+.equipment-category {
+	margin-bottom: 24px;
+}
+
+.equipment-category h3 {
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0 0 12px 0;
+}
+
+.equipment-item {
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 8px;
+	padding: 14px 16px;
+	margin-bottom: 8px;
+}
+
+.equipment-item strong {
+	display: block;
+	font-size: 14px;
+	margin-bottom: 4px;
+	color: var(--text-primary);
+}
+
+.equipment-item p {
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.6;
+	margin: 0;
+}
+
+/* ---- Link cards (guides + community) ---- */
+.link-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 12px;
+}
+
+.resource-card {
+	display: block;
+	position: relative;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 10px;
+	padding: 16px 18px;
+	text-decoration: none;
+	color: inherit;
+	transition:
+		border-color 0.15s,
+		transform 0.15s;
+}
+
+.resource-card:hover {
+	border-color: var(--accent, #7c6aed);
+	transform: translateY(-2px);
+}
+
+.resource-tag {
+	display: inline-block;
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	padding: 2px 7px;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	background: var(--accent-soft, rgba(124, 106, 237, 0.12));
+	color: var(--accent, #7c6aed);
+}
+
+.resource-card h3 {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 6px 0;
+}
+
+.resource-card p {
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	margin: 0;
+}
+
+.resource-external {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	font-size: 14px;
+	color: var(--text-muted);
+	opacity: 0.4;
+	transition: opacity 0.15s;
+}
+
+.resource-card:hover .resource-external {
+	opacity: 1;
+	color: var(--accent, #7c6aed);
+}

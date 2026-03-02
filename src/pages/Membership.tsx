@@ -24,10 +24,10 @@ const features = [
 		icon: "🎯",
 	},
 	{
-		title: "Early Access",
+		title: "Custom Drill Creator",
 		description:
-			"Get new features first as TapLabs evolves. Members shape the product through priority feedback.",
-		icon: "⚡",
+			"Build your own drills from scratch with a visual grid editor. Set note patterns, hand assignments, recovery bars, and loops — then play them at any BPM.",
+		icon: "🛠️",
 	},
 ];
 
@@ -92,8 +92,8 @@ export default function Membership() {
 					<ComparisonRow label="Drift curve analysis" member />
 					<ComparisonRow label="Consistency scoring" member />
 					<ComparisonRow label="Long-term stat tracking" member />
+					<ComparisonRow label="Custom drill creator" member />
 					<ComparisonRow label="Coaching insights" member />
-					<ComparisonRow label="Early access to features" member />
 				</div>
 			</div>
 
