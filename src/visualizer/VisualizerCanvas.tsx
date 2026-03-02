@@ -19,7 +19,6 @@ type Props = {
 	isRunning: boolean;
 	visualStyle: string;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
-	// osuTravelMultiplier: number;
 	windows: HitWindows;
 	onSessionComplete?: (analytics: SessionAnalytics | null) => void;
 	sessionEndRef?: React.RefObject<number>;
@@ -29,6 +28,12 @@ type Props = {
 	upcomingNotesRef: React.RefObject<
 		(number | { time: number; side?: NoteSide })[]
 	>;
+	/** Swap L/R assignments in dual mode */
+	mirrorHands?: boolean;
+	/** KeyboardEvent.code for left tap (default "KeyZ") */
+	keyLeft?: string;
+	/** KeyboardEvent.code for right tap (default "KeyX") */
+	keyRight?: string;
 };
 
 type ActiveNote = {
@@ -36,6 +41,8 @@ type ActiveNote = {
 	scheduledTime: number;
 	spawnTime: number;
 	side: NoteSide;
+	/** Resolved hand for dual mode — "either" gets assigned at spawn */
+	resolvedHand: "left" | "right";
 };
 type FloatingFace = {
 	id: number;
@@ -43,8 +50,70 @@ type FloatingFace = {
 	spawnTime: number;
 	vx: number;
 	vy: number;
+	/** Which side the face floats from in dual mode */
+	hand: "left" | "right";
 };
 type NotePosition = { x: number; y: number };
+
+/* ------------------------------------------------------------------ */
+/*  DUAL-MODE DRAW HELPERS                                             */
+/* ------------------------------------------------------------------ */
+
+const DUAL_LEFT_COLOR = "#4a9fe8";
+const DUAL_RIGHT_COLOR = "#e85a5a";
+const DUAL_CIRCLE_RADIUS = 30;
+
+function drawDualCircle(
+	ctx: CanvasRenderingContext2D,
+	x: number,
+	y: number,
+	color: string,
+	label: string,
+	pulseScale: number,
+	labelColor: string,
+) {
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.scale(pulseScale, pulseScale);
+	ctx.translate(-x, -y);
+
+	// Glow
+	if (pulseScale > 1.01) {
+		ctx.shadowColor = color;
+		ctx.shadowBlur = 20 * (pulseScale - 1) * 8;
+	}
+
+	// Ring
+	ctx.strokeStyle = color;
+	ctx.lineWidth = 3;
+	ctx.globalAlpha = 0.3 + 0.7 * Math.min(1, (pulseScale - 1) * 8 + 0.3);
+	ctx.beginPath();
+	ctx.arc(x, y, DUAL_CIRCLE_RADIUS, 0, Math.PI * 2);
+	ctx.stroke();
+
+	// Fill on hit
+	if (pulseScale > 1.01) {
+		ctx.fillStyle = color;
+		ctx.globalAlpha = 0.25 * Math.min(1, (pulseScale - 1) * 8);
+		ctx.beginPath();
+		ctx.arc(x, y, DUAL_CIRCLE_RADIUS, 0, Math.PI * 2);
+		ctx.fill();
+	}
+
+	ctx.shadowBlur = 0;
+	ctx.globalAlpha = pulseScale > 1.01 ? 1 : 0.6;
+	ctx.fillStyle = pulseScale > 1.01 ? "#ffffff" : labelColor;
+	ctx.font = "bold 22px system-ui";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(label, x, y);
+
+	ctx.restore();
+}
+
+/* ------------------------------------------------------------------ */
+/*  COMPONENT                                                          */
+/* ------------------------------------------------------------------ */
 
 export default function VisualizerCanvas({
 	drill,
@@ -61,6 +130,9 @@ export default function VisualizerCanvas({
 	windows,
 	externalTapRef,
 	onSessionComplete,
+	mirrorHands = false,
+	keyLeft = "KeyZ",
+	keyRight = "KeyX",
 }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const rafRef = useRef<number | null>(null);
@@ -68,9 +140,13 @@ export default function VisualizerCanvas({
 	const submittedRef = useRef(false);
 	const engineRef = useRef(engine);
 	const lastHitTimeRef = useRef<number>(0);
+	const lastLeftHitRef = useRef<number>(0);
+	const lastRightHitRef = useRef<number>(0);
 	const floatingFacesRef = useRef<FloatingFace[]>([]);
 	const faceIdRef = useRef(0);
 	const notePositionsRef = useRef<Map<number, NotePosition>>(new Map());
+	/** Alternator for resolving "either" notes in dual mode */
+	const dualAlternatorRef = useRef<"left" | "right">("left");
 
 	const themeRef = useRef({
 		bg: "",
@@ -151,7 +227,10 @@ export default function VisualizerCanvas({
 	}, [isRunning, userId, drill, onSessionComplete, isPracticeMode]);
 
 	useEffect(() => {
-		if (isRunning) submittedRef.current = false;
+		if (isRunning) {
+			submittedRef.current = false;
+			dualAlternatorRef.current = "left";
+		}
 	}, [isRunning]);
 
 	useEffect(() => {
@@ -206,7 +285,10 @@ export default function VisualizerCanvas({
 			const offset = now - note.scheduledTime;
 			const grade = getGrade(offset);
 
-			if (note.side !== "either" && side !== note.side) {
+			// In dual mode, check against resolvedHand instead of raw side
+			const expectedSide =
+				visualStyle === "dual" ? note.resolvedHand : note.side;
+			if (expectedSide !== "either" && side !== expectedSide) {
 				engine.registerMiss();
 				return;
 			}
@@ -214,6 +296,9 @@ export default function VisualizerCanvas({
 			if (grade !== null) {
 				engine.registerHit(offset, grade, side);
 				lastHitTimeRef.current = now;
+				if (side === "left") lastLeftHitRef.current = now;
+				else lastRightHitRef.current = now;
+
 				const spreadRad = (130 * Math.PI) / 180;
 				const angle =
 					-Math.PI / 2 + (Math.random() * spreadRad - spreadRad / 2);
@@ -224,6 +309,7 @@ export default function VisualizerCanvas({
 					spawnTime: now,
 					vx: Math.cos(angle) * speed,
 					vy: Math.sin(angle) * speed,
+					hand: note.resolvedHand,
 				});
 				notePositionsRef.current.delete(note.id);
 				activeNotes.splice(closestIndex, 1);
@@ -233,8 +319,8 @@ export default function VisualizerCanvas({
 		if (externalTapRef) externalTapRef.current = () => handleTap("left");
 
 		const keyHandler = (e: KeyboardEvent) => {
-			if (e.code === "KeyZ") handleTap("left");
-			if (e.code === "KeyX") handleTap("right");
+			if (e.code === keyLeft) handleTap("left");
+			if (e.code === keyRight) handleTap("right");
 		};
 		window.addEventListener("keydown", keyHandler);
 
@@ -255,6 +341,25 @@ export default function VisualizerCanvas({
 			};
 			notePositionsRef.current.set(id, pos);
 			return pos;
+		};
+
+		/** Resolve "either" to a specific hand for dual mode */
+		const flipHand = (h: "left" | "right"): "left" | "right" =>
+			h === "left" ? "right" : "left";
+
+		const resolveHand = (side: NoteSide): "left" | "right" => {
+			let hand: "left" | "right";
+			if (side === "left") {
+				hand = "left";
+				dualAlternatorRef.current = "right";
+			} else if (side === "right") {
+				hand = "right";
+				dualAlternatorRef.current = "left";
+			} else {
+				hand = dualAlternatorRef.current;
+				dualAlternatorRef.current = hand === "left" ? "right" : "left";
+			}
+			return mirrorHands ? flipHand(hand) : hand;
 		};
 
 		const draw = () => {
@@ -310,8 +415,62 @@ export default function VisualizerCanvas({
 				}
 			}
 
-			// Center circle (non-osu only)
-			if (visualStyle !== "osu") {
+			const isDual = visualStyle === "dual";
+
+			// ---- TARGET CIRCLES ----
+			if (isDual) {
+				// Two circles stacked vertically
+				const circleGap = Math.min(50, height * 0.18);
+				const leftY = centerY - circleGap;
+				const rightY = centerY + circleGap;
+
+				const leftElapsed = now - lastLeftHitRef.current;
+				let leftPulse = 1;
+				if (leftElapsed < 120) {
+					const t = leftElapsed / 120;
+					leftPulse = 1 + 0.25 * (1 - Math.pow(1 - t, 3));
+				}
+
+				const rightElapsed = now - lastRightHitRef.current;
+				let rightPulse = 1;
+				if (rightElapsed < 120) {
+					const t = rightElapsed / 120;
+					rightPulse = 1 + 0.25 * (1 - Math.pow(1 - t, 3));
+				}
+
+				drawDualCircle(
+					ctx,
+					centerX,
+					leftY,
+					DUAL_LEFT_COLOR,
+					"L",
+					leftPulse,
+					textMuted,
+				);
+				drawDualCircle(
+					ctx,
+					centerX,
+					rightY,
+					DUAL_RIGHT_COLOR,
+					"R",
+					rightPulse,
+					textMuted,
+				);
+
+				// Horizontal divider
+				ctx.save();
+				ctx.strokeStyle = textMuted;
+				ctx.globalAlpha = 0.15;
+				ctx.lineWidth = 1;
+				ctx.setLineDash([4, 4]);
+				ctx.beginPath();
+				ctx.moveTo(centerX - 50, centerY);
+				ctx.lineTo(centerX + 50, centerY);
+				ctx.stroke();
+				ctx.setLineDash([]);
+				ctx.restore();
+			} else if (visualStyle !== "osu") {
+				// Single circle (existing behavior)
 				const pulseElapsed = now - lastHitTimeRef.current;
 				let pulseScale = 1;
 				if (pulseElapsed < 120) {
@@ -330,13 +489,23 @@ export default function VisualizerCanvas({
 				ctx.restore();
 			}
 
-			// Floating faces
+			// ---- FLOATING FACES ----
 			floatingFacesRef.current = floatingFacesRef.current.filter((face) => {
 				const elapsed = now - face.spawnTime;
 				if (elapsed > 600) return false;
 				const t = elapsed / 1000;
-				const x = centerX + face.vx * t;
-				const y = centerY - 60 + face.vy * t;
+
+				// In dual mode, faces float from their respective circle
+				const faceOriginX = centerX;
+				let faceOriginY = centerY;
+				if (isDual) {
+					const circleGap = Math.min(50, height * 0.18);
+					faceOriginY =
+						face.hand === "left" ? centerY - circleGap : centerY + circleGap;
+				}
+
+				const x = faceOriginX + face.vx * t;
+				const y = faceOriginY - 60 + face.vy * t;
 				let text = ":)";
 				let color = perfect;
 				if (face.grade === 100) {
@@ -357,7 +526,7 @@ export default function VisualizerCanvas({
 				return true;
 			});
 
-			// Spawn + draw notes
+			// ---- SPAWN + DRAW NOTES ----
 			const effectiveTravelTime =
 				visualStyle === "osu" ? osuTravelTime : travelTime;
 
@@ -374,18 +543,79 @@ export default function VisualizerCanvas({
 					const scheduledTime = typeof raw === "number" ? raw : raw.time;
 					const side: NoteSide =
 						typeof raw === "number" ? "either" : (raw.side ?? "either");
+
 					activeNotes.push({
 						id: noteId++,
 						scheduledTime,
 						spawnTime: scheduledTime - effectiveTravelTime,
 						side,
+						resolvedHand: isDual
+							? resolveHand(side)
+							: side === "either"
+								? "left"
+								: side,
 					});
 				}
 
 				const noteRadius = 22;
 				const notesPerBar = drill.bars[0].notes.length || 1;
 
-				if (visualStyle === "osu") {
+				if (isDual) {
+					// ---- DUAL CIRCLE NOTE RENDERING (vertical split) ----
+					const circleGap = Math.min(50, height * 0.18);
+					const leftTargetY = centerY - circleGap;
+					const rightTargetY = centerY + circleGap;
+
+					activeNotes = activeNotes.filter((note) => {
+						if (now - note.scheduledTime > windows.MEH) {
+							engine.registerMiss();
+							return false;
+						}
+
+						const progress = (now - note.spawnTime) / travelTime;
+						if (progress < 0 || progress >= 1.2) return progress < 1.2;
+
+						const isLeft = note.resolvedHand === "left";
+						const targetY = isLeft ? leftTargetY : rightTargetY;
+						const noteColor_ = isLeft ? DUAL_LEFT_COLOR : DUAL_RIGHT_COLOR;
+
+						// Notes travel horizontally toward center, split vertically toward their circle
+						const x = startX + progress * (centerX - startX);
+						const splitProgress = Math.min(1, progress * 1.5);
+						const y =
+							centerY + (targetY - centerY) * easeOutCubic(splitProgress);
+
+						// Fade in
+						const alpha = Math.min(1, progress * 3);
+
+						ctx.save();
+						ctx.globalAlpha = alpha;
+						ctx.translate(x, y);
+
+						// Filled circle with hand color
+						ctx.fillStyle = noteColor_ + "30";
+						ctx.beginPath();
+						ctx.arc(0, 0, noteRadius, 0, Math.PI * 2);
+						ctx.fill();
+
+						// Border
+						ctx.strokeStyle = noteColor_;
+						ctx.lineWidth = 3;
+						ctx.beginPath();
+						ctx.arc(0, 0, noteRadius, 0, Math.PI * 2);
+						ctx.stroke();
+
+						// Label
+						ctx.fillStyle = noteColor_;
+						ctx.font = "bold 13px system-ui";
+						ctx.textAlign = "center";
+						ctx.textBaseline = "middle";
+						ctx.fillText(isLeft ? "L" : "R", 0, 0);
+
+						ctx.restore();
+						return true;
+					});
+				} else if (visualStyle === "osu") {
 					activeNotes = activeNotes.filter((note) => {
 						if (now - note.scheduledTime > windows.MEH) {
 							engine.registerMiss();
@@ -485,6 +715,9 @@ export default function VisualizerCanvas({
 		engine,
 		drill.bars,
 		visualStyle,
+		mirrorHands,
+		keyLeft,
+		keyRight,
 	]);
 
 	return (
@@ -492,4 +725,12 @@ export default function VisualizerCanvas({
 			<canvas ref={canvasRef} className="visualizer-canvas" />
 		</div>
 	);
+}
+
+/* ------------------------------------------------------------------ */
+/*  EASING                                                             */
+/* ------------------------------------------------------------------ */
+
+function easeOutCubic(t: number): number {
+	return 1 - Math.pow(1 - t, 3);
 }

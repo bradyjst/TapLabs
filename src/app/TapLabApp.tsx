@@ -1,6 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
+import { useCustomDrills } from "../drills/useCustomDrills.tsx";
 import { useAuth } from "../context/useAuth";
 import { initHitSound } from "../lib/hitSound";
 import { Settings } from "../settings/Settings";
@@ -14,6 +15,7 @@ import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import Header from "../components/Header/Header";
 import ProfileModal from "../components/ProfileModal/ProfileModal";
+import DrillCreator from "../drills/drillCreator";
 import "./TapLab.css";
 
 export default function TapLabApp() {
@@ -26,14 +28,21 @@ export default function TapLabApp() {
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
 	const [statsOpen, setStatsOpen] = useState(false);
 	const [profileOpen, setProfileOpen] = useState(false);
-	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
+	const [creatorOpen, setCreatorOpen] = useState(false);
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null,
 	);
 	const { isPaid } = useProfile();
 	const { settings, updateSetting } = useSettings();
+	const { drills: customDrills, addTemplate } = useCustomDrills();
 
+	const allDrills = useMemo(
+		() => [...coreDrills, ...customDrills],
+		[customDrills],
+	);
+
+	const selectedDrill = allDrills.find((d) => d.id === selectedDrillId)!;
 	const isPracticeMode = bpmOverride !== null;
 
 	const effectiveDrill = useMemo(() => {
@@ -42,16 +51,18 @@ export default function TapLabApp() {
 	}, [selectedDrill, bpmOverride]);
 
 	const engine = useTapEngine(effectiveDrill);
+
 	useEffect(() => {
 		localStorage.setItem("selectedDrillId", selectedDrillId);
 	}, [selectedDrillId]);
+
 	return (
 		<div
 			className={`app ${drillModalOpen ? "sidebar-open" : "sidebar-collapsed"}`}
 		>
 			{drillModalOpen && (
 				<Sidebar
-					drills={coreDrills}
+					drills={allDrills}
 					selectedDrillId={selectedDrillId}
 					setSelectedDrillId={setSelectedDrillId}
 					onClose={() => setDrillModalOpen(false)}
@@ -63,6 +74,7 @@ export default function TapLabApp() {
 					onDrillSelectClick={() => setDrillModalOpen(true)}
 					onSettingsClick={() => setSettingsBarOpen((v) => !v)}
 					onProfileClick={() => setProfileOpen(true)}
+					onCreatorClick={isPaid ? () => setCreatorOpen(true) : undefined}
 				/>
 
 				<div className="main-inner">
@@ -76,6 +88,9 @@ export default function TapLabApp() {
 						isRunning={engine.isRunning}
 						getGrade={engine.getGrade}
 						windows={engine.hitWindows}
+						mirrorHands={settings.mirrorHands}
+						keyLeft={settings.keyLeft}
+						keyRight={settings.keyRight}
 						externalTapRef={tapRef}
 						sessionEndRef={engine.live.sessionEndRef}
 						stop={engine.stop}
@@ -150,6 +165,12 @@ export default function TapLabApp() {
 				onClose={() => setSettingsBarOpen(false)}
 				visualStyle={settings.visualStyle}
 				setVisualStyle={(style) => updateSetting("visualStyle", style)}
+				mirrorHands={settings.mirrorHands}
+				setMirrorHands={(v) => updateSetting("mirrorHands", v)}
+				keyLeft={settings.keyLeft}
+				setKeyLeft={(v) => updateSetting("keyLeft", v)}
+				keyRight={settings.keyRight}
+				setKeyRight={(v) => updateSetting("keyRight", v)}
 			/>
 
 			{statsOpen && (
@@ -160,7 +181,22 @@ export default function TapLabApp() {
 				/>
 			)}
 
-			{/* Rendered at root level so position:fixed works correctly */}
+			{creatorOpen && (
+				<div
+					className="creator-modal-overlay"
+					onClick={() => setCreatorOpen(false)}
+				>
+					<div className="creator-modal" onClick={(e) => e.stopPropagation()}>
+						<DrillCreator
+							onSave={(template) => {
+								addTemplate(template);
+								setCreatorOpen(false);
+							}}
+						/>
+					</div>
+				</div>
+			)}
+
 			{profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
 		</div>
 	);

@@ -5,12 +5,14 @@ type Props = {
 	onDrillSelectClick: () => void;
 	onSettingsClick: () => void;
 	onProfileClick: () => void;
+	onCreatorClick?: () => void;
 };
 
 export default function Header({
 	onDrillSelectClick,
 	onSettingsClick,
 	onProfileClick,
+	onCreatorClick,
 }: Props) {
 	return (
 		<div className="header-root">
@@ -34,6 +36,11 @@ export default function Header({
 
 					{/* Action buttons + auth */}
 					<div className="header-actions">
+						{onCreatorClick && (
+							<button className="header-btn" onClick={onCreatorClick}>
+								+ Create
+							</button>
+						)}
 						<button className="header-action-btn" onClick={onDrillSelectClick}>
 							Drills
 						</button>

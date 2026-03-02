@@ -2,12 +2,18 @@ import { useState, useCallback } from "react";
 
 type Settings = {
 	visualStyle: string;
+	mirrorHands: boolean;
+	keyLeft: string;
+	keyRight: string;
 };
 
 const STORAGE_KEY = "taplabs-settings";
 
 const defaults: Settings = {
 	visualStyle: "minimal",
+	mirrorHands: false,
+	keyLeft: "KeyZ",
+	keyRight: "KeyX",
 };
 
 function loadSettings(): Settings {

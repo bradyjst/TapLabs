@@ -89,7 +89,9 @@
 
 	cursor: pointer;
 
-	transition: border 0.15s ease, background 0.15s ease;
+	transition:
+		border 0.15s ease,
+		background 0.15s ease;
 }
 
 .settings-section select:hover {
@@ -100,4 +102,39 @@
 	outline: none;
 	border-color: var(--accent);
 	box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+.settings-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	margin-top: 8px;
+	cursor: pointer;
+}
+
+.settings-keybinds {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.settings-keybind {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.keybind-btn {
+	min-width: 80px;
+	padding: 6px 12px;
+	text-align: center;
+	font-family: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.keybind-btn.listening {
+	border-color: var(--accent);
+	color: var(--accent);
 }
