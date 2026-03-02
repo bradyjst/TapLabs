@@ -81,7 +81,8 @@ export default function TapLabApp() {
 					onDrillSelectClick={() => setDrillModalOpen(true)}
 					onSettingsClick={() => setSettingsBarOpen((v) => !v)}
 					onProfileClick={() => setProfileOpen(true)}
-					onCreatorClick={isPaid ? () => setCreatorOpen(true) : undefined}
+					onCreatorClick={() => setCreatorOpen(true)}
+					isPaidUser={isPaid}
 				/>
 
 				<div className="main-inner">

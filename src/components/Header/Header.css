@@ -123,3 +123,8 @@
 		font-size: 0.78rem;
 	}
 }
+
+.header-btn-locked {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
