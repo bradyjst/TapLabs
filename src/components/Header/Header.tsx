@@ -1,0 +1,50 @@
+import AuthButton from "../AuthButton/AuthButton";
+import "./Header.css";
+
+type Props = {
+	onDrillSelectClick: () => void;
+	onSettingsClick: () => void;
+};
+
+export default function Header({ onDrillSelectClick, onSettingsClick }: Props) {
+	return (
+		<div className="header-root">
+			<header className="site-header">
+				<div className="header-inner">
+					{/* Wordmark */}
+					<a href="/" className="wordmark">
+						<span className="wordmark-tap">Tap</span>
+						<span className="wordmark-lab">Labs</span>
+					</a>
+
+					{/* Nav links */}
+					<nav className="header-nav">
+						<a href="/resources" className="nav-link">
+							Resources
+						</a>
+						<a href="/changelog" className="nav-link">
+							Changelog
+						</a>
+					</nav>
+
+					{/* Action buttons + auth */}
+					<div className="header-actions">
+						<button className="header-action-btn" onClick={onDrillSelectClick}>
+							Drills
+						</button>
+						<button className="header-action-btn" onClick={onSettingsClick}>
+							Settings
+						</button>
+						<AuthButton />
+					</div>
+				</div>
+			</header>
+
+			{/* Beta banner — out of main flow */}
+			<div className="header-banner">
+				Beta — scores may not save permanently and the site may receive
+				significant changes.
+			</div>
+		</div>
+	);
+}

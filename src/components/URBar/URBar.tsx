@@ -18,15 +18,6 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		// Pull theme once
-		const rootStyles = getComputedStyle(document.documentElement);
-		const perfectColor =
-			rootStyles.getPropertyValue("--perfect").trim() || "#3ddc97";
-		const goodColor = rootStyles.getPropertyValue("--good").trim() || "#ffd166";
-		const mehColor = rootStyles.getPropertyValue("--meh").trim() || "#ff5c7a";
-		const borderColor =
-			rootStyles.getPropertyValue("--border").trim() || "rgba(255,255,255,0.2)";
-
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();
 			canvas.width = rect.width;
@@ -41,6 +32,22 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			const height = canvas.height;
 			const centerX = width / 2;
 
+			// Read theme every frame so changes apply immediately
+			const rootStyles = getComputedStyle(document.documentElement);
+			const perfectColor =
+				rootStyles.getPropertyValue("--perfect").trim() || "#3ddc97";
+			const goodColor =
+				rootStyles.getPropertyValue("--good").trim() || "#ffd166";
+			const mehColor = rootStyles.getPropertyValue("--meh").trim() || "#ff5c7a";
+			const borderColor =
+				rootStyles.getPropertyValue("--border").trim() ||
+				"rgba(255,255,255,0.2)";
+			const bgColor = rootStyles.getPropertyValue("--bg").trim() || "#0f172a";
+			const surfaceColor =
+				rootStyles.getPropertyValue("--surface").trim() || "#111827";
+			const accentColor =
+				rootStyles.getPropertyValue("--accent").trim() || "#22d3ee";
+
 			const offsetsRaw = recentOffsetsMsRef.current ?? [];
 
 			// Hard cap to last 120 hits
@@ -50,24 +57,20 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 					: offsetsRaw;
 
 			const windows = getHitWindows(od);
-
-			// 🔥 Scale relative to OD
 			const maxVisual = windows.MEH * 1.2;
-
 			const scale = (ms: number) => (ms / maxVisual) * (width / 2);
 
 			ctx.clearRect(0, 0, width, height);
 
-			// Background
+			// Background — themed
 			const bg = ctx.createLinearGradient(0, 0, 0, height);
-			bg.addColorStop(0, "#0b0c10");
-			bg.addColorStop(1, "#10121a");
+			bg.addColorStop(0, bgColor);
+			bg.addColorStop(1, surfaceColor);
 			ctx.fillStyle = bg;
 			ctx.fillRect(0, 0, width, height);
 
-			// 🔥 Adaptive grid
+			// Adaptive grid
 			const gridStep = Math.round(maxVisual / 6);
-
 			ctx.strokeStyle = "rgba(255,255,255,0.05)";
 			ctx.lineWidth = 1;
 
@@ -86,12 +89,11 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 					centerX - half,
 					0,
 					centerX + half,
-					0
+					0,
 				);
 				g.addColorStop(0, "transparent");
 				g.addColorStop(0.5, color);
 				g.addColorStop(1, "transparent");
-
 				ctx.globalAlpha = alpha;
 				ctx.fillStyle = g;
 				ctx.fillRect(centerX - half, 0, half * 2, height);
@@ -115,14 +117,11 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 			ctx.restore();
 
 			// Hits
-			const glowCutoff = offsets.length - 20;
+			const recentCutoff = offsets.length - 20;
 
 			for (let i = 0; i < offsets.length; i++) {
 				const rawOffset = offsets[i];
-
-				// 🔥 Clamp to visual range
 				const offset = Math.max(-maxVisual, Math.min(maxVisual, rawOffset));
-
 				const abs = Math.abs(offset);
 				const x = centerX + scale(offset);
 
@@ -130,14 +129,14 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				if (abs <= windows.PERFECT) color = perfectColor;
 				else if (abs <= windows.GOOD) color = goodColor;
 
-				const alpha = offsets.length > 0 ? 1 - i / offsets.length : 1;
+				const isRecent = i >= recentCutoff;
 
 				ctx.save();
-				ctx.globalAlpha = alpha;
+				ctx.globalAlpha = isRecent ? 1 : 0.2;
 				ctx.strokeStyle = color;
 				ctx.lineWidth = 3;
 
-				if (i >= glowCutoff) {
+				if (isRecent) {
 					ctx.shadowColor = color;
 					ctx.shadowBlur = 10;
 				}
@@ -149,18 +148,16 @@ const URBar = ({ recentOffsetsMsRef, od }: Props) => {
 				ctx.restore();
 			}
 
-			// Mean line
+			// Mean line — themed
 			if (offsets.length > 0) {
 				const rawMean = offsets.reduce((a, b) => a + b, 0) / offsets.length;
-
 				smoothedMeanRef.current += (rawMean - smoothedMeanRef.current) * 0.12;
-
 				const meanX = centerX + scale(smoothedMeanRef.current);
 
 				ctx.save();
-				ctx.strokeStyle = "#00bfff";
+				ctx.strokeStyle = accentColor;
 				ctx.lineWidth = 3;
-				ctx.shadowColor = "#00bfff";
+				ctx.shadowColor = accentColor;
 				ctx.shadowBlur = 12;
 				ctx.beginPath();
 				ctx.moveTo(meanX, 0);

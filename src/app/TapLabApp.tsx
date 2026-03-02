@@ -12,7 +12,7 @@ import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
-import AuthButton from "../components/AuthButton/AuthButton";
+import Header from "../components/Header/Header";
 import "./TapLab.css";
 
 export default function TapLabApp() {
@@ -34,11 +34,7 @@ export default function TapLabApp() {
 
 	const effectiveDrill = useMemo(() => {
 		if (!bpmOverride) return selectedDrill;
-
-		return {
-			...selectedDrill,
-			bpm: bpmOverride,
-		};
+		return { ...selectedDrill, bpm: bpmOverride };
 	}, [selectedDrill, bpmOverride]);
 
 	const engine = useTapEngine(effectiveDrill);
@@ -57,30 +53,12 @@ export default function TapLabApp() {
 			)}
 
 			<main className="main">
+				<Header
+					onDrillSelectClick={() => setDrillModalOpen(true)}
+					onSettingsClick={() => setSettingsBarOpen((v) => !v)}
+				/>
+
 				<div className="main-inner">
-					<div className="banner">
-						This site is currently in beta. Your scores may not permanently
-						save, and the site may receive significant changes.
-					</div>
-
-					<div className="controls-row">
-						<button
-							className="sidebar-toggle-floating"
-							onClick={() => setDrillModalOpen(true)}
-						>
-							Drill Select
-						</button>
-
-						<AuthButton />
-
-						<button
-							className="sidebar-toggle-floating"
-							onClick={() => setSettingsBarOpen((v) => !v)}
-						>
-							Settings
-						</button>
-					</div>
-
 					<div className="current-drill-display">
 						<h4>{effectiveDrill.name}</h4>
 					</div>
@@ -139,7 +117,6 @@ export default function TapLabApp() {
 									value={bpmOverride ?? selectedDrill.bpm}
 									onChange={(e) => {
 										const value = Number(e.target.value);
-
 										if (value === selectedDrill.bpm) {
 											setBpmOverride(null);
 										} else {
@@ -157,11 +134,7 @@ export default function TapLabApp() {
 						</div>
 					</div>
 
-					<MobileTapPads
-						onTap={() => {
-							tapRef.current();
-						}}
-					/>
+					<MobileTapPads onTap={() => tapRef.current()} />
 				</div>
 			</main>
 
@@ -171,7 +144,7 @@ export default function TapLabApp() {
 				visualStyle={settings.visualStyle}
 				setVisualStyle={(style) => updateSetting("visualStyle", style)}
 			/>
-			{/* STATS MODAL */}
+
 			{statsOpen && (
 				<StatsPanel
 					data={lastAnalytics}

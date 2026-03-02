@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import ThemeSelector from "../components/Theme/ThemeSelector";
+import ThemeSelector from "../theme/ThemeSelector";
 import "./Settings.css";
 
 interface SettingsProps {

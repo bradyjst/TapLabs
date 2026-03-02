@@ -18,6 +18,8 @@ export type TapLabsTheme = {
   // feedback colors
   perfect: string;
   early: string;
+  good: string;
+  meh: string;
   late: string;
 
   // gameplay visuals
