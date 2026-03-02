@@ -214,7 +214,7 @@ export function computeStats(sessions: Session[]): UserStats {
 	for (const bpm of sortedBpms) {
 		const accs = bpmAccuracies.get(bpm)!;
 		const avg = accs.reduce((a, b) => a + b, 0) / accs.length;
-		if (avg >= 95) {
+		if (avg >= 0.95) {
 			bpmCeiling = bpm;
 			break;
 		}

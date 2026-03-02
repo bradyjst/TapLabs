@@ -440,28 +440,6 @@ export default function VisualizerCanvas({
 						if (progress < 0 || progress >= 1.2) return progress < 1.2;
 						const x = startX + progress * (centerX - startX);
 
-						// if (visualStyle === "approach") {
-						// 	const t = Math.max(
-						// 		0,
-						// 		Math.min(
-						// 			1,
-						// 			1 -
-						// 				(note.scheduledTime - now) /
-						// 					(note.scheduledTime - note.spawnTime),
-						// 		),
-						// 	);
-						// 	ctx.save();
-						// 	ctx.translate(x, centerY);
-						// 	ctx.scale(2 - t, 2 - t);
-						// 	ctx.translate(-x, -centerY);
-						// 	ctx.strokeStyle = approachColor;
-						// 	ctx.lineWidth = 3;
-						// 	ctx.beginPath();
-						// 	ctx.arc(x, centerY, noteRadius, 0, Math.PI * 2);
-						// 	ctx.stroke();
-						// 	ctx.restore();
-						// }
-
 						ctx.save();
 						ctx.translate(x, centerY);
 						ctx.fillStyle = accentSoft;

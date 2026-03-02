@@ -361,11 +361,11 @@ function StatsOverview({ stats }: { stats: UserStats }) {
 				/>
 				<OverviewCard
 					label="Avg Accuracy"
-					value={`${stats.avgAccuracy.toFixed(2)}%`}
+					value={`${(stats.avgAccuracy * 100).toFixed(2)}%`}
 				/>
 				<OverviewCard
 					label="Best Accuracy"
-					value={`${stats.bestAccuracy.toFixed(2)}%`}
+					value={`${(stats.bestAccuracy * 100).toFixed(2)}%`}
 				/>
 				<OverviewCard label="Avg UR" value={stats.avgUr.toFixed(1)} />
 				<OverviewCard label="Best UR" value={stats.bestUr.toFixed(1)} accent />
@@ -431,7 +431,7 @@ function ChartsSection({ stats }: { stats: UserStats }) {
 									domain={["auto", "auto"]}
 									stroke="var(--text-muted)"
 									fontSize={11}
-									tickFormatter={(v) => `${v}%`}
+									tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
 								/>
 								<Tooltip
 									contentStyle={{
@@ -441,7 +441,7 @@ function ChartsSection({ stats }: { stats: UserStats }) {
 										fontSize: 12,
 									}}
 									formatter={(v: number | undefined) => [
-										v !== undefined ? `${v.toFixed(2)}%` : "",
+										v !== undefined ? `${(v * 100).toFixed(2)}%` : "",
 										"Accuracy",
 									]}
 									labelFormatter={(d) => formatDate(d)}
@@ -621,7 +621,7 @@ function DrillBreakdowns({ stats }: { stats: UserStats }) {
 								<td className="drill-name">{d.burstType}</td>
 								<td>{d.bpm}</td>
 								<td>{d.sessions}</td>
-								<td>{d.avgAccuracy.toFixed(1)}%</td>
+								<td>{(d.avgAccuracy * 100).toFixed(1)}%</td>
 								<td>{d.avgUr.toFixed(1)}</td>
 								<td className="accent">{d.bestUr.toFixed(1)}</td>
 								<td>{d.bestGrade}</td>

@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { useTapEngine } from "../engine/useTapEngine";
 import { coreDrills } from "../drills/coreDrills";
 import { useAuth } from "../context/useAuth";
@@ -18,7 +18,9 @@ import "./TapLab.css";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
-	const [selectedDrillId, setSelectedDrillId] = useState(coreDrills[0].id);
+	const [selectedDrillId, setSelectedDrillId] = useState(() => {
+		return localStorage.getItem("selectedDrillId") ?? "burst3_150";
+	});
 	const [bpmOverride, setBpmOverride] = useState<number | null>(null);
 	const [drillModalOpen, setDrillModalOpen] = useState(false);
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
@@ -40,7 +42,9 @@ export default function TapLabApp() {
 	}, [selectedDrill, bpmOverride]);
 
 	const engine = useTapEngine(effectiveDrill);
-
+	useEffect(() => {
+		localStorage.setItem("selectedDrillId", selectedDrillId);
+	}, [selectedDrillId]);
 	return (
 		<div
 			className={`app ${drillModalOpen ? "sidebar-open" : "sidebar-collapsed"}`}
