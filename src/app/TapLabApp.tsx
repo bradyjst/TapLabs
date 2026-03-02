@@ -13,6 +13,7 @@ import URBar from "../components/URBar/URBar";
 import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import Header from "../components/Header/Header";
+import ProfileModal from "../components/ProfileModal/ProfileModal";
 import "./TapLab.css";
 
 export default function TapLabApp() {
@@ -22,6 +23,7 @@ export default function TapLabApp() {
 	const [drillModalOpen, setDrillModalOpen] = useState(false);
 	const [settingsBarOpen, setSettingsBarOpen] = useState(false);
 	const [statsOpen, setStatsOpen] = useState(false);
+	const [profileOpen, setProfileOpen] = useState(false);
 	const selectedDrill = coreDrills.find((d) => d.id === selectedDrillId)!;
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
@@ -56,6 +58,7 @@ export default function TapLabApp() {
 				<Header
 					onDrillSelectClick={() => setDrillModalOpen(true)}
 					onSettingsClick={() => setSettingsBarOpen((v) => !v)}
+					onProfileClick={() => setProfileOpen(true)}
 				/>
 
 				<div className="main-inner">
@@ -152,6 +155,9 @@ export default function TapLabApp() {
 					onClose={() => setStatsOpen(false)}
 				/>
 			)}
+
+			{/* Rendered at root level so position:fixed works correctly */}
+			{profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
 		</div>
 	);
 }

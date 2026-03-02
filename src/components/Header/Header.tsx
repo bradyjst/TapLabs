@@ -4,9 +4,14 @@ import "./Header.css";
 type Props = {
 	onDrillSelectClick: () => void;
 	onSettingsClick: () => void;
+	onProfileClick: () => void;
 };
 
-export default function Header({ onDrillSelectClick, onSettingsClick }: Props) {
+export default function Header({
+	onDrillSelectClick,
+	onSettingsClick,
+	onProfileClick,
+}: Props) {
 	return (
 		<div className="header-root">
 			<header className="site-header">
@@ -35,12 +40,12 @@ export default function Header({ onDrillSelectClick, onSettingsClick }: Props) {
 						<button className="header-action-btn" onClick={onSettingsClick}>
 							Settings
 						</button>
-						<AuthButton />
+						<AuthButton onProfileClick={onProfileClick} />
 					</div>
 				</div>
 			</header>
 
-			{/* Beta banner — out of main flow */}
+			{/* Beta banner */}
 			<div className="header-banner">
 				Beta — scores may not save permanently and the site may receive
 				significant changes.
