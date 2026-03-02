@@ -33,6 +33,8 @@
 	--accent-cyan-border: rgba(34, 211, 238, 0.4);
 	--accent-violet-border: rgba(168, 85, 247, 0.4);
 	--visualizer-bg-image: none;
+
+	--header-height: 80px; /* 52px nav + 28px banner */
 }
 
 * {
