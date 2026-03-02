@@ -13,13 +13,11 @@ type SidebarProps = {
 };
 
 const BPM_BUCKETS = [
-	{ min: 100, max: 120 },
-	{ min: 130, max: 150 },
-	{ min: 160, max: 180 },
-	{ min: 190, max: 210 },
-	{ min: 220, max: 240 },
-	{ min: 250, max: 270 },
-	{ min: 280, max: 300 },
+	{ min: 150, max: 190 },
+	{ min: 200, max: 240 },
+	{ min: 250, max: 290 },
+	{ min: 300, max: 340 },
+	{ min: 350, max: 400 },
 ];
 
 export default function Sidebar({
@@ -57,7 +55,7 @@ export default function Sidebar({
 
 	const selectedDrill = useMemo(
 		() => drills.find((d) => d.id === selectedDrillId),
-		[drills, selectedDrillId]
+		[drills, selectedDrillId],
 	);
 
 	const selectedMeta = selectedDrill ? analyzeDrill(selectedDrill) : null;

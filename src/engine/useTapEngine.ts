@@ -15,6 +15,7 @@ export type TapEvent = {
   index: number;
 };
 
+type ScheduledNote = number | { time: number; side: "left" | "right" | "either" };
 /* ---------------------------------- */
 /* -------- RUNNING STATS ----------- */
 /* ---------------------------------- */
@@ -46,28 +47,33 @@ function stdDev(stats: RunningStats) {
 /* ------ PATTERN TIME BUILDER ------ */
 /* ---------------------------------- */
 
-function buildPatternTimes(drill: Drill, sessionStartMs: number) {
+function buildPatternTimes(drill: Drill, sessionStartMs: number): ScheduledNote[] {
   const beatLength = 60000 / drill.bpm;
   const barLength = beatLength * drill.timeSig.beatsPerBar;
   const gridSize = beatLength / drill.resolution;
-  const gridsPerBar =
-    drill.timeSig.beatsPerBar * drill.resolution;
+  const gridsPerBar = drill.timeSig.beatsPerBar * drill.resolution;
 
-  const times: number[] = [];
+  const times: ScheduledNote[] = [];
   const totalBars = drill.durationBars;
 
   for (let barCounter = 0; barCounter < totalBars; barCounter++) {
     const barIndex = barCounter % drill.bars.length;
-
-    const barStart =
-      sessionStartMs +
-      barCounter * barLength;
-
+    const barStart = sessionStartMs + barCounter * barLength;
     const bar = drill.bars[barIndex];
 
-    for (const gridIndex of bar.notes) {
-      if (gridIndex >= gridsPerBar) continue;
-      times.push(barStart + gridIndex * gridSize);
+    for (const note of bar.notes) {
+      const slot = typeof note === "number" ? note : note.slot;
+      const side = typeof note === "number" ? "either" : (note.side ?? "either");
+
+      if (slot >= gridsPerBar) continue;
+
+      const time = barStart + slot * gridSize;
+
+      if (side === "either") {
+        times.push(time);
+      } else {
+        times.push({ time, side });
+      }
     }
   }
 
@@ -83,7 +89,7 @@ export function useTapEngine(drill: Drill) {
 
   const sessionStartRef = useRef<number>(0);
   const metronomeStartRef = useRef<number>(0);
-  const upcomingNotesRef = useRef<number[]>([]);
+  const upcomingNotesRef = useRef<ScheduledNote[]>([]);
   const sessionEndRef = useRef<number>(0);
 
   const offsetsStatsRef = useRef<RunningStats>(createStats());

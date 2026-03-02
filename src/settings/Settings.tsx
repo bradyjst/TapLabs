@@ -7,6 +7,8 @@ interface SettingsProps {
 	onClose: () => void;
 	visualStyle: string;
 	setVisualStyle: (style: string) => void;
+	// osuTravelMultiplier: number;
+	// setOsuTravelMultiplier: (v: number) => void;
 }
 
 export const Settings: React.FC<SettingsProps> = ({
@@ -49,8 +51,8 @@ export const Settings: React.FC<SettingsProps> = ({
 						value={visualStyle}
 						onChange={(e) => setVisualStyle(e.target.value)}
 					>
-						<option value="minimal">Minimal</option>
-						<option value="approach">Approach</option>
+						<option value="approach">Moving Notes</option>
+						<option value="osu">Approach Circle</option>
 					</select>
 				</div>
 			</div>

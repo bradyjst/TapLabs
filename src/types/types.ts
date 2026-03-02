@@ -3,16 +3,20 @@ export type Difficulty =
   | "medium"
   | "hard"
   | "expert"
-  |  "extreme"
+  | "extreme"
   | "weekly";
 
 export type TimeSignature = {
-  beatsPerBar: number; // usually 4
-  beatUnit: 4 | 8;     // 4 = quarter note base
+  beatsPerBar: number;
+  beatUnit: 4 | 8;
 };
 
+export type NoteSide = "left" | "right" | "either";
+
+export type NoteEntry = number | { slot: number; side: NoteSide };
+
 export type MusicalBar = {
-  notes: number[]; // grid positions inside bar
+  notes: NoteEntry[];
 };
 
 export type Drill = {
@@ -23,7 +27,8 @@ export type Drill = {
   od: number;
   durationBars: number;
   timeSig: TimeSignature;
-  resolution: number; // 1 = quarter, 2 = 8th, 4 = 16th, 8 = 32nd
-
+  resolution: number;
   bars: MusicalBar[];
+  templateId?: string;
+  isCustom?: boolean;
 };
