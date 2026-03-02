@@ -8,6 +8,11 @@ import { Settings } from "../settings/Settings";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import { useProfile } from "../context/useProfile";
 import { useSettings } from "../settings/useSettings";
+import { useUserStats } from "../stats/useUserStats";
+import {
+	PlayerCard,
+	DEFAULT_COSMETICS,
+} from "../components/PlayerCard/PlayerCard";
 import StatsPanel from "../stats/StatsPanel";
 import VisualizerCanvas from "../visualizer/VisualizerCanvas";
 import URBar from "../components/URBar/URBar";
@@ -16,10 +21,12 @@ import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import Header from "../components/Header/Header";
 import ProfileModal from "../components/ProfileModal/ProfileModal";
 import DrillCreator from "../drills/drillCreator";
+
 import "./TapLab.css";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
+	const { stats } = useUserStats();
 	const [selectedDrillId, setSelectedDrillId] = useState(() => {
 		return localStorage.getItem("selectedDrillId") ?? "burst3_150";
 	});
@@ -33,7 +40,7 @@ export default function TapLabApp() {
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null,
 	);
-	const { isPaid } = useProfile();
+	const { isPaid, profile, updatePlayerCard } = useProfile();
 	const { settings, updateSetting } = useSettings();
 	const { drills: customDrills, addTemplate } = useCustomDrills();
 
@@ -109,6 +116,19 @@ export default function TapLabApp() {
 						recentOffsetsMsRef={engine.live.recentOffsetsMsRef}
 						od={selectedDrill.od}
 					/>
+					<div className="playercard-wrapper">
+						{user ? (
+							<PlayerCard
+								cosmetics={profile?.player_card ?? DEFAULT_COSMETICS}
+								stats={stats}
+								fallbackName={user?.email?.split("@")[0] ?? "Player"}
+								isPaid={isPaid}
+								onChange={(next) => updatePlayerCard(next)}
+							/>
+						) : (
+							"Log in to see your player card"
+						)}
+					</div>
 
 					<div className="session-controls">
 						<div className="drill-controls">
@@ -120,7 +140,7 @@ export default function TapLabApp() {
 										engine.start();
 									}}
 								>
-									Begin Session
+									Begin Drill
 								</button>
 							) : (
 								<button className="stop-btn" onClick={() => engine.stop()}>

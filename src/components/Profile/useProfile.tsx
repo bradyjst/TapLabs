@@ -1,11 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../context/useAuth";
 import { supabase } from "../../lib/supabase";
+import {
+	DEFAULT_COSMETICS,
+	type CardCosmetics,
+} from "../../components/PlayerCard/PlayerCard";
 
 export type Profile = {
 	id: string;
 	is_paid: boolean;
 	osu_profile_url: string | null;
+	player_card: CardCosmetics;
 	created_at: string;
 };
 
@@ -26,7 +31,7 @@ export function useProfile() {
 
 			const { data, error: fetchError } = await supabase
 				.from("profiles")
-				.select("id, is_paid, osu_profile_url, created_at")
+				.select("id, is_paid, osu_profile_url, player_card, created_at")
 				.eq("id", user!.id)
 				.single();
 
@@ -39,7 +44,10 @@ export function useProfile() {
 				return;
 			}
 
-			setProfile(data);
+			setProfile({
+				...data,
+				player_card: { ...DEFAULT_COSMETICS, ...(data.player_card ?? {}) },
+			});
 			setLoading(false);
 		}
 
@@ -70,6 +78,26 @@ export function useProfile() {
 		[user],
 	);
 
+	const updatePlayerCard = useCallback(
+		async (card: CardCosmetics) => {
+			if (!user) return false;
+
+			const { error: updateError } = await supabase
+				.from("profiles")
+				.update({ player_card: card })
+				.eq("id", user.id);
+
+			if (updateError) {
+				console.error("Failed to update player card:", updateError);
+				return false;
+			}
+
+			setProfile((prev) => (prev ? { ...prev, player_card: card } : prev));
+			return true;
+		},
+		[user],
+	);
+
 	if (!user) {
 		return {
 			profile: null,
@@ -77,10 +105,18 @@ export function useProfile() {
 			loading: false,
 			error: null,
 			updateOsuProfile,
+			updatePlayerCard,
 		};
 	}
 
 	const isPaid = profile?.is_paid ?? false;
 
-	return { profile, isPaid, loading, error, updateOsuProfile };
+	return {
+		profile,
+		isPaid,
+		loading,
+		error,
+		updateOsuProfile,
+		updatePlayerCard,
+	};
 }

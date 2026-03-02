@@ -284,3 +284,14 @@
 	overflow-y: auto;
 	border-radius: 12px;
 }
+
+.playercard-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 10px;
+	max-width: 480px;
+	margin: 12px auto;
+	font-size: 13px;
+	color: var(--text-muted);
+}

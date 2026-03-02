@@ -1,0 +1,343 @@
+/* ---- Player Card ---- */
+.player-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 14px 18px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--card-accent, var(--accent, #7c6aed));
+	border-radius: 10px;
+	position: relative;
+	overflow: hidden;
+}
+
+.player-card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: var(--card-accent, var(--accent, #7c6aed));
+	opacity: 0.04;
+	pointer-events: none;
+}
+
+.pc-left {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.pc-name-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.pc-badge {
+	font-size: 16px;
+	flex-shrink: 0;
+}
+
+.pc-name {
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--text-primary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pc-title {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--card-accent, var(--accent, #7c6aed));
+	opacity: 0.85;
+}
+
+.pc-stats {
+	display: flex;
+	gap: 20px;
+	flex-shrink: 0;
+}
+
+.pc-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+}
+
+.pc-stat-value {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--text-primary);
+}
+
+.pc-stat-label {
+	font-size: 10px;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.pc-edit-btn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	background: none;
+	border: none;
+	color: var(--text-muted);
+	font-size: 14px;
+	cursor: pointer;
+	padding: 4px;
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+.player-card:hover .pc-edit-btn {
+	opacity: 1;
+}
+
+.pc-edit-btn:hover {
+	color: var(--text-primary);
+}
+
+/* ---- Editor Modal ---- */
+.pce-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+}
+
+.pce-modal {
+	background: var(--bg, #0d0d12);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 12px;
+	padding: 24px;
+	width: 90%;
+	max-width: 440px;
+	max-height: 85vh;
+	overflow-y: auto;
+}
+
+.pce-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.pce-header h2 {
+	font-size: 16px;
+	font-weight: 700;
+	margin: 0;
+}
+
+.pce-close {
+	background: none;
+	border: none;
+	color: var(--text-muted);
+	font-size: 18px;
+	cursor: pointer;
+	padding: 4px;
+}
+
+.pce-close:hover {
+	color: var(--text-primary);
+}
+
+.pce-preview {
+	margin-bottom: 20px;
+}
+
+/* ---- Fields ---- */
+.pce-field {
+	margin-bottom: 18px;
+}
+
+.pce-field label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--text-muted);
+	margin-bottom: 8px;
+}
+
+.pce-field input {
+	width: 100%;
+	padding: 8px 12px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 6px;
+	color: var(--text-primary);
+	font-family: inherit;
+	font-size: 14px;
+	outline: none;
+	transition: border-color 0.15s;
+	box-sizing: border-box;
+}
+
+.pce-field input:focus {
+	border-color: var(--accent, #7c6aed);
+}
+
+/* ---- Member tag ---- */
+.pce-member-tag {
+	font-size: 9px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 1px 6px;
+	border-radius: 3px;
+	background: var(--accent-soft, rgba(124, 106, 237, 0.15));
+	color: var(--accent, #7c6aed);
+}
+
+/* ---- Locked state ---- */
+.pce-locked {
+	opacity: 0.6;
+}
+
+.pce-locked-msg {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 0;
+}
+
+/* ---- Color swatches ---- */
+.pce-colors {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.pce-color-swatch {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.pce-color-swatch:hover {
+	transform: scale(1.15);
+}
+
+.pce-color-swatch.active {
+	border-color: #fff;
+	box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+}
+
+/* ---- Titles ---- */
+.pce-titles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.pce-title-btn {
+	font-size: 12px;
+	padding: 5px 10px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 6px;
+	color: var(--text-muted);
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.15s;
+}
+
+.pce-title-btn:hover {
+	border-color: var(--accent, #7c6aed);
+	color: var(--text-primary);
+}
+
+.pce-title-btn.active {
+	border-color: var(--accent, #7c6aed);
+	color: var(--accent, #7c6aed);
+	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
+}
+
+/* ---- Badges ---- */
+.pce-badges {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.pce-badge-btn {
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.pce-badge-btn:hover {
+	border-color: var(--accent, #7c6aed);
+}
+
+.pce-badge-btn.active {
+	border-color: var(--accent, #7c6aed);
+	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
+}
+
+/* ---- Actions ---- */
+.pce-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.pce-save {
+	flex: 1;
+	padding: 10px;
+	background: var(--accent, #7c6aed);
+	border: none;
+	border-radius: 8px;
+	color: #fff;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: filter 0.15s;
+}
+
+.pce-save:hover {
+	filter: brightness(1.15);
+}
+
+.pce-cancel {
+	padding: 10px 16px;
+	background: none;
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 8px;
+	color: var(--text-muted);
+	font-family: inherit;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.pce-cancel:hover {
+	border-color: var(--text-muted);
+	color: var(--text-primary);
+}
