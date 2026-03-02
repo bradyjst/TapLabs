@@ -1,7 +1,9 @@
 .profile-modal-overlay {
 	position: fixed;
-	inset: 0;
-	padding-top: var(--header-height); /* account for header + banner */
+	top: var(--header-height, 80px); /* start below header */
+	left: 0;
+	right: 0;
+	bottom: 0;
 
 	background: rgba(0, 0, 0, 0.55);
 	backdrop-filter: blur(4px);
@@ -12,7 +14,6 @@
 
 	z-index: 1000;
 }
-
 .profile-container {
 	width: min(420px, 92vw);
 	max-height: 85vh;
