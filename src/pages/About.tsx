@@ -44,14 +44,6 @@ export default function About() {
 				by updates during this period. If you run into issues or have ideas,
 				feedback is always welcome.
 			</p>
-
-			<h2>What's next?</h2>
-			<p>
-				The roadmap includes long-term stat tracking, advanced coaching
-				diagnostics, visual themes, and more. Members get early access to these
-				features as they ship. Check out the{" "}
-				<Link to="/membership">Membership page</Link> to learn more.
-			</p>
 		</div>
 	);
 }
