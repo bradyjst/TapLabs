@@ -41,14 +41,14 @@
 	gap: 8px;
 	margin-bottom: 36px;
 	padding: 14px;
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 10px;
 }
 
 .resources-nav a {
 	font-size: 12px;
-	color: var(--accent, #7c6aed);
+	color: var(--accent);
 	text-decoration: none;
 	padding: 4px 10px;
 	border-radius: 6px;
@@ -57,8 +57,8 @@
 }
 
 .resources-nav a:hover {
-	border-color: var(--accent, #7c6aed);
-	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
+	border-color: var(--accent);
+	background: var(--accent-soft);
 }
 
 /* ---- Sections ---- */
@@ -72,7 +72,7 @@
 	font-weight: 700;
 	margin: 0 0 8px 0;
 	padding-bottom: 8px;
-	border-bottom: 1px solid var(--border, #2a2a3a);
+	border-bottom: 1px solid var(--border);
 }
 
 .section-desc {
@@ -90,15 +90,15 @@
 }
 
 .routine-card {
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 10px;
 	padding: 18px 20px;
 	transition: border-color 0.15s;
 }
 
 .routine-card:hover {
-	border-color: var(--accent, #7c6aed);
+	border-color: var(--accent);
 }
 
 .routine-header {
@@ -119,10 +119,10 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.8px;
-	color: var(--accent, #7c6aed);
+	color: var(--accent);
 	padding: 2px 8px;
 	border-radius: 4px;
-	background: var(--accent-soft, rgba(124, 106, 237, 0.12));
+	background: var(--accent-soft);
 	white-space: nowrap;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .routine-steps li::marker {
-	color: var(--accent, #7c6aed);
+	color: var(--accent);
 	font-weight: 600;
 }
 
@@ -162,8 +162,8 @@
 }
 
 .equipment-item {
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 8px;
 	padding: 14px 16px;
 	margin-bottom: 8px;
@@ -193,8 +193,8 @@
 .resource-card {
 	display: block;
 	position: relative;
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 10px;
 	padding: 16px 18px;
 	text-decoration: none;
@@ -205,7 +205,7 @@
 }
 
 .resource-card:hover {
-	border-color: var(--accent, #7c6aed);
+	border-color: var(--accent);
 	transform: translateY(-2px);
 }
 
@@ -218,8 +218,8 @@
 	padding: 2px 7px;
 	border-radius: 4px;
 	margin-bottom: 8px;
-	background: var(--accent-soft, rgba(124, 106, 237, 0.12));
-	color: var(--accent, #7c6aed);
+	background: var(--accent-soft);
+	color: var(--accent);
 }
 
 .resource-card h3 {
@@ -247,5 +247,5 @@
 
 .resource-card:hover .resource-external {
 	opacity: 1;
-	color: var(--accent, #7c6aed);
+	color: var(--accent);
 }

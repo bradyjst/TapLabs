@@ -58,6 +58,46 @@ export default function Feedback() {
 				</p>
 			</div>
 
+			<div className="coming-soon-section">
+				<h2>Coming Soon</h2>
+				<p className="coming-soon-intro">Features we're working on next.</p>
+
+				<div className="coming-soon-list">
+					<div className="coming-soon-item">
+						<span className="coming-soon-icon">🥁</span>
+						<div className="coming-soon-info">
+							<h4>Metronome Sounds</h4>
+							<p>
+								Audible click track to help you internalize the beat while
+								practicing.
+							</p>
+						</div>
+						<span className="coming-soon-tag">Planned</span>
+					</div>
+
+					<div className="coming-soon-item">
+						<span className="coming-soon-icon">🔊</span>
+						<div className="coming-soon-info">
+							<h4>Custom Hit Sounds</h4>
+							<p>Choose from different hit sound packs or upload your own.</p>
+						</div>
+						<span className="coming-soon-tag">Planned</span>
+					</div>
+
+					<div className="coming-soon-item">
+						<span className="coming-soon-icon">💻</span>
+						<div className="coming-soon-info">
+							<h4>Downloadable Client</h4>
+							<p>
+								Standalone desktop app with lower input latency and offline
+								play.
+							</p>
+						</div>
+						<span className="coming-soon-tag">Planned</span>
+					</div>
+				</div>
+			</div>
+
 			<div className="feedback-tabs">
 				<button
 					className={`feedback-tab ${tab === "suggestions" ? "active" : ""}`}

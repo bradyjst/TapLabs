@@ -47,14 +47,14 @@
 	display: flex;
 	gap: 16px;
 	padding: 20px;
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 10px;
 	transition: border-color 0.15s;
 }
 
 .collab-card:hover {
-	border-color: var(--card-accent, var(--accent, #7c6aed));
+	border-color: var(--card-accent, var(--accent));
 }
 
 .collab-avatar {
@@ -66,7 +66,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--bg, #0d0d12);
+	background: var(--bg);
 	overflow: hidden;
 }
 
@@ -100,7 +100,7 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.8px;
-	color: var(--card-accent, var(--accent, #7c6aed));
+	color: var(--card-accent, var(--accent));
 	margin-bottom: 8px;
 }
 
@@ -122,14 +122,14 @@
 	color: var(--text-muted);
 	text-decoration: none;
 	padding: 3px 8px;
-	border: 1px solid var(--border, #2a2a3a);
+	border: 1px solid var(--border);
 	border-radius: 5px;
 	transition: all 0.15s;
 }
 
 .collab-links a:hover {
 	color: var(--text-primary);
-	border-color: var(--card-accent, var(--accent, #7c6aed));
+	border-color: var(--card-accent, var(--accent));
 }
 
 /* ---- Empty state ---- */
@@ -137,8 +137,8 @@
 	text-align: center;
 	padding: 60px 24px;
 	margin-bottom: 40px;
-	background: var(--bg-secondary, #16161f);
-	border: 1px dashed var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px dashed var(--border);
 	border-radius: 12px;
 }
 
@@ -164,8 +164,8 @@
 /* ---- CTA ---- */
 .collabs-cta {
 	padding: 24px;
-	background: var(--bg-secondary, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: 10px;
 	text-align: center;
 }

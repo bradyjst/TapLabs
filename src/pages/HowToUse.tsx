@@ -42,10 +42,10 @@ export default function HowToUse() {
 			<section id="getting-started" className="howto-section">
 				<h2>Getting Started</h2>
 				<p>
-					Pick a drill from the drill selector, hit{" "}
-					<strong>Begin Session</strong>, and tap along to the notes. Your goal
-					is to hit each note as close to its scheduled time as possible. After
-					the session ends, you'll see a breakdown of your performance.
+					Pick a drill from the drill selector, hit <strong>Begin Drill</strong>
+					, and tap along to the notes. Your goal is to hit each note as close
+					to its scheduled time as possible. After the session ends, you'll see
+					a breakdown of your performance.
 				</p>
 				<p>
 					Start with low-BPM burst drills to warm up, then work your way up.
