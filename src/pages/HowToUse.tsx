@@ -42,15 +42,15 @@ export default function HowToUse() {
 			<section id="getting-started" className="howto-section">
 				<h2>Getting Started</h2>
 				<p>
-					Pick a drill from the drill selector, hit <strong>Begin Drill</strong>
-					, and tap along to the notes. Your goal is to hit each note as close
-					to its scheduled time as possible. After the session ends, you'll see
-					a breakdown of your performance.
+					Pick a drill from the sidebar, hit <strong>Begin Session</strong>, and
+					tap along to the notes. Your goal is to hit each note as close to its
+					scheduled time as possible. After the session ends, you'll see a
+					breakdown of your performance.
 				</p>
 				<p>
 					Start with low-BPM burst drills to warm up, then work your way up.
-					Consistency matters more than speed. a clean 160 BPM is better than a
-					sloppy 220.
+					Consistency matters more than speed — a clean 200 BPM is better than a
+					sloppy 260.
 				</p>
 			</section>
 
@@ -78,7 +78,7 @@ export default function HowToUse() {
 						<div>
 							<strong>100 (Good)</strong>
 							<p>
-								Slightly off. early or late, but still within an acceptable
+								Slightly off — early or late, but still within an acceptable
 								range.
 							</p>
 						</div>
@@ -99,7 +99,7 @@ export default function HowToUse() {
 							<strong>Miss</strong>
 							<p>
 								The note passed without being hit, or you pressed the wrong key
-								on a hand-specific note.
+								on a finger-specific note.
 							</p>
 						</div>
 					</div>
@@ -133,7 +133,7 @@ export default function HowToUse() {
 					<h3>OD (Overall Difficulty)</h3>
 					<p>
 						Controls how tight the timing windows are. Higher OD means smaller
-						windows for 300s. OD scales automatically with BPM; faster drills
+						windows for 300s. OD scales automatically with BPM — faster drills
 						demand more precision.
 					</p>
 				</div>
@@ -152,7 +152,7 @@ export default function HowToUse() {
 					<p>
 						When you override the BPM using the Tempo Override input, the
 						session enters Practice Mode. Scores from practice sessions are not
-						submitted to your profile. This lets you experiment freely without
+						submitted to your profile — this lets you experiment freely without
 						impacting your stats.
 					</p>
 				</div>
@@ -184,14 +184,14 @@ export default function HowToUse() {
 					<h3>Trills</h3>
 					<p>
 						Strict alternating left-right patterns (L-R-L-R). These force proper
-						hand independence and expose any imbalance between your hands.
+						finger independence and expose any imbalance between your fingers.
 					</p>
 				</div>
 
 				<div className="howto-drill">
 					<h3>Doubles</h3>
 					<p>
-						Two consecutive notes on the same hand before switching
+						Two consecutive notes on the same finger before switching
 						(LL-RR-LL-RR). Trains your ability to double-tap cleanly without
 						losing rhythm.
 					</p>
@@ -201,7 +201,7 @@ export default function HowToUse() {
 					<h3>Gallop</h3>
 					<p>
 						An uneven rhythmic pattern with gaps. Useful for training
-						non-uniform timing and preventing your hands from falling into
+						non-uniform timing and preventing your fingers from falling into
 						autopilot.
 					</p>
 				</div>
@@ -248,11 +248,11 @@ export default function HowToUse() {
 				<div className="howto-drill">
 					<h3>Dual Circles (L/R)</h3>
 					<p>
-						Two target circles stacked vertically — left hand on top, right hand
-						on bottom. Notes split toward their assigned circle as they travel.
-						On stream drills, notes alternate automatically. On drills with
-						forced hand assignments (trills, doubles), notes go to their
-						designated side. Use this mode to visualize and train hand
+						Two target circles stacked vertically — left finger on top, right
+						finger on bottom. Notes split toward their assigned circle as they
+						travel. On stream drills, notes alternate automatically. On drills
+						with forced finger assignments (trills, doubles), notes go to their
+						designated side. Use this mode to visualize and train finger
 						independence.
 					</p>
 				</div>
@@ -279,11 +279,12 @@ export default function HowToUse() {
 				</div>
 
 				<div className="howto-metric">
-					<h3>Mirror Hands</h3>
+					<h3>Mirror Fingers</h3>
 					<p>
-						Available in Dual Circle mode. Swaps all left and right hand
+						Available in Dual Circle mode. Swaps all left and right finger
 						assignments — left becomes right, right becomes left. Useful for
-						training your weaker hand on patterns that normally favor the other.
+						training your weaker finger on patterns that normally favor the
+						other.
 					</p>
 				</div>
 
@@ -308,9 +309,9 @@ export default function HowToUse() {
 				<p>
 					The editor gives you a 16-slot grid per bar (4 beats × 4
 					subdivisions). Click cells to paint notes — choose between general
-					notes (either hand), or forced left/right assignments. You can add up
-					to 8 bars, set recovery bars for rest between loops, and configure how
-					many times the pattern repeats.
+					notes (either finger), or forced left/right assignments. You can add
+					up to 8 bars, set recovery bars for rest between loops, and configure
+					how many times the pattern repeats.
 				</p>
 				<p>
 					Custom drills appear in the sidebar alongside the built-in drills and

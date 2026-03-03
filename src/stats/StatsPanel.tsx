@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
 import "./StatsPanel.css";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import { analyzeSession } from "../coach/coachEngine";
@@ -39,7 +38,6 @@ export default function StatsPanel({
 	const {
 		meanOffset,
 		unstableRate,
-		stdDev,
 		earlyPercent,
 		latePercent,
 		leftMean,
@@ -49,9 +47,6 @@ export default function StatsPanel({
 		consistencyScore,
 		totalTaps,
 	} = data;
-
-	const driftLabel =
-		Math.abs(meanOffset) < 2 ? "Centered" : meanOffset < 0 ? "Early" : "Late";
 
 	const driftClass =
 		Math.abs(meanOffset) < 2 ? "neutral" : meanOffset < 0 ? "early" : "late";
@@ -73,8 +68,6 @@ export default function StatsPanel({
 
 					<StatRow label="Total Hits" value={totalTaps} />
 
-					<StatRow label="Timing Spread" value={`${stdDev.toFixed(2)} ms`} />
-
 					<StatRow label="Unstable Rate" value={unstableRate.toFixed(0)} />
 
 					<StatRow
@@ -83,21 +76,19 @@ export default function StatsPanel({
 						highlight={driftClass}
 					/>
 
-					<StatRow label="Drift" value={driftLabel} highlight={driftClass} />
-
 					<StatRow
-						label="Early / Late"
+						label="Early / Late Split"
 						value={`${(earlyPercent * 100).toFixed(0)}% / ${(
 							latePercent * 100
 						).toFixed(0)}%`}
 					/>
 
-					<StatRow label="Left Mean" value={`${leftMean.toFixed(2)} ms`} />
+					<StatRow label="Left Offset" value={`${leftMean.toFixed(2)} ms`} />
 
-					<StatRow label="Right Mean" value={`${rightMean.toFixed(2)} ms`} />
+					<StatRow label="Right Offset" value={`${rightMean.toFixed(2)} ms`} />
 
 					<StatRow
-						label="Imbalance"
+						label="Finger Gap"
 						value={`${imbalancePercent.toFixed(1)}%`}
 					/>
 				</div>
@@ -148,9 +139,6 @@ export default function StatsPanel({
 								<span className="coach-locked-icon">🎯</span>
 								<h3>Coaching</h3>
 								<p>Get personalized tips after every session.</p>
-								<Link to="/membership" className="coach-locked-link">
-									View Membership
-								</Link>
 							</div>
 						)}
 					</>
@@ -158,41 +146,41 @@ export default function StatsPanel({
 			</div>
 		</div>
 	);
+}
 
-	/* ------------------ */
-	/* Stat Row Component */
-	/* ------------------ */
+/* ------------------ */
+/* Stat Row Component */
+/* ------------------ */
 
-	function StatRow({
-		label,
-		value,
-		highlight,
-	}: {
-		label: string;
-		value: string | number;
-		highlight?: string;
-	}) {
-		return (
-			<div className="stat-row">
-				<span className="label">{label}</span>
-				<span className={`value ${highlight ?? ""}`}>{value}</span>
-			</div>
-		);
-	}
+function StatRow({
+	label,
+	value,
+	highlight,
+}: {
+	label: string;
+	value: string | number;
+	highlight?: string;
+}) {
+	return (
+		<div className="stat-row">
+			<span className="label">{label}</span>
+			<span className={`value ${highlight ?? ""}`}>{value}</span>
+		</div>
+	);
+}
 
-	/* ------------------ */
-	/* Helpers */
-	/* ------------------ */
+/* ------------------ */
+/* Helpers */
+/* ------------------ */
 
-	function getConsistencyClass(score: number) {
-		if (score > 75) return "good";
-		if (score > 50) return "medium";
-		return "bad";
-	}
+function getConsistencyClass(score: number) {
+	if (score > 75) return "good";
+	if (score > 50) return "medium";
+	return "bad";
+}
 
-	function getRiskClass(risk: number) {
-		if (risk < 30) return "good";
-		if (risk < 60) return "medium";
-		return "bad";
-	}
+function getRiskClass(risk: number) {
+	if (risk < 30) return "good";
+	if (risk < 60) return "medium";
+	return "bad";
 }

@@ -140,6 +140,7 @@
 .howto-metric,
 .howto-drill {
 	margin-bottom: 16px;
+	color: var(--text-primary);
 }
 
 .howto-metric h3,
@@ -147,6 +148,7 @@
 	font-size: 15px;
 	font-weight: 600;
 	margin: 0 0 6px 0;
+	color: var(--text-primary);
 }
 
 /* ---- Badges ---- */

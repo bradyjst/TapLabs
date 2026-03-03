@@ -118,7 +118,7 @@ export const Settings: React.FC<SettingsProps> = ({
 								checked={mirrorHands}
 								onChange={(e) => setMirrorHands(e.target.checked)}
 							/>
-							Mirror hands (swap L ↔ R)
+							Mirror fingers (swap L ↔ R)
 						</label>
 					)}
 				</div>

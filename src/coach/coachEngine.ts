@@ -39,23 +39,23 @@ export type ProfileCoachInput = {
 export function analyzeSession(data: SessionAnalytics): CoachTip[] {
 	const tips: CoachTip[] = [];
 
-	// Hand imbalance
+	// Finger imbalance
 	if (data.imbalancePercent > 15) {
 		const weak = Math.abs(data.leftMean) > Math.abs(data.rightMean) ? "left" : "right";
 		tips.push({
-			id: "hand-imbalance",
+			id: "finger-imbalance",
 			severity: "action",
-			title: "Hand Imbalance Detected",
-			message: `Your ${weak} hand is ${data.imbalancePercent.toFixed(0)}% less accurate. Try trill and doubles drills with mirror hands enabled to even things out.`,
+			title: "Finger Imbalance Detected",
+			message: `Your ${weak} finger is ${data.imbalancePercent.toFixed(0)}% less accurate. Try trill and doubles drills with mirror enabled to even things out.`,
 			drill: "trill8_150",
 		});
 	} else if (data.imbalancePercent > 8) {
 		const weak = Math.abs(data.leftMean) > Math.abs(data.rightMean) ? "left" : "right";
 		tips.push({
-			id: "hand-imbalance-mild",
+			id: "finger-imbalance-mild",
 			severity: "info",
-			title: "Slight Hand Imbalance",
-			message: `Your ${weak} hand is slightly weaker (${data.imbalancePercent.toFixed(0)}% imbalance). Not critical, but trill practice will help.`,
+			title: "Slight Finger Imbalance",
+			message: `Your ${weak} finger is slightly weaker (${data.imbalancePercent.toFixed(0)}% imbalance). Not critical, but trill practice will help.`,
 		});
 	}
 
@@ -169,15 +169,15 @@ export function analyzeSession(data: SessionAnalytics): CoachTip[] {
 		});
 	}
 
-	// Hand stddev difference
-	const handStdDiff = Math.abs(data.leftStdDev - data.rightStdDev);
-	if (handStdDiff > 6) {
-		const inconsistentHand = data.leftStdDev > data.rightStdDev ? "left" : "right";
+	// Finger stddev difference
+	const fingerStdDiff = Math.abs(data.leftStdDev - data.rightStdDev);
+	if (fingerStdDiff > 6) {
+		const inconsistentFinger = data.leftStdDev > data.rightStdDev ? "left" : "right";
 		tips.push({
-			id: "hand-consistency",
+			id: "finger-consistency",
 			severity: "info",
-			title: `${inconsistentHand === "left" ? "Left" : "Right"} Hand Less Consistent`,
-			message: `Your ${inconsistentHand} hand has more timing variance. It's not just offset — the spread is wider. Isolated hand practice or slower trills will help stabilize it.`,
+			title: `${inconsistentFinger === "left" ? "Left" : "Right"} Finger Less Consistent`,
+			message: `Your ${inconsistentFinger} finger has more timing variance. It's not just offset — the spread is wider. Isolated practice or slower trills will help stabilize it.`,
 		});
 	}
 
