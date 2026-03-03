@@ -11,6 +11,7 @@ export async function submitSession(data: {
 	miss: number;
 	meanOffset: number;
 	unstableRate: number;
+	visualStyle?: string;
 }) {
 	const accuracy = calcAccuracy(
 		data.h300,
@@ -36,6 +37,7 @@ export async function submitSession(data: {
 			mean_offset: data.meanOffset,
 			unstable_rate: data.unstableRate,
 			grade,
+			visual_style: data.visualStyle ?? "single",
 		},
 	]);
 

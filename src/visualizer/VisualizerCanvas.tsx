@@ -224,10 +224,18 @@ export default function VisualizerCanvas({
 					miss: live.missRef.current,
 					meanOffset: live.meanOffsetRef.current,
 					unstableRate: live.unstableRateRef.current,
+					visualStyle: visualStyle,
 				});
 			}
 		}
-	}, [isRunning, userId, drill, onSessionComplete, isPracticeMode]);
+	}, [
+		isRunning,
+		userId,
+		drill,
+		onSessionComplete,
+		isPracticeMode,
+		visualStyle,
+	]);
 
 	useEffect(() => {
 		if (isRunning) {
@@ -290,7 +298,7 @@ export default function VisualizerCanvas({
 
 			// In dual mode, check against resolvedHand instead of raw side
 			const expectedSide =
-				visualStyle === "dual" ? note.resolvedHand : note.side;
+				visualStyle === "dual" ? note.resolvedHand : "either";
 			if (expectedSide !== "either" && side !== expectedSide) {
 				engine.registerMiss();
 				spawnMissFace(note.resolvedHand);
