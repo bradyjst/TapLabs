@@ -27,8 +27,8 @@ export type DrillTemplate = {
 
 export const CORE_TEMPLATES: DrillTemplate[] = [
   // Bursts
-  { id: "burst3",      label: "3 Burst",       bars: ["xxx............."] },
-  { id: "burst5",      label: "5 Burst",       bars: ["xxxxx..........."] },
+  { id: "burst3", label: "3 Burst", bars: ["xxx..xxx..xxx..."] },
+  { id: "burst5", label: "5 Burst", bars: ["xxxxx...xxxxx..."] },
   { id: "burst7",      label: "7 Burst",       bars: ["xxxxxxx........."] },
   { id: "burst9",      label: "9 Burst",       bars: ["xxxxxxxxx......."] },
   { id: "burst13",     label: "13 Burst",      bars: ["xxxxxxxxxxxxx..."] },
@@ -46,7 +46,7 @@ export const CORE_TEMPLATES: DrillTemplate[] = [
   // Patterns with gaps
   { id: "gallop",      label: "Gallop",        bars: ["x.xxx.xxx.xxx.xx"] },
   { id: "triplet",     label: "Triplets",      bars: ["xxx.xxx.xxx.xxx."] },
-  { id: "deathstream", label: "Deathstream",   bars: ["xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx"], recoveryBars: 2 },
+  { id: "deathstream", label: "Deathstream",   bars: ["xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx", "xxxxxxxxxxxxxxxx"], recoveryBars: 1 },
 ];
 
 /* ---------------------------------- */
