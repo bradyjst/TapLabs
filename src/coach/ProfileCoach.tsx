@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { analyzeProfile } from "./coachEngine";
 import type { UserStats } from "../stats/useUserStats";
 import CoachTips from "./CoachTips";
-import "../CoachTips/CoachTips.css";
+import "./CoachTips.css";
 
 interface ProfileCoachProps {
 	stats: UserStats | null;
