@@ -16,6 +16,7 @@ import { useProfile } from "../components/Profile/useProfile";
 import { useUserStats } from "../stats/useUserStats";
 import { computeStats, parseBurstType } from "../stats/useUserStats";
 import type { UserStats } from "../stats/useUserStats";
+import ProfileCoach from "../coach/ProfileCoach";
 import "./Profile.css";
 
 /* ======================== */
@@ -226,6 +227,7 @@ export default function Profile() {
 								)}
 								<HitBreakdown stats={filteredStats} />
 								<DrillBreakdowns stats={filteredStats} />
+								<ProfileCoach stats={filteredStats} isPaid={isPaid} />
 							</>
 						) : (
 							<div className="profile-empty-state">
