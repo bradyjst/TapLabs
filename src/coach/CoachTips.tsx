@@ -1,4 +1,4 @@
-import type { CoachTip } from "../../coaching/coachEngine";
+import type { CoachTip } from "./coachEngine";
 import "./CoachTips.css";
 
 interface CoachTipsProps {
@@ -27,9 +27,7 @@ export default function CoachTips({ tips, title = "Coach" }: CoachTipsProps) {
 						</div>
 						<p className="coach-tip-msg">{tip.message}</p>
 						{tip.drill && (
-							<span className="coach-tip-drill">
-								Try: {tip.drill}
-							</span>
+							<span className="coach-tip-drill">Try: {tip.drill}</span>
 						)}
 					</div>
 				))}

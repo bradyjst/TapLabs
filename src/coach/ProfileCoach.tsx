@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { analyzeProfile } from "../../coaching/coachEngine";
-import type { UserStats } from "../../stats/useUserStats";
-import CoachTips from "../CoachTips/CoachTips";
+import { analyzeProfile } from "./coachEngine";
+import type { UserStats } from "../stats/useUserStats";
+import CoachTips from "./CoachTips";
 import "../CoachTips/CoachTips.css";
 
 interface ProfileCoachProps {
@@ -29,9 +29,7 @@ export default function ProfileCoach({ stats, isPaid }: ProfileCoachProps) {
 			<div className="coach-locked">
 				<span className="coach-locked-icon">🎯</span>
 				<h3>Coach</h3>
-				<p>
-					Personalized practice recommendations based on your history.
-				</p>
+				<p>Personalized practice recommendations based on your history.</p>
 				<Link to="/membership" className="coach-locked-link">
 					View Membership
 				</Link>

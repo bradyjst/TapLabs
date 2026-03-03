@@ -1,6 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import "./StatsPanel.css";
 import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
+import { analyzeSession } from "../coach/coachEngine";
+import CoachTips from "../coach/CoachTips";
 import HistogramChart from "../components/Charts/HistogramChart";
 import DriftCurveChart from "../components/Charts/DriftCurveChart";
 
@@ -19,6 +22,11 @@ export default function StatsPanel({ data, isPaid = false, onClose }: Props) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
+
+	const coachTips = useMemo(() => {
+		if (!data) return [];
+		return analyzeSession(data);
+	}, [data]);
 
 	if (!data) return null;
 
@@ -121,6 +129,23 @@ export default function StatsPanel({ data, isPaid = false, onClose }: Props) {
 						</p>
 					)}
 				</div>
+
+				{/* COACHING SECTION */}
+
+				{isPaid ? (
+					<div className="stats-section">
+						<CoachTips tips={coachTips} title="Session Coaching" />
+					</div>
+				) : (
+					<div className="coach-locked">
+						<span className="coach-locked-icon">🎯</span>
+						<h3>Coaching</h3>
+						<p>Get personalized tips after every session.</p>
+						<Link to="/membership" className="coach-locked-link">
+							View Membership
+						</Link>
+					</div>
+				)}
 			</div>
 		</div>
 	);
