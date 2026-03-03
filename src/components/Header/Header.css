@@ -11,6 +11,8 @@
 	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
 	border-bottom: 1px solid var(--border);
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
 }
 
 .header-inner {
