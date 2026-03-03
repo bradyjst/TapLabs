@@ -25,6 +25,7 @@ import AuthModal from "../components/AuthModal/AuthModal";
 import DrillCreator from "../drills/drillCreator";
 
 import "./TapLab.css";
+import ProfileCoach from "../coach/ProfileCoach.tsx";
 
 export default function TapLabApp() {
 	const { user } = useAuth();
@@ -184,6 +185,7 @@ export default function TapLabApp() {
 
 					<MobileTapPads onTap={() => tapRef.current()} />
 					<Leaderboard currentUserId={user?.id ?? null} />
+					<ProfileCoach stats={stats} isPaid={isPaid} />
 				</div>
 			</main>
 
