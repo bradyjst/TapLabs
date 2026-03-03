@@ -181,7 +181,7 @@ export default function Resources() {
 
 			{/* ---- Practice Routines ---- */}
 			<section id="routines" className="resources-section">
-				<h2>Practice Routines</h2>
+				<h2>Practice Routine Suggestions</h2>
 				<p className="section-desc">
 					Structured plans for different skill levels. Each routine is designed
 					to be run as a single session. Adjust BPM to match your current
