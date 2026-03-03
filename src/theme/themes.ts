@@ -29,31 +29,30 @@ export const darkTheme: TapLabsTheme = {
 };
 
 export const lightTheme: TapLabsTheme = {
-  bg: "#f8fafc",
-  surface: "#ffffff",
-  border: "#e2e8f0",
-  grid: "#f1f5f9",
+  bg: "#f0eee8",
+  surface: "#e8e6df",
+  border: "#d4d0c8",
+  grid: "#e4e1da",
 
-  textPrimary: "#0f172a",
-  textMuted: "#64748b",
+  textPrimary: "#2c2a25",
+  textMuted: "#7a756b",
 
-  accent: "rgb(15, 118, 110)",
-  accentSoft: "rgba(15, 118, 110, 0.08)",
-  accentBorder: "rgba(15, 118, 110, 0.35)",
+  accent: "#6b5ce7",
+  accentSoft: "rgba(107, 92, 231, 0.1)",
+  accentBorder: "rgba(107, 92, 231, 0.35)",
 
-  perfect: "#0f766e",
-  good: "#b45309",
-  meh: "#be123c",
-  early: "#c2410c",
-  late: "#b91c1c",
+  perfect: "#4a8c6f",
+  good: "#b08a3e",
+  meh: "#c25a6e",
+  early: "#c27a42",
+  late: "#b84c4c",
 
-  noteColor: "rgb(15, 118, 110)",
-  approachColor: "rgba(15, 118, 110, 0.50)",
+  noteColor: "#6b5ce7",
+  approachColor: "rgba(107, 92, 231, 0.45)",
 
-  backgroundImage: "#f1f5f9",
-  visualizerOverlay: "rgba(255,255,255,0.35)",
+  backgroundImage: "#e4e1da",
+  visualizerOverlay: "rgba(240, 238, 232, 0.4)",
 };
-
 // ─── PREMIUM THEMES ───────────────────────────────────────────────────────────
 
 export const cyanTheme: TapLabsTheme = {
