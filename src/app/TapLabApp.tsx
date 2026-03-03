@@ -9,6 +9,7 @@ import type { SessionAnalytics } from "../analytics/sessionAnalyzer";
 import { useProfile } from "../context/useProfile";
 import { useSettings } from "../settings/useSettings";
 import { useUserStats } from "../stats/useUserStats";
+import Leaderboard from "../components/LeaderBoard/LeaderBoard";
 import {
 	PlayerCard,
 	DEFAULT_COSMETICS,
@@ -178,6 +179,7 @@ export default function TapLabApp() {
 					</div>
 
 					<MobileTapPads onTap={() => tapRef.current()} />
+					<Leaderboard currentUserId={user?.id ?? null} />
 				</div>
 			</main>
 

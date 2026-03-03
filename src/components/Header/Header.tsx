@@ -41,6 +41,9 @@ export default function Header({
 						<a href="/membership" className="nav-link">
 							Membership
 						</a>
+						<a href="/feedback" className="nav-link">
+							Feedback
+						</a>
 					</nav>
 
 					{/* Action buttons + auth */}

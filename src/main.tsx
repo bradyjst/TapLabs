@@ -8,6 +8,7 @@ import Privacy from "./pages/Privacy";
 import Membership from "./pages/Membership";
 import Profile from "./pages/Profile";
 import HowToUse from "./pages/HowToUse";
+import Feedback from "./pages/Feedback";
 import Collaborators from "./pages/Collaborators";
 import Resources from "./pages/Resources";
 import Layout from "./layout/Layout";
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 						<Route path="/how-to-use" element={<HowToUse />} />
 						<Route path="/collaborators" element={<Collaborators />} />
 						<Route path="/resources" element={<Resources />} />
+						<Route path="/feedback" element={<Feedback />} />
 					</Route>
 				</Routes>
 			</BrowserRouter>

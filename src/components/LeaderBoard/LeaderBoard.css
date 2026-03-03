@@ -1,0 +1,148 @@
+/* ---- Leaderboard section ---- */
+.lb-section {
+	width: 100%;
+	max-width: 580px;
+	margin: 24px auto 40px;
+}
+
+.lb-title {
+	font-size: 15px;
+	font-weight: 700;
+	margin: 0 0 12px 0;
+	text-align: center;
+	color: var(--text-primary);
+}
+
+.lb-loading,
+.lb-empty {
+	text-align: center;
+	padding: 20px;
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+/* ---- List ---- */
+.lb-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.lb-entry {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 12px;
+	background: var(--bg-secondary, #16161f);
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 10px;
+	transition: border-color 0.15s;
+}
+
+.lb-entry:hover {
+	border-color: var(--accent, #7c6aed);
+}
+
+.lb-entry-you {
+	border-color: var(--accent, #7c6aed);
+	background: var(--accent-soft, rgba(124, 106, 237, 0.06));
+}
+
+/* ---- Rank ---- */
+.lb-rank {
+	flex-shrink: 0;
+	width: 36px;
+	text-align: center;
+}
+
+.lb-medal {
+	font-size: 20px;
+}
+
+.lb-rank-num {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--text-muted);
+}
+
+/* ---- Player card wrapper ---- */
+.lb-card-wrapper {
+	flex: 1;
+	min-width: 0;
+}
+
+.lb-card-wrapper .player-card {
+	border: none;
+	padding: 4px 8px;
+	background: transparent;
+}
+
+.lb-card-wrapper .player-card::before {
+	display: none;
+}
+
+.lb-card-wrapper .pc-edit-btn {
+	display: none;
+}
+
+.lb-card-wrapper .pc-stats {
+	display: none;
+}
+
+/* ---- Score ---- */
+.lb-score {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	flex-shrink: 0;
+	gap: 2px;
+}
+
+.lb-score-value {
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--accent, #7c6aed);
+}
+
+.lb-score-label {
+	font-size: 10px;
+	color: var(--text-muted);
+}
+
+/* ---- Expand button ---- */
+.lb-expand-btn {
+	display: block;
+	width: 100%;
+	margin-top: 8px;
+	padding: 10px;
+	background: none;
+	border: 1px solid var(--border, #2a2a3a);
+	border-radius: 8px;
+	color: var(--text-muted);
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.lb-expand-btn:hover {
+	border-color: var(--accent, #7c6aed);
+	color: var(--text-primary);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+	.lb-entry {
+		gap: 8px;
+		padding: 8px 10px;
+	}
+
+	.lb-rank {
+		width: 28px;
+	}
+
+	.lb-score-value {
+		font-size: 13px;
+	}
+}
