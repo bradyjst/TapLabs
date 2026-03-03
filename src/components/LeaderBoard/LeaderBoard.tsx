@@ -3,7 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { PlayerCard, DEFAULT_COSMETICS } from "../PlayerCard/PlayerCard";
 import type { CardCosmetics } from "../PlayerCard/PlayerCard";
 import type { UserStats } from "../../stats/useUserStats";
-import "./Leaderboard.css";
+import "./LeaderBoard.css";
 
 /* ------------------------------------------------------------------ */
 /*  TYPES                                                              */
