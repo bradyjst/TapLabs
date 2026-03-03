@@ -59,7 +59,21 @@ export default function TapLabApp() {
 		if (!bpmOverride) return selectedDrill;
 		return { ...selectedDrill, bpm: bpmOverride };
 	}, [selectedDrill, bpmOverride]);
+	const [hidePremium, setHidePremium] = useState(
+		() => localStorage.getItem("tl-hide-premium") === "true",
+	);
+	const [offsetMs, setOffsetMs] = useState(
+		() => Number(localStorage.getItem("tl-offset-ms")) || 0,
+	);
 
+	// Persist on change
+	useEffect(() => {
+		localStorage.setItem("tl-hide-premium", String(hidePremium));
+	}, [hidePremium]);
+
+	useEffect(() => {
+		localStorage.setItem("tl-offset-ms", String(offsetMs));
+	}, [offsetMs]);
 	const engine = useTapEngine(effectiveDrill);
 
 	useEffect(() => {
@@ -88,6 +102,7 @@ export default function TapLabApp() {
 					onAuthClick={() => setAuthOpen(true)}
 					displayName={profile?.player_card?.displayName || undefined}
 					isPaidUser={isPaid}
+					hidePremium={hidePremium}
 				/>
 
 				<div className="main-inner">
@@ -109,6 +124,7 @@ export default function TapLabApp() {
 						stop={engine.stop}
 						drill={effectiveDrill}
 						engine={engine}
+						offsetMs={offsetMs}
 						userId={user?.id}
 						isPracticeMode={isPracticeMode}
 						visualStyle={settings.visualStyle}
@@ -198,6 +214,11 @@ export default function TapLabApp() {
 				setKeyLeft={(v) => updateSetting("keyLeft", v)}
 				keyRight={settings.keyRight}
 				setKeyRight={(v) => updateSetting("keyRight", v)}
+				hidePremium={hidePremium}
+				setHidePremium={setHidePremium}
+				offsetMs={offsetMs}
+				setOffsetMs={setOffsetMs}
+				isPaid={isPaid}
 			/>
 
 			{statsOpen && (
@@ -205,6 +226,7 @@ export default function TapLabApp() {
 					data={lastAnalytics}
 					isPaid={isPaid}
 					onClose={() => setStatsOpen(false)}
+					hidePremium={hidePremium}
 				/>
 			)}
 

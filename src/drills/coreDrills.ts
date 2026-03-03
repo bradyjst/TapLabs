@@ -27,7 +27,7 @@ export type DrillTemplate = {
 
 export const CORE_TEMPLATES: DrillTemplate[] = [
   // Bursts
-  { id: "burst3", label: "3 Burst", bars: ["xxx..xxx..xxx..."] },
+  { id: "burst3", label: "3 Burst", bars: ["xxx.....xxx....."] },
   { id: "burst5", label: "5 Burst", bars: ["xxxxx...xxxxx..."] },
   { id: "burst7",      label: "7 Burst",       bars: ["xxxxxxx........."] },
   { id: "burst9",      label: "9 Burst",       bars: ["xxxxxxxxx......."] },

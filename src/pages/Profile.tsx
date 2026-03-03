@@ -54,6 +54,9 @@ export default function Profile() {
 	const [burstFilter, setBurstFilter] = useState<string>("all");
 	const [bpmFilter, setBpmFilter] = useState<string>("all");
 
+	const hidePremium =
+		!isPaid && localStorage.getItem("tl-hide-premium") === "true";
+
 	// Derive available filter options from sessions
 	const filterOptions = useMemo(() => {
 		const bursts = new Set<string>();
@@ -216,18 +219,25 @@ export default function Profile() {
 							</div>
 						</div>
 
-						{/* ---- STATS (all free, charts gated) ---- */}
+						{/* ---- FREE STATS ---- */}
 						{filteredStats && filteredStats.totalSessions > 0 ? (
 							<>
 								<StatsOverview stats={filteredStats} />
-								{isPaid ? (
-									<ChartsSection stats={filteredStats} />
-								) : (
-									<MemberUpsell feature="Progress Charts" />
-								)}
 								<HitBreakdown stats={filteredStats} />
 								<DrillBreakdowns stats={filteredStats} />
-								<ProfileCoach stats={filteredStats} isPaid={isPaid} />
+
+								{/* ---- PREMIUM SECTION (bottom) ---- */}
+								{(isPaid || !hidePremium) && (
+									<>
+										{isPaid ? (
+											<ChartsSection stats={filteredStats} />
+										) : (
+											<MemberUpsell feature="Progress Charts" />
+										)}
+
+										<ProfileCoach stats={filteredStats} isPaid={isPaid} />
+									</>
+								)}
 							</>
 						) : (
 							<div className="profile-empty-state">

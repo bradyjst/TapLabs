@@ -9,6 +9,7 @@ type Props = {
 	onAuthClick: () => void;
 	isPaidUser?: boolean;
 	displayName?: string;
+	hidePremium?: boolean;
 };
 
 export default function Header({
@@ -19,6 +20,7 @@ export default function Header({
 	onAuthClick,
 	isPaidUser,
 	displayName,
+	hidePremium,
 }: Props) {
 	return (
 		<div className="header-root">
@@ -52,13 +54,15 @@ export default function Header({
 
 					{/* Action buttons + auth */}
 					<div className="header-actions">
-						<button
-							className={`header-action-btn ${!isPaidUser ? "header-btn-locked" : ""}`}
-							onClick={isPaidUser ? onCreatorClick : undefined}
-							title={!isPaidUser ? "Member feature" : undefined}
-						>
-							{!isPaidUser && "🔒 "}+ Create
-						</button>
+						{(isPaidUser || !hidePremium) && (
+							<button
+								className={`header-action-btn ${!isPaidUser ? "header-btn-locked" : ""}`}
+								onClick={isPaidUser ? onCreatorClick : undefined}
+								title={!isPaidUser ? "Member feature" : undefined}
+							>
+								{!isPaidUser && "🔒 "}+ Create
+							</button>
+						)}
 						<button className="header-action-btn" onClick={onDrillSelectClick}>
 							Drills
 						</button>

@@ -11,9 +11,15 @@ type Props = {
 	data: SessionAnalytics | null;
 	isPaid?: boolean;
 	onClose: () => void;
+	hidePremium: boolean;
 };
 
-export default function StatsPanel({ data, isPaid = false, onClose }: Props) {
+export default function StatsPanel({
+	data,
+	isPaid = false,
+	onClose,
+	hidePremium,
+}: Props) {
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -96,94 +102,97 @@ export default function StatsPanel({ data, isPaid = false, onClose }: Props) {
 					/>
 				</div>
 
-				{/* ADVANCED SECTION */}
+				{/* ADVANCED + COACHING (hidden if free user opted out) */}
+				{(isPaid || !hidePremium) && (
+					<>
+						<div
+							className={`stats-section advanced ${!isPaid ? "locked" : ""}`}
+						>
+							<h3>Advanced Diagnostics {isPaid ? "" : " 🔒"}</h3>
 
-				<div className={`stats-section advanced ${!isPaid ? "locked" : ""}`}>
-					<h3>Advanced Diagnostics {isPaid ? "" : " 🔒"}</h3>
+							{isPaid ? (
+								<>
+									<h4>Timing Distribution</h4>
 
-					{isPaid ? (
-						<>
-							<h4>Timing Distribution</h4>
+									<HistogramChart histogram={data.histogram} />
 
-							<HistogramChart histogram={data.histogram} />
+									<h4>Drift Over Session</h4>
 
-							<h4>Drift Over Session</h4>
+									<DriftCurveChart driftCurve={data.driftCurve} />
 
-							<DriftCurveChart driftCurve={data.driftCurve} />
+									<StatRow
+										label="Consistency Score"
+										value={consistencyScore.toFixed(0)}
+										highlight={getConsistencyClass(consistencyScore)}
+									/>
 
-							<StatRow
-								label="Consistency Score"
-								value={consistencyScore.toFixed(0)}
-								highlight={getConsistencyClass(consistencyScore)}
-							/>
+									<StatRow
+										label="Galloping Risk"
+										value={`${gallopingRisk.toFixed(0)}%`}
+										highlight={getRiskClass(gallopingRisk)}
+									/>
+								</>
+							) : (
+								<p className="locked-text">
+									Unlock deep rhythm diagnostics and performance curves.
+								</p>
+							)}
+						</div>
 
-							<StatRow
-								label="Galloping Risk"
-								value={`${gallopingRisk.toFixed(0)}%`}
-								highlight={getRiskClass(gallopingRisk)}
-							/>
-						</>
-					) : (
-						<p className="locked-text">
-							Unlock deep rhythm diagnostics and performance curves.
-						</p>
-					)}
-				</div>
-
-				{/* COACHING SECTION */}
-
-				{isPaid ? (
-					<div className="stats-section">
-						<CoachTips tips={coachTips} title="Session Coaching" />
-					</div>
-				) : (
-					<div className="coach-locked">
-						<span className="coach-locked-icon">🎯</span>
-						<h3>Coaching</h3>
-						<p>Get personalized tips after every session.</p>
-						<Link to="/membership" className="coach-locked-link">
-							View Membership
-						</Link>
-					</div>
+						{isPaid ? (
+							<div className="stats-section">
+								<CoachTips tips={coachTips} title="Session Coaching" />
+							</div>
+						) : (
+							<div className="coach-locked">
+								<span className="coach-locked-icon">🎯</span>
+								<h3>Coaching</h3>
+								<p>Get personalized tips after every session.</p>
+								<Link to="/membership" className="coach-locked-link">
+									View Membership
+								</Link>
+							</div>
+						)}
+					</>
 				)}
 			</div>
 		</div>
 	);
-}
 
-/* ------------------ */
-/* Stat Row Component */
-/* ------------------ */
+	/* ------------------ */
+	/* Stat Row Component */
+	/* ------------------ */
 
-function StatRow({
-	label,
-	value,
-	highlight,
-}: {
-	label: string;
-	value: string | number;
-	highlight?: string;
-}) {
-	return (
-		<div className="stat-row">
-			<span className="label">{label}</span>
-			<span className={`value ${highlight ?? ""}`}>{value}</span>
-		</div>
-	);
-}
+	function StatRow({
+		label,
+		value,
+		highlight,
+	}: {
+		label: string;
+		value: string | number;
+		highlight?: string;
+	}) {
+		return (
+			<div className="stat-row">
+				<span className="label">{label}</span>
+				<span className={`value ${highlight ?? ""}`}>{value}</span>
+			</div>
+		);
+	}
 
-/* ------------------ */
-/* Helpers */
-/* ------------------ */
+	/* ------------------ */
+	/* Helpers */
+	/* ------------------ */
 
-function getConsistencyClass(score: number) {
-	if (score > 75) return "good";
-	if (score > 50) return "medium";
-	return "bad";
-}
+	function getConsistencyClass(score: number) {
+		if (score > 75) return "good";
+		if (score > 50) return "medium";
+		return "bad";
+	}
 
-function getRiskClass(risk: number) {
-	if (risk < 30) return "good";
-	if (risk < 60) return "medium";
-	return "bad";
+	function getRiskClass(risk: number) {
+		if (risk < 30) return "good";
+		if (risk < 60) return "medium";
+		return "bad";
+	}
 }

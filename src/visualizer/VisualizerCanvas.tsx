@@ -17,6 +17,7 @@ type Props = {
 	userId?: string;
 	msPerGrid: number;
 	isRunning: boolean;
+	offsetMs: number;
 	visualStyle: string;
 	getGrade: (offset: number) => 300 | 100 | 50 | null;
 	windows: HitWindows;
@@ -131,6 +132,7 @@ export default function VisualizerCanvas({
 	stop,
 	getGrade,
 	windows,
+	offsetMs,
 	externalTapRef,
 	onSessionComplete,
 	mirrorHands = false,
@@ -293,7 +295,7 @@ export default function VisualizerCanvas({
 			if (closestIndex === -1) return;
 
 			const note = activeNotes[closestIndex];
-			const offset = now - note.scheduledTime;
+			const offset = now - note.scheduledTime - offsetMs;
 			const grade = getGrade(offset);
 
 			// In dual mode, check against resolvedHand instead of raw side
@@ -763,6 +765,7 @@ export default function VisualizerCanvas({
 		mirrorHands,
 		keyLeft,
 		keyRight,
+		offsetMs,
 	]);
 
 	return (
