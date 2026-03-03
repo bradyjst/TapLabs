@@ -79,10 +79,7 @@ export default function Header({
 			</header>
 
 			{/* Beta banner */}
-			<div className="header-banner">
-				Beta — scores may not save permanently and the site may receive
-				significant changes.
-			</div>
+			<div className="header-banner">Welcome to TapLabs!</div>
 		</div>
 	);
 }
