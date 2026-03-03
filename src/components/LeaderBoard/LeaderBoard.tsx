@@ -208,7 +208,10 @@ function buildBoard(
 				...DEFAULT_COSMETICS,
 				...(profile?.player_card ?? {}),
 			},
-			display_name: profile?.display_name ?? null,
+			display_name:
+				profile?.display_name ??
+				(profile?.player_card as CardCosmetics | null)?.displayName ??
+				null,
 			email_prefix: user_id.slice(0, 8),
 			is_paid: profile?.is_paid ?? false,
 		});

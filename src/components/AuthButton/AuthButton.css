@@ -1,141 +1,27 @@
-.auth-modal {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.55);
-	backdrop-filter: blur(8px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 999;
-	animation: fadeIn 0.15s ease;
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-.auth-box {
-	background: var(--bg, #0d0d12);
-	border: 1px solid var(--border, #2a2a3a);
-	border-radius: 14px;
-	padding: 24px;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	width: 280px;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-	animation: popIn 0.15s ease;
-}
-
-@keyframes popIn {
-	from {
-		transform: scale(0.96);
-		opacity: 0;
-	}
-	to {
-		transform: scale(1);
-		opacity: 1;
-	}
-}
-
-.auth-box h3 {
-	margin: 0;
-	text-align: center;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
-.auth-box input {
-	background: var(--surface, #16161f);
-	border: 1px solid var(--border, #2a2a3a);
-	color: var(--text-primary);
-	padding: 8px 10px;
-	border-radius: 8px;
-	font-size: 13px;
-	font-family: inherit;
-	outline: none;
-	transition: border-color 0.15s ease;
-}
-
-.auth-box input:focus {
-	border-color: var(--accent, #7c6aed);
-}
-
-.google-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	background: #fff;
-	color: #222;
-	border: none;
-	border-radius: 8px;
-	padding: 8px;
-	font-size: 13px;
-	font-family: inherit;
-	cursor: pointer;
-	transition: transform 0.1s ease;
-}
-
-.google-btn:hover {
-	transform: scale(1.02);
-}
-
-.google-icon {
-	width: 16px;
-	height: 16px;
-}
-
-.email-btn {
-	background: var(--accent-soft, rgba(124, 106, 237, 0.15));
-	border: 1px solid var(--accent, #7c6aed);
-	color: var(--text-primary);
-	border-radius: 8px;
-	padding: 8px;
-	font-size: 13px;
-	font-family: inherit;
-	cursor: pointer;
-	transition: all 0.15s ease;
-}
-
-.email-btn:hover {
-	background: var(--accent, #7c6aed);
-	color: #fff;
-}
-
-.email-btn.alt {
-	background: var(--surface, #16161f);
-	border-color: var(--border, #2a2a3a);
-}
-
-.email-btn.alt:hover {
-	border-color: var(--accent, #7c6aed);
-	background: var(--accent-soft, rgba(124, 106, 237, 0.1));
-	color: var(--text-primary);
-}
-
-.close-btn {
-	background: none;
-	border: none;
+.auth-btn {
+	font-size: 0.82rem;
+	font-weight: 500;
 	color: var(--text-muted);
-	font-size: 11px;
-	font-family: inherit;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	padding: 0.35rem 0.75rem;
+	border-radius: 6px;
 	cursor: pointer;
-	transition: color 0.15s;
+	font-family: inherit;
+	white-space: nowrap;
+	transition:
+		color 0.15s ease,
+		border-color 0.15s ease,
+		background 0.15s ease;
 }
 
-.close-btn:hover {
+.auth-btn:hover {
 	color: var(--text-primary);
+	border-color: var(--accent);
+	background: var(--accent-soft);
 }
 
-.divider {
-	text-align: center;
-	font-size: 11px;
-	color: var(--text-muted);
-	margin: 4px 0;
+.auth-btn.logged-in {
+	color: var(--text-primary);
+	border-color: var(--accent);
 }
