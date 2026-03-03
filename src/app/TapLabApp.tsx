@@ -21,6 +21,7 @@ import Sidebar from "../sidebar/Sidebar";
 import MobileTapPads from "../components/MobileTapPads/MobileTapPads";
 import Header from "../components/Header/Header";
 import ProfileModal from "../components/ProfileModal/ProfileModal";
+import AuthModal from "../components/AuthModal/AuthModal";
 import DrillCreator from "../drills/drillCreator";
 
 import "./TapLab.css";
@@ -37,6 +38,7 @@ export default function TapLabApp() {
 	const [statsOpen, setStatsOpen] = useState(false);
 	const [profileOpen, setProfileOpen] = useState(false);
 	const [creatorOpen, setCreatorOpen] = useState(false);
+	const [authOpen, setAuthOpen] = useState(false);
 	const tapRef = useRef<() => void>(() => {});
 	const [lastAnalytics, setLastAnalytics] = useState<SessionAnalytics | null>(
 		null,
@@ -83,6 +85,8 @@ export default function TapLabApp() {
 					onSettingsClick={() => setSettingsBarOpen((v) => !v)}
 					onProfileClick={() => setProfileOpen(true)}
 					onCreatorClick={() => setCreatorOpen(true)}
+					onAuthClick={() => setAuthOpen(true)}
+					displayName={profile?.player_card?.displayName || undefined}
 					isPaidUser={isPaid}
 				/>
 
@@ -221,6 +225,8 @@ export default function TapLabApp() {
 			)}
 
 			{profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
+
+			{authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
 		</div>
 	);
 }

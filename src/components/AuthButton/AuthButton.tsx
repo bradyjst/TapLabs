@@ -1,30 +1,26 @@
-import { useState } from "react";
-import AuthModal from "../AuthModal/AuthModal";
 import { useAuth } from "../../context/useAuth";
 import "./AuthButton.css";
 
 type Props = {
 	onProfileClick: () => void;
+	onAuthClick: () => void;
+	displayName?: string;
 };
 
-export default function AuthButton({ onProfileClick }: Props) {
+export default function AuthButton({ onProfileClick, onAuthClick }: Props) {
 	const { user } = useAuth();
-	const [showAuthModal, setShowAuthModal] = useState(false);
 
 	if (!user) {
 		return (
-			<>
-				<button className="auth-btn" onClick={() => setShowAuthModal(true)}>
-					Sign In
-				</button>
-				{showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-			</>
+			<button className="auth-btn" onClick={onAuthClick}>
+				Sign In
+			</button>
 		);
 	}
 
 	return (
 		<button className="auth-btn logged-in" onClick={onProfileClick}>
-			👤 {user.email?.split("@")[0]} ▾
+			{user.email?.split("@")[0]} ▾
 		</button>
 	);
 }

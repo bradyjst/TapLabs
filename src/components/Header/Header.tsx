@@ -6,7 +6,9 @@ type Props = {
 	onSettingsClick: () => void;
 	onProfileClick: () => void;
 	onCreatorClick?: () => void;
+	onAuthClick: () => void;
 	isPaidUser?: boolean;
+	displayName?: string;
 };
 
 export default function Header({
@@ -14,7 +16,9 @@ export default function Header({
 	onSettingsClick,
 	onProfileClick,
 	onCreatorClick,
+	onAuthClick,
 	isPaidUser,
+	displayName,
 }: Props) {
 	return (
 		<div className="header-root">
@@ -41,9 +45,6 @@ export default function Header({
 						<a href="/membership" className="nav-link">
 							Membership
 						</a>
-						<a href="/feedback" className="nav-link">
-							Feedback
-						</a>
 					</nav>
 
 					{/* Action buttons + auth */}
@@ -61,7 +62,11 @@ export default function Header({
 						<button className="header-action-btn" onClick={onSettingsClick}>
 							Settings
 						</button>
-						<AuthButton onProfileClick={onProfileClick} />
+						<AuthButton
+							onProfileClick={onProfileClick}
+							onAuthClick={onAuthClick}
+							displayName={displayName}
+						/>
 					</div>
 				</div>
 			</header>
