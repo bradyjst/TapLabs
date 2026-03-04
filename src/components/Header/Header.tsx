@@ -19,6 +19,7 @@ const CHANGELOG = [
 		date: "March 4, 2026",
 		items: [
 			"New `What's new` section 🤓",
+			"Leaderboard changes and hotfixes",
 			"Player cards no longer paywalled. This was a leftover from prelaunch and should never have launched as a paid feature",
 			"Added contest card to membership page. Contest page coming soon.",
 		],
