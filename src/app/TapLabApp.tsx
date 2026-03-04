@@ -199,7 +199,10 @@ export default function TapLabApp() {
 					</div>
 
 					<MobileTapPads onTap={() => tapRef.current()} />
-					<Leaderboard currentUserId={user?.id ?? null} />
+					<Leaderboard
+						currentUserId={user?.id ?? null}
+						drillId={selectedDrillId}
+					/>
 				</div>
 			</main>
 

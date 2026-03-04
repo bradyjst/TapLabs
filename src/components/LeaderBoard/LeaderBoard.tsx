@@ -37,8 +37,10 @@ type LeaderboardRow = {
 
 export default function Leaderboard({
 	currentUserId,
+	drillId,
 }: {
 	currentUserId: string | null;
+	drillId: string;
 }) {
 	const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -48,8 +50,12 @@ export default function Leaderboard({
 		let cancelled = false;
 
 		async function load() {
+			setLoading(true);
+			setError(null);
+
 			const { data, error: rpcError } = await supabase.rpc("get_leaderboard", {
-				lim: 10,
+				drill: drillId,
+				lim: 5,
 			});
 
 			if (cancelled) return;
@@ -90,7 +96,7 @@ export default function Leaderboard({
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [drillId]);
 
 	if (loading) {
 		return (
@@ -114,7 +120,7 @@ export default function Leaderboard({
 		return (
 			<div className="lb-section">
 				<h3 className="lb-title">Leaderboard</h3>
-				<div className="lb-empty">No sessions recorded yet.</div>
+				<div className="lb-empty">No scores for this drill yet.</div>
 			</div>
 		);
 	}
