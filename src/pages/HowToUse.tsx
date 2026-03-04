@@ -357,8 +357,7 @@ export default function HowToUse() {
 				<p>
 					TapLabs will be installable as a Progressive Web App on desktop and
 					mobile. Once available, you'll be able to add it to your home screen
-					or dock for a native app experience with offline support and reduced
-					input latency.
+					or dock for a native app experience with offline support.
 				</p>
 			</section>
 		</div>
