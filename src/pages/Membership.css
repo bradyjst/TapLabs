@@ -90,6 +90,12 @@
 	margin: 0;
 }
 
+.feature-card:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+	max-width: calc(50% - 0.625rem);
+	margin: 0 auto;
+}
+
 /* -------- Comparison Table -------- */
 
 .membership-comparison {

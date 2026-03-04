@@ -20,14 +20,20 @@ const features = [
 	{
 		title: "Coaching Insights",
 		description:
-			"Personalized feedback based on your session patterns. Coming soon. Identify bad habits before they become permanent.",
+			"Personalized feedback based on your session patterns. Available now and being continually developed.",
 		icon: "🎯",
 	},
 	{
 		title: "Custom Drill Creator",
 		description:
-			"Build your own drills from scratch with a visual grid editor. Set note patterns, hand assignments, recovery bars, and loops — then play them at any BPM.",
+			"Build your own drills from scratch with a visual grid editor. Set note patterns, finger assignments, recovery bars, and loops, then play them at any BPM.",
 		icon: "🛠️",
+	},
+	{
+		title: "Contests & Giveaways",
+		description:
+			"Get exclusive access to member-only contests and giveaways. Compete for prizes and bragging rights in time limited challenges.",
+		icon: "🏆",
 	},
 ];
 
@@ -94,6 +100,7 @@ export default function Membership() {
 					<ComparisonRow label="Long-term stat tracking" member />
 					<ComparisonRow label="Custom drill creator" member />
 					<ComparisonRow label="Coaching insights" member />
+					<ComparisonRow label="Contests & giveaways" member />
 				</div>
 			</div>
 
