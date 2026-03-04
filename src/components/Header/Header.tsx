@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AuthButton from "../AuthButton/AuthButton";
 import "./Header.css";
 
@@ -12,6 +13,18 @@ type Props = {
 	hidePremium?: boolean;
 };
 
+const CHANGELOG = [
+	{
+		version: "1.01",
+		date: "March 4, 2026",
+		items: [
+			"New `What's new` section 🤓",
+			"Player cards no longer paywalled. This was a leftover from prelaunch and should never have launched as a paid feature",
+			"Added contest card to membership page. Contest page coming soon.",
+		],
+	},
+];
+
 export default function Header({
 	onDrillSelectClick,
 	onSettingsClick,
@@ -22,6 +35,8 @@ export default function Header({
 	displayName,
 	hidePremium,
 }: Props) {
+	const [showWhatsNew, setShowWhatsNew] = useState(false);
+
 	return (
 		<div className="header-root">
 			<header className="site-header">
@@ -40,7 +55,6 @@ export default function Header({
 						<a href="/resources" className="nav-link">
 							Resources
 						</a>
-
 						<a href="/collaborators" className="nav-link">
 							Collaborators
 						</a>
@@ -50,6 +64,12 @@ export default function Header({
 						<a href="/feedback" className="nav-link">
 							Feedback
 						</a>
+						<button
+							className="nav-link nav-link-btn"
+							onClick={() => setShowWhatsNew(true)}
+						>
+							What's New
+						</button>
 					</nav>
 
 					{/* Action buttons + auth */}
@@ -80,6 +100,41 @@ export default function Header({
 
 			{/* Beta banner */}
 			<div className="header-banner">Welcome to TapLabs!</div>
+
+			{/* What's New modal */}
+			{showWhatsNew && (
+				<div
+					className="whats-new-overlay"
+					onClick={() => setShowWhatsNew(false)}
+				>
+					<div className="whats-new-modal" onClick={(e) => e.stopPropagation()}>
+						<div className="whats-new-header">
+							<h2>What's New</h2>
+							<button
+								className="whats-new-close"
+								onClick={() => setShowWhatsNew(false)}
+							>
+								✕
+							</button>
+						</div>
+						<div className="whats-new-body">
+							{CHANGELOG.map((entry) => (
+								<div key={entry.version} className="whats-new-entry">
+									<div className="whats-new-version">
+										<span className="version-tag">v{entry.version}</span>
+										<span className="version-date">{entry.date}</span>
+									</div>
+									<ul className="whats-new-list">
+										{entry.items.map((item) => (
+											<li key={item}>{item}</li>
+										))}
+									</ul>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

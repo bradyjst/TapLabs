@@ -139,3 +139,113 @@
 		font-size: 0.78rem;
 	}
 }
+/* Add these to your existing Header.css */
+
+.nav-link-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+/* -------- What's New Modal -------- */
+
+.whats-new-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.whats-new-modal {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	width: 100%;
+	max-width: 480px;
+	max-height: 80vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.whats-new-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1.25rem 1.5rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.whats-new-header h2 {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin: 0;
+}
+
+.whats-new-close {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--text-muted);
+	font-size: 1rem;
+	padding: 0.25rem;
+	line-height: 1;
+	transition: color 0.2s ease;
+}
+
+.whats-new-close:hover {
+	color: var(--text-primary);
+}
+
+.whats-new-body {
+	overflow-y: auto;
+	padding: 1.25rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.whats-new-entry {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+}
+
+.whats-new-version {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.version-tag {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--accent);
+	background: var(--accent-soft);
+	border: 1px solid var(--accent-border);
+	border-radius: 4px;
+	padding: 0.15rem 0.5rem;
+}
+
+.version-date {
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
+.whats-new-list {
+	margin: 0;
+	padding-left: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.whats-new-list li {
+	font-size: 0.875rem;
+	color: var(--text-muted);
+	line-height: 1.5;
+}

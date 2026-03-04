@@ -68,10 +68,9 @@ export function PlayerCard({
 }: PlayerCardProps) {
 	const [editing, setEditing] = useState(false);
 	const name = cosmetics.displayName || fallbackName;
-	const accent =
-		isPaid && cosmetics.accentColor ? cosmetics.accentColor : "#7c6aed";
-	const title = isPaid ? cosmetics.title : "";
-	const badge = isPaid ? cosmetics.badge : "";
+	const accent = cosmetics.accentColor || "#7c6aed";
+	const title = cosmetics.title;
+	const badge = cosmetics.badge;
 
 	return (
 		<>
@@ -182,7 +181,7 @@ function PlayerCardEditor({
 					/>
 				</div>
 
-				{/* Display name — always free */}
+				{/* Display name */}
 				<div className="pce-field">
 					<label>Display Name</label>
 					<input
@@ -194,77 +193,52 @@ function PlayerCardEditor({
 					/>
 				</div>
 
-				{/* Accent color — paid */}
-				<div className={`pce-field ${!isPaid ? "pce-locked" : ""}`}>
-					<label>
-						Accent Color
-						{!isPaid && <span className="pce-member-tag">Member</span>}
-					</label>
-					{isPaid ? (
-						<div className="pce-colors">
-							{ACCENT_COLORS.map((c) => (
-								<button
-									key={c.value}
-									className={`pce-color-swatch ${draft.accentColor === c.value ? "active" : ""}`}
-									style={{ background: c.value }}
-									onClick={() => update("accentColor", c.value)}
-									title={c.label}
-								/>
-							))}
-						</div>
-					) : (
-						<p className="pce-locked-msg">
-							Unlock card colors with a membership.
-						</p>
-					)}
+				{/* Accent color */}
+				<div className="pce-field">
+					<label>Accent Color</label>
+					<div className="pce-colors">
+						{ACCENT_COLORS.map((c) => (
+							<button
+								key={c.value}
+								className={`pce-color-swatch ${draft.accentColor === c.value ? "active" : ""}`}
+								style={{ background: c.value }}
+								onClick={() => update("accentColor", c.value)}
+								title={c.label}
+							/>
+						))}
+					</div>
 				</div>
 
-				{/* Title — paid */}
-				<div className={`pce-field ${!isPaid ? "pce-locked" : ""}`}>
-					<label>
-						Title
-						{!isPaid && <span className="pce-member-tag">Member</span>}
-					</label>
-					{isPaid ? (
-						<div className="pce-titles">
-							{TITLES.map((t) => (
-								<button
-									key={t}
-									className={`pce-title-btn ${draft.title === t ? "active" : ""}`}
-									onClick={() => update("title", t)}
-								>
-									{t || "None"}
-								</button>
-							))}
-						</div>
-					) : (
-						<p className="pce-locked-msg">
-							Unlock custom titles with a membership.
-						</p>
-					)}
+				{/* Title */}
+				<div className="pce-field">
+					<label>Title</label>
+					<div className="pce-titles">
+						{TITLES.map((t) => (
+							<button
+								key={t}
+								className={`pce-title-btn ${draft.title === t ? "active" : ""}`}
+								onClick={() => update("title", t)}
+							>
+								{t || "None"}
+							</button>
+						))}
+					</div>
 				</div>
 
-				{/* Badge — paid */}
-				<div className={`pce-field ${!isPaid ? "pce-locked" : ""}`}>
-					<label>
-						Badge
-						{!isPaid && <span className="pce-member-tag">Member</span>}
-					</label>
-					{isPaid ? (
-						<div className="pce-badges">
-							{BADGES.map((b) => (
-								<button
-									key={b}
-									className={`pce-badge-btn ${draft.badge === b ? "active" : ""}`}
-									onClick={() => update("badge", b)}
-								>
-									{b || "✕"}
-								</button>
-							))}
-						</div>
-					) : (
-						<p className="pce-locked-msg">Unlock badges with a membership.</p>
-					)}
+				{/* Badge */}
+				<div className="pce-field">
+					<label>Badge</label>
+					<div className="pce-badges">
+						{BADGES.map((b) => (
+							<button
+								key={b}
+								className={`pce-badge-btn ${draft.badge === b ? "active" : ""}`}
+								onClick={() => update("badge", b)}
+							>
+								{b || "✕"}
+							</button>
+						))}
+					</div>
 				</div>
 
 				<div className="pce-actions">
