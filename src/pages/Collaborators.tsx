@@ -5,26 +5,24 @@ type Collaborator = {
 	name: string;
 	role: string;
 	description: string;
-	/** Optional links (socials, github, osu profile, etc.) */
 	links?: { label: string; url: string }[];
-	/** Optional avatar URL — falls back to initials */
 	avatar?: string;
 };
 
-const collaborators: Collaborator[] = [
-	// Add collaborators here as they join:
-	//
-	// {
-	// 	name: "Username",
-	// 	role: "Design / Code / Testing / etc.",
-	// 	description: "What they helped with or contributed to the project.",
-	// 	links: [
-	// 		{ label: "GitHub", url: "https://github.com/..." },
-	// 		{ label: "osu!", url: "https://osu.ppy.sh/users/..." },
-	// 		{ label: "Twitter", url: "https://twitter.com/..." },
-	// 	],
-	// 	avatar: "https://...",
-	// },
+const collaborators: Collaborator[] = [];
+
+type SpecialThanks = {
+	name: string;
+	note: string;
+	url?: string;
+};
+
+const specialThanks: SpecialThanks[] = [
+	{
+		name: "hippochans",
+		note: "Early feedback and testing",
+		url: "https://www.reddit.com/user/hippochans",
+	},
 ];
 
 function getInitials(name: string): string {
@@ -36,7 +34,6 @@ function getInitials(name: string): string {
 		.slice(0, 2);
 }
 
-/** Simple hash to pick a consistent accent color per person */
 function nameToColor(name: string): string {
 	const colors = [
 		"#7c6aed",
@@ -124,6 +121,30 @@ export default function Collaborators() {
 					<p>This space is reserved. Stay tuned.</p>
 				</div>
 			)}
+
+			<div className="special-thanks">
+				<h2>Special Thanks</h2>
+				<div className="thanks-list">
+					{specialThanks.map((person) => (
+						<div key={person.name} className="thanks-item">
+							<span className="thanks-name">
+								{person.url ? (
+									<a
+										href={person.url}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{person.name}
+									</a>
+								) : (
+									person.name
+								)}
+							</span>
+							<span className="thanks-note">{person.note}</span>
+						</div>
+					))}
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -53,7 +53,6 @@ export const lightTheme: TapLabsTheme = {
   backgroundImage: "#e4e1da",
   visualizerOverlay: "rgba(240, 238, 232, 0.4)",
 };
-// ─── PREMIUM THEMES ───────────────────────────────────────────────────────────
 
 export const cyanTheme: TapLabsTheme = {
   bg: "#0f172a",
@@ -80,6 +79,8 @@ export const cyanTheme: TapLabsTheme = {
   backgroundImage: "#020617",
   visualizerOverlay: "rgba(0,0,0,0.45)",
 };
+// ─── PREMIUM THEMES ───────────────────────────────────────────────────────────
+
 
 export const violetTheme: TapLabsTheme = {
   bg: "#0f172a",
@@ -190,10 +191,10 @@ export const midnightTheme: TapLabsTheme = {
 export const FREE_THEMES = {
   dark: darkTheme,
   light: lightTheme,
+   cyan: cyanTheme,
 } as const;
 
 export const PREMIUM_THEMES = {
-  cyan: cyanTheme,
   violet: violetTheme,
   rose: roseTheme,
   gold: goldTheme,
