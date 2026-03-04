@@ -17,13 +17,7 @@ type SpecialThanks = {
 	url?: string;
 };
 
-const specialThanks: SpecialThanks[] = [
-	{
-		name: "hippochans",
-		note: "Early feedback and testing",
-		url: "https://www.reddit.com/user/hippochans",
-	},
-];
+const specialThanks: SpecialThanks[] = [];
 
 function getInitials(name: string): string {
 	return name
