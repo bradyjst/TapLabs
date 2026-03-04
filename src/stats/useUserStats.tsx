@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { supabase } from "../lib/supabase";
+import { coreDrills } from "../drills/coreDrills";
 
 export type Session = {
 	drill_id: string;
@@ -17,7 +18,7 @@ export type Session = {
 
 type DrillBreakdown = {
 	drillId: string;
-	burstType: string;
+	drillName: string;
 	bpm: number;
 	sessions: number;
 	avgAccuracy: number;
@@ -66,17 +67,26 @@ function bestGrade(a: string, b: string): string {
 	return (GRADE_RANK[a] ?? 0) >= (GRADE_RANK[b] ?? 0) ? a : b;
 }
 
-export function parseBurstType(drillId: string): {
-	burstType: string;
-	bpm: number;
-} {
-	// drill IDs are like "burst5_180"
-	const match = drillId.match(/^burst(\d+)_(\d+)$/);
-	if (!match) return { burstType: drillId, bpm: 0 };
-	return { burstType: `${match[1]} Burst`, bpm: Number(match[2]) };
+/** Build a Map<drillId, displayName> from an array of drills */
+function buildDrillNameMap(
+	drills: { id: string; name: string }[],
+): Map<string, string> {
+	const map = new Map<string, string>();
+	for (const d of drills) {
+		map.set(d.id, d.name);
+	}
+	return map;
 }
 
-export function computeStats(sessions: Session[]): UserStats {
+/** Fallback: turn "deathstream_170" into "Deathstream 170" */
+function formatDrillId(drillId: string): string {
+	return drillId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function computeStats(
+	sessions: Session[],
+	drillNames: Map<string, string>,
+): UserStats {
 	if (sessions.length === 0) {
 		return {
 			totalSessions: 0,
@@ -145,9 +155,9 @@ export function computeStats(sessions: Session[]): UserStats {
 		if (s.unstable_rate < bestUrVal) bestUrVal = s.unstable_rate;
 		topGrade = bestGrade(topGrade, s.grade);
 
-		// Drill counts
-		const { burstType } = parseBurstType(s.drill_id);
-		drillCounts.set(burstType, (drillCounts.get(burstType) ?? 0) + 1);
+		// Drill counts — use display name for readability
+		const displayName = drillNames.get(s.drill_id) ?? formatDrillId(s.drill_id);
+		drillCounts.set(displayName, (drillCounts.get(displayName) ?? 0) + 1);
 
 		// BPM ceiling tracking
 		if (!bpmAccuracies.has(s.bpm)) bpmAccuracies.set(s.bpm, []);
@@ -233,19 +243,16 @@ export function computeStats(sessions: Session[]): UserStats {
 
 	// Drill breakdowns sorted by session count
 	const drillBreakdowns: DrillBreakdown[] = [...drillMap.entries()]
-		.map(([drillId, d]) => {
-			const { burstType, bpm } = parseBurstType(drillId);
-			return {
-				drillId,
-				burstType,
-				bpm,
-				sessions: d.sessions,
-				avgAccuracy: d.sumAccuracy / d.sessions,
-				avgUr: d.sumUr / d.sessions,
-				bestUr: d.bestUr,
-				bestGrade: d.bestGrade,
-			};
-		})
+		.map(([drillId, d]) => ({
+			drillId,
+			drillName: drillNames.get(drillId) ?? formatDrillId(drillId),
+			bpm: sessions.find((s) => s.drill_id === drillId)?.bpm ?? 0,
+			sessions: d.sessions,
+			avgAccuracy: d.sumAccuracy / d.sessions,
+			avgUr: d.sumUr / d.sessions,
+			bestUr: d.bestUr,
+			bestGrade: d.bestGrade,
+		}))
 		.sort((a, b) => b.sessions - a.sessions);
 
 	const sorted = sessions.sort(
@@ -283,6 +290,8 @@ export function useUserStats() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const drillNames = buildDrillNameMap(coreDrills);
+
 	useEffect(() => {
 		if (!user) return;
 
@@ -311,7 +320,7 @@ export function useUserStats() {
 
 			const rows = data ?? [];
 			setSessions(rows);
-			setStats(computeStats(rows));
+			setStats(computeStats(rows, drillNames));
 			setLoading(false);
 		}
 
@@ -320,7 +329,7 @@ export function useUserStats() {
 		return () => {
 			cancelled = true;
 		};
-	}, [user]);
+	}, [drillNames, user]);
 
 	if (!user) {
 		return { stats: null, sessions: [], loading: false, error: null };

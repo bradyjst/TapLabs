@@ -13,11 +13,76 @@ import {
 } from "recharts";
 import { useAuth } from "../context/useAuth";
 import { useProfile } from "../components/Profile/useProfile";
-import { useUserStats } from "../stats/useUserStats";
-import { computeStats, parseBurstType } from "../stats/useUserStats";
+import { useUserStats, computeStats } from "../stats/useUserStats";
 import type { UserStats } from "../stats/useUserStats";
+import { coreDrills } from "../drills/coreDrills";
 import ProfileCoach from "../coach/ProfileCoach";
 import "./Profile.css";
+
+/* ======================== */
+/* Drill name helpers       */
+/* ======================== */
+
+const drillNameMap = new Map<string, string>();
+for (const d of coreDrills) {
+	drillNameMap.set(d.id, d.name);
+}
+
+function getDrillName(drillId: string): string {
+	return (
+		drillNameMap.get(drillId) ??
+		drillId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+	);
+}
+
+/** Extract a general type label + bpm from a drill_id like "burst5_180" */
+function parseDrillMeta(drillId: string): { label: string; bpm: number } {
+	const match = drillId.match(/^(.+?)_(\d+)$/);
+	if (!match) return { label: getDrillName(drillId), bpm: 0 };
+	const baseId = match[1];
+	const bpm = Number(match[2]);
+	// Find any drill with this base to get its template label
+	const sample = coreDrills.find((d) => d.id.startsWith(baseId + "_"));
+	const label = sample
+		? sample.name.replace(/^\d+\s*BPM\s*/, "")
+		: baseId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+	return { label, bpm };
+}
+
+/* ======================== */
+/* Info Popout              */
+/* ======================== */
+
+function InfoPopout({
+	label,
+	children,
+}: {
+	label?: string;
+	children: React.ReactNode;
+}) {
+	const [open, setOpen] = useState(false);
+
+	return (
+		<span className="info-popout-anchor">
+			<button
+				className="info-popout-btn"
+				onClick={() => setOpen((v) => !v)}
+				aria-label={`Info about ${label ?? "this stat"}`}
+			>
+				?
+			</button>
+			{open && (
+				<>
+					<div
+						className="info-popout-backdrop"
+						onClick={() => setOpen(false)}
+					/>
+					<div className="info-popout-bubble">{children}</div>
+				</>
+			)}
+		</span>
+	);
+}
 
 /* ======================== */
 /* Paywall Prompt           */
@@ -59,22 +124,18 @@ export default function Profile() {
 
 	// Derive available filter options from sessions
 	const filterOptions = useMemo(() => {
-		const bursts = new Set<string>();
+		const labels = new Set<string>();
 		const bpms = new Set<number>();
 
 		for (const s of sessions) {
-			const { burstType, bpm } = parseBurstType(s.drill_id);
-			bursts.add(burstType);
+			const { label, bpm } = parseDrillMeta(s.drill_id);
+			labels.add(label);
 			bpms.add(bpm);
 		}
 
 		return {
-			bursts: [...bursts].sort((a, b) => {
-				const numA = parseInt(a);
-				const numB = parseInt(b);
-				return numA - numB;
-			}),
-			bpms: [...bpms].sort((a, b) => a - b),
+			labels: [...labels].sort(),
+			bpms: [...bpms].filter((b) => b > 0).sort((a, b) => a - b),
 		};
 	}, [sessions]);
 
@@ -84,13 +145,13 @@ export default function Profile() {
 		if (sessions.length === 0) return stats;
 
 		const filtered = sessions.filter((s) => {
-			const { burstType, bpm } = parseBurstType(s.drill_id);
-			if (burstFilter !== "all" && burstType !== burstFilter) return false;
+			const { label, bpm } = parseDrillMeta(s.drill_id);
+			if (burstFilter !== "all" && label !== burstFilter) return false;
 			if (bpmFilter !== "all" && bpm !== Number(bpmFilter)) return false;
 			return true;
 		});
 
-		return computeStats(filtered);
+		return computeStats(filtered, drillNameMap);
 	}, [sessions, stats, burstFilter, bpmFilter]);
 
 	const hasActiveFilter = burstFilter !== "all" || bpmFilter !== "all";
@@ -168,13 +229,13 @@ export default function Profile() {
 
 								<div className="filter-controls">
 									<div className="filter-group">
-										<label>Burst Type</label>
+										<label>Drill Type</label>
 										<select
 											value={burstFilter}
 											onChange={(e) => setBurstFilter(e.target.value)}
 										>
-											<option value="all">All Bursts</option>
-											{filterOptions.bursts.map((b) => (
+											<option value="all">All Drills</option>
+											{filterOptions.labels.map((b) => (
 												<option key={b} value={b}>
 													{b}
 												</option>
@@ -399,6 +460,20 @@ function StatsOverview({ stats }: { stats: UserStats }) {
 					label="BPM Ceiling"
 					value={stats.bpmCeiling ? `${stats.bpmCeiling}` : "—"}
 					accent
+					info={
+						<>
+							<strong>BPM Ceiling</strong>
+							<p>
+								The highest BPM where your average accuracy across all sessions
+								at that BPM is at least 95%. This represents the fastest tempo
+								you can consistently play well at.
+							</p>
+							<p>
+								Play more sessions at higher BPMs with 95%+ accuracy to raise
+								your ceiling.
+							</p>
+						</>
+					}
 				/>
 				<OverviewCard
 					label="Avg Accuracy"
@@ -427,17 +502,22 @@ function OverviewCard({
 	label,
 	value,
 	accent,
+	info,
 }: {
 	label: string;
 	value: string;
 	accent?: boolean;
+	info?: React.ReactNode;
 }) {
 	return (
 		<div className="overview-card">
 			<span className={`overview-card-value ${accent ? "accent" : ""}`}>
 				{value}
 			</span>
-			<span className="overview-card-label">{label}</span>
+			<span className="overview-card-label">
+				{label}
+				{info && <InfoPopout label={label}>{info}</InfoPopout>}
+			</span>
 		</div>
 	);
 }
@@ -659,7 +739,7 @@ function DrillBreakdowns({ stats }: { stats: UserStats }) {
 					<tbody>
 						{drills.map((d) => (
 							<tr key={d.drillId}>
-								<td className="drill-name">{d.burstType}</td>
+								<td className="drill-name">{d.drillName}</td>
 								<td>{d.bpm}</td>
 								<td>{d.sessions}</td>
 								<td>{(d.avgAccuracy * 100).toFixed(1)}%</td>
