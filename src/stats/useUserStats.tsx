@@ -83,9 +83,12 @@ function formatDrillId(drillId: string): string {
 	return drillId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// Built once at module level — coreDrills is static
+const drillNames = buildDrillNameMap(coreDrills);
+
 export function computeStats(
 	sessions: Session[],
-	drillNames: Map<string, string>,
+	names: Map<string, string> = drillNames,
 ): UserStats {
 	if (sessions.length === 0) {
 		return {
@@ -156,7 +159,7 @@ export function computeStats(
 		topGrade = bestGrade(topGrade, s.grade);
 
 		// Drill counts — use display name for readability
-		const displayName = drillNames.get(s.drill_id) ?? formatDrillId(s.drill_id);
+		const displayName = names.get(s.drill_id) ?? formatDrillId(s.drill_id);
 		drillCounts.set(displayName, (drillCounts.get(displayName) ?? 0) + 1);
 
 		// BPM ceiling tracking
@@ -245,7 +248,7 @@ export function computeStats(
 	const drillBreakdowns: DrillBreakdown[] = [...drillMap.entries()]
 		.map(([drillId, d]) => ({
 			drillId,
-			drillName: drillNames.get(drillId) ?? formatDrillId(drillId),
+			drillName: names.get(drillId) ?? formatDrillId(drillId),
 			bpm: sessions.find((s) => s.drill_id === drillId)?.bpm ?? 0,
 			sessions: d.sessions,
 			avgAccuracy: d.sumAccuracy / d.sessions,
@@ -290,8 +293,6 @@ export function useUserStats() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const drillNames = buildDrillNameMap(coreDrills);
-
 	useEffect(() => {
 		if (!user) return;
 
@@ -329,7 +330,7 @@ export function useUserStats() {
 		return () => {
 			cancelled = true;
 		};
-	}, [drillNames, user]);
+	}, [user]);
 
 	if (!user) {
 		return { stats: null, sessions: [], loading: false, error: null };
