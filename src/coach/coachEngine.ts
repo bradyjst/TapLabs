@@ -14,7 +14,7 @@ export type CoachTip = {
 
 export type DrillBreakdown = {
 	drillId: string;
-	burstType: string;
+	drillName: string;
 	bpm: number;
 	sessions: number;
 	avgAccuracy: number;
@@ -213,8 +213,8 @@ export function analyzeProfile(input: ProfileCoachInput): CoachTip[] {
 	}
 
 	// Variety check
-	const burstTypes = new Set(drillBreakdowns.map((d) => d.burstType));
-	if (burstTypes.size <= 2 && drillBreakdowns.length >= 5) {
+	const drillTypes = new Set(drillBreakdowns.map((d) => d.drillName));
+	if (drillTypes.size <= 2 && drillBreakdowns.length >= 5) {
 		tips.push({
 			id: "low-variety",
 			severity: "action",
@@ -239,12 +239,12 @@ export function analyzeProfile(input: ProfileCoachInput): CoachTip[] {
 	// Weak drill types
 	const byType = new Map<string, { totalAcc: number; count: number }>();
 	for (const d of drillBreakdowns) {
-		const existing = byType.get(d.burstType);
+		const existing = byType.get(d.drillName);
 		if (existing) {
 			existing.totalAcc += d.avgAccuracy;
 			existing.count++;
 		} else {
-			byType.set(d.burstType, { totalAcc: d.avgAccuracy, count: 1 });
+			byType.set(d.drillName, { totalAcc: d.avgAccuracy, count: 1 });
 		}
 	}
 
@@ -257,7 +257,7 @@ export function analyzeProfile(input: ProfileCoachInput): CoachTip[] {
 		if (!strongest || avg > strongest.acc) strongest = { type, acc: avg };
 	}
 
-	if (weakest && strongest && burstTypes.size >= 3) {
+	if (weakest && strongest && drillTypes.size >= 3) {
 		const gap = strongest.acc - weakest.acc;
 		if (gap > 0.05) {
 			tips.push({
@@ -281,11 +281,13 @@ export function analyzeProfile(input: ProfileCoachInput): CoachTip[] {
 
 	// Short burst comfort zone
 	const shortBursts = drillBreakdowns.filter((d) => {
-		const num = parseInt(d.burstType);
+		const match = d.drillName.match(/^(\d+)/);
+		const num = match ? parseInt(match[1]) : NaN;
 		return !isNaN(num) && num <= 5;
 	});
 	const longBursts = drillBreakdowns.filter((d) => {
-		const num = parseInt(d.burstType);
+		const match = d.drillName.match(/^(\d+)/);
+		const num = match ? parseInt(match[1]) : NaN;
 		return !isNaN(num) && num >= 12;
 	});
 
