@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { signOut } from "../../lib/auth";
 import { useAuth } from "../../context/useAuth";
-import { supabase } from "../../lib/supabase";
-import { useProfile } from "../../context/useProfile";
 import { useUserStats } from "../../stats/useUserStats";
 import "./ProfileModal.css";
 
@@ -13,7 +11,7 @@ interface Props {
 
 export default function ProfileModal({ onClose }: Props) {
 	const { user } = useAuth();
-	const { isPaid, loading } = useProfile();
+
 	const { stats } = useUserStats();
 
 	useEffect(() => {
@@ -24,17 +22,6 @@ export default function ProfileModal({ onClose }: Props) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
-
-	async function openCustomerPortal() {
-		const { data, error } = await supabase.functions.invoke("customer-portal");
-
-		if (error) {
-			console.error("Portal error:", error);
-			return;
-		}
-
-		window.location.href = data.url;
-	}
 
 	if (!user) return null;
 
@@ -85,13 +72,7 @@ export default function ProfileModal({ onClose }: Props) {
 					</Link>
 				</div>
 
-				<div className="profile-section">
-					{!loading && isPaid && (
-						<button onClick={openCustomerPortal} className="manage-btn">
-							Manage Subscription
-						</button>
-					)}
-				</div>
+				<div className="profile-section"></div>
 
 				<div className="profile-section">
 					<button className="logout-btn" onClick={signOut}>
