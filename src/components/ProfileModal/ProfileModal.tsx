@@ -25,25 +25,6 @@ export default function ProfileModal({ onClose }: Props) {
 		return () => window.removeEventListener("keydown", handler);
 	}, [onClose]);
 
-	async function startCheckout() {
-		try {
-			const { data, error } = await supabase.functions.invoke("checkout");
-
-			if (error) {
-				console.error("Checkout error:", error);
-				return;
-			}
-
-			if (data?.url) {
-				window.location.href = data.url;
-			} else {
-				console.error("No checkout URL returned:", data);
-			}
-		} catch (err) {
-			console.error("Unexpected checkout failure:", err);
-		}
-	}
-
 	async function openCustomerPortal() {
 		const { data, error } = await supabase.functions.invoke("customer-portal");
 
@@ -105,32 +86,6 @@ export default function ProfileModal({ onClose }: Props) {
 				</div>
 
 				<div className="profile-section">
-					<h3>Membership</h3>
-
-					<div className="profile-row">
-						<span className="label">Status</span>
-
-						<span className={`value ${isPaid ? "member" : "free"}`}>
-							{loading ? "Loading..." : isPaid ? "Member" : "Free User"}
-						</span>
-					</div>
-
-					{!loading && !isPaid && (
-						<>
-							<button onClick={startCheckout} className="upgrade-btn">
-								Become a Member
-							</button>
-
-							<Link
-								to="/membership"
-								className="membership-info-link"
-								onClick={onClose}
-							>
-								Learn what's included →
-							</Link>
-						</>
-					)}
-
 					{!loading && isPaid && (
 						<button onClick={openCustomerPortal} className="manage-btn">
 							Manage Subscription

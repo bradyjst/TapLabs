@@ -24,6 +24,16 @@ const CHANGELOG = [
 			"Added contest card to membership page. Contest page coming soon.",
 		],
 	},
+	{
+		version: "1.02",
+		date: "April 9, 2026",
+		items: [
+			"I've ended development of taplabs much sooner than expected.",
+			"Everyone is now considered a paid user, and anyone who paid",
+			"previously has been refunded. Thanks for the support",
+			"I hope this helps you achieve your tapping dreams! 😎 ",
+		],
+	},
 ];
 
 export default function Header({
