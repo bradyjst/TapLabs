@@ -72,8 +72,6 @@ export default function ProfileModal({ onClose }: Props) {
 					</Link>
 				</div>
 
-				<div className="profile-section"></div>
-
 				<div className="profile-section">
 					<button className="logout-btn" onClick={signOut}>
 						Logout
